@@ -255,14 +255,16 @@ impl Solver {
     }
 
     fn step_branches (&mut self, depth : usize) {
+        /*
         let mut branches : HashSet<RTGFacility> = HashSet::new();
         for branch in &self.branches {
             if ! self.seen.contains_key(branch) {
                 branches.insert(branch.clone());
             }
         }
-        self.branches = HashSet::new();
-        println!("At depth {}, {} branches to consider", depth, branches.len());
+         */
+        let mut branches = HashSet::new();
+        println!("At depth {}, {} branches to consider", depth, self.branches.len());
         let (restx, resrx) = mpsc::channel();
         let mut threads = Vec::new();
         let mut worktxs = Vec::new();
@@ -276,47 +278,58 @@ impl Solver {
                     let msg = workrx.recv().unwrap();
                     match msg {
                         None => break,
-                        Some(facility) => facility.push_branches_to(&restx)
+                        Some(facility) => {
+                                facility.push_branches_to(&restx)
+                        }
                     }
                 }
-                println!("Thread finished!");
+//                println!("Thread finished!");
                 restx.send(None).unwrap();
             }));
         }
-        println!("Insert work...");
+//        println!("Insert work...");
         let mut finished = 0;
         let mut worker = 0;
-        for branch in &branches {
+        for branch in self.branches.drain() {
             self.seen.insert(branch.clone(), depth);
-            worktxs[worker].send(Some(branch.clone())).unwrap();
+            worktxs[worker].send(Some(branch)).unwrap();
             worker += 1;
             if worker == WORKER_COUNT { worker = 0; }
             let rc = resrx.try_recv();
             match rc {
                 Err(_) => {},
                 Ok(None) => { finished += 1 },
-                Ok(Some(fac)) => { self.branches.insert(fac); }
+                Ok(Some(fac)) => {
+                    if ! self.seen.contains_key(&fac) {
+                        branches.insert(fac);
+                    }
+                }
             }
         }
-        println!("Insert ends...");
+//        println!("Insert ends...");
         for i in 0..WORKER_COUNT {
             worktxs[i].send(None).unwrap();
         }
-        println!("Work sent, gather results...");
+//        println!("Work sent, gather results...");
         while finished != WORKER_COUNT {
             let branch = resrx.recv().unwrap();
             match branch {
                 None => {
                     finished += 1;
-                    println!("We have {} results, {} threads done", self.branches.len(), finished);
+//                    println!("We have {} results, {} threads done", self.branches.len(), finished);
                 },
-                Some(fac) => { self.branches.insert(fac); }
+                Some(fac) => {
+                    if ! self.seen.contains_key(&fac) {
+                        branches.insert(fac);
+                    }
+                }
             }
         }
-        println!("Join threads...");
+//        println!("Join threads...");
         for worker in threads {
             worker.join().unwrap();
         }
+        self.branches = branches;
     }
 
     fn finished (&self) -> bool {
