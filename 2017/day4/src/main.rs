@@ -12,10 +12,6 @@ struct Passphrase {
 }
 
 impl Passphrase {
-    fn new () -> Passphrase {
-        Passphrase { words: Vec::new() }
-    }
-
     fn from_line (line: String) -> Passphrase {
         Passphrase {
             words: line.split_whitespace().map(|s|s.to_owned()).collect()

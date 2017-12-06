@@ -65,7 +65,6 @@ fn problem2 (minv: i32) -> i32 {
         }
     }
     unreachable!();
-    0
 }
 
 fn main() {
