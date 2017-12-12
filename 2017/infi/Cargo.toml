@@ -1,0 +1,8 @@
+[package]
+name = "infi"
+version = "0.1.0"
+authors = ["Daniel Silverstone <dsilvers@digital-scurf.org>"]
+
+[dependencies]
+regex = "0.2"
+lazy_static = "0.2.2"
