@@ -1,0 +1,8 @@
+[package]
+name = "day20"
+version = "0.1.0"
+authors = ["Daniel Silverstone <daniel.silverstone@codethink.co.uk>"]
+
+[dependencies]
+regex = "0.2"
+lazy_static = "~1"
