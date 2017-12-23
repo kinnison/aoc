@@ -1,0 +1,66 @@
+set b 57       	       	    ; b = 57
+set c b			    ; c = b
+jnz a 2			    ; if a, goto 5 (target 1)
+jnz 1 5			    ; goto 9 (target 7)
+mul b 100	  target1   ; b *= 100
+sub b -100000		    ; b += 100_000
+set c b			    ; c = b
+sub c -17000		    ; c += 17000
+set f 1		  target7   ; f = 1
+set d 2			    ; d = 2
+set e 2		  target4   ; e = 2
+set g d		  target3   ; g = d
+mul g e			    ; g *= e
+sub g b			    ; g -= b
+jnz g 2			    ; if g goto 17 (target 2)
+set f 0			    ; f = 0
+sub e -1	  target2   ; e += 1
+set g e			    ; g = e
+sub g b			    ; g -= b
+jnz g -8		    ; if g goto 12 (target 3)
+sub d -1		    ; d += 1
+set g d			    ; g = d
+sub g b			    ; g -= b
+jnz g -13		    ; if g goto 11 (target 4)
+jnz f 2                     ; if f goto 27 (target 5)
+sub h -1	       	    ; h += 1
+set g b		  target5   ; g = b
+sub g c			    ; g -= c
+jnz g 2			    ; if g goto 31 (target 6)
+jnz 1 3		       	    ; HALT (goto 33)
+sub b -17	  target6   ; b += 17
+jnz 1 -23		    ; goto 9 (target 7)
+
+Thinking through non-debug mode...
+
+Given the above annotations, if a is non-zero our control input (b) is
+multiplied by 100 and then has 100_000 added making it 105_700 instead of 57
+and our control input (c) is, instead of 57, 105_700 + 17_000 == 122_700
+
+When c = b = 57, we got 3025 multiplications out
+
+Through the main loop, (c) never changes, and b is altered by 17 per loop
+where h is altered by only 1.  The control test for whether or not to
+run around the main loop over and over appears to be:
+
+if (b - c) != 0, loop
+
+Since we know c is 17,000 larger than b at the start, it's reasonable to assume
+that whatever the number of multiplications, h will reach a maximum of (17_000
+/ 17) = 1000
+
+Whether h increments or not is based on the value of f which is
+initialised to one initially and is zeroed at instruction 16 dependent on
+what's happening in the loop.  (if f == 0 then h += 1)
+
+The main code then seems to be two loops which appear to be multiplying two
+values together and comparing them to the (b) value.  If they're equal then
+that's what sets f to zero which will increment h.
+
+Effectively we seem to be saying "is (b) the multiple of two numbers?" or
+in other words, a primality test.  If (b) isn't prime, h is incremented.
+
+So, we have a loop, from b to c, stepping 17 each time, checking for primality
+and counting the non-primes we encounter...  So let's implement problem 2
+our input for that is 57 which we can extract from the first instruction
+
