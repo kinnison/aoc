@@ -7,6 +7,8 @@ pub use std::collections::HashMap;
 
 pub use permutohedron::Heap;
 
+pub use serde_json::Value;
+
 pub fn read_input(day: usize) -> Result<String> {
     read_to_string(format!("inputs/day{}", day))
 }
