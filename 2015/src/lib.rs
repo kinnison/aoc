@@ -4,6 +4,7 @@ pub use std::io::Result;
 pub use lazy_static::lazy_static;
 pub use regex::Regex;
 pub use std::collections::HashMap;
+pub use std::collections::HashSet;
 
 pub use permutohedron::Heap;
 
