@@ -6,6 +6,7 @@ pub use regex::Regex;
 pub use std::collections::HashMap;
 pub use std::collections::HashSet;
 
+pub use permutohedron::heap_recursive;
 pub use permutohedron::Heap;
 
 pub use serde_json::Value;
