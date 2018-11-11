@@ -260,7 +260,7 @@ fn play_game(base: &GameState) -> Vec<Option<i32>> {
     base.print();
     let mut results = HashSet::new();
     let mut turns = full_turn(&base);
-    let mut goes = 0;
+    //let mut goes = 0;
     while turns.len() > 0 {
         //println!("************************************************************************");
         //println!("Gathered {} turns", turns.len());
@@ -275,7 +275,7 @@ fn play_game(base: &GameState) -> Vec<Option<i32>> {
                 }
             }
         }
-        goes += 1;
+        //goes += 1;
         //println!(
         //    "At the end of {} goes we have {} things to think about and {} results",
         //    goes,

@@ -71,15 +71,6 @@ impl Password {
     }
 }
 
-fn test() {
-    let mut testdata = Password::from_str("abcdefgh");
-    testdata.increment_to_valid();
-    println!("next after abcdefgh is {}", testdata.as_string());
-    let mut testdata = Password::from_str("ghijklmn");
-    testdata.increment_to_valid();
-    println!("next after ghijklmn is {}", testdata.as_string());
-}
-
 fn part1(input: &Password) -> String {
     let mut v = input.clone();
     v.increment_to_valid();

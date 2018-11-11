@@ -1,7 +1,7 @@
 use aoc2015::*;
 
 struct Reindeer {
-    name: String,
+    _name: String,
     speed: usize,
     runtime: usize,
     resttime: usize,
@@ -18,7 +18,7 @@ impl Reindeer {
             let runtime = cap.get(3).unwrap().as_str().parse().unwrap();
             let resttime = cap.get(4).unwrap().as_str().parse().unwrap();
             Reindeer {
-                name,
+                _name: name,
                 speed,
                 runtime,
                 resttime,

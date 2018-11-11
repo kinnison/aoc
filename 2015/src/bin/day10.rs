@@ -38,13 +38,6 @@ impl LookAndSay {
     fn len(&self) -> usize {
         self.value.len()
     }
-
-    fn as_string(&self) -> String {
-        self.value
-            .iter()
-            .map(|ch| (ch + '0' as u8) as char)
-            .collect()
-    }
 }
 
 fn part1(input: &LookAndSay) -> usize {
