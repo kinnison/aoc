@@ -1,5 +1,6 @@
 use std::fs::read_to_string;
-pub use std::io::Result;
+
+pub type Result<T> = std::result::Result<T, Box<std::error::Error>>;
 
 pub use lazy_static::lazy_static;
 pub use regex::Regex;
@@ -11,5 +12,5 @@ pub use permutohedron::Heap;
 pub use serde_json::Value;
 
 pub fn read_input(day: usize) -> Result<String> {
-    read_to_string(format!("inputs/day{}", day))
+    Ok(read_to_string(format!("inputs/day{}", day))?)
 }

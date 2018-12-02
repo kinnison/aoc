@@ -18,7 +18,10 @@ fn part1(input: &Vec<&str>) -> usize {
 
 fn single_common(left: &str, right: &str) -> Option<usize> {
     let pairs = left.chars().zip(right.chars()).enumerate();
-    let diffs: Vec<usize> = pairs.filter(|(n, (l, r))| l != r).map(|(n, _)| n).collect();
+    let diffs: Vec<usize> = pairs
+        .filter(|(_n, (l, r))| l != r)
+        .map(|(n, _)| n)
+        .collect();
     if diffs.len() != 1 {
         None
     } else {
@@ -26,19 +29,19 @@ fn single_common(left: &str, right: &str) -> Option<usize> {
     }
 }
 
-fn part2(input: &Vec<&str>) -> String {
+fn part2(input: &Vec<&str>) -> Result<String> {
     for l in 0..input.len() - 1 {
         for r in l + 1..input.len() {
             if let Some(ofs) = single_common(input[l], input[r]) {
-                return input[l]
+                return Ok(input[l]
                     .chars()
                     .take(ofs)
                     .chain(input[l].chars().skip(ofs + 1))
-                    .collect();
+                    .collect());
             }
         }
     }
-    unreachable!()
+    Err("Unable to find two which have a matching single character")?
 }
 
 fn main() -> Result<()> {
@@ -52,7 +55,7 @@ fn main() -> Result<()> {
     let input: Vec<&str> = input.lines().collect();
     println!("Test 1: {}", part1(&test_input1));
     println!("Part 1: {}", part1(&input));
-    println!("Test 2: {}", part2(&test_input2));
-    println!("Part 2: {}", part2(&input));
+    println!("Test 2: {}", part2(&test_input2)?);
+    println!("Part 2: {}", part2(&input)?);
     Ok(())
 }
