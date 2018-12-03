@@ -12,7 +12,8 @@ impl Claim {
     fn try_from<S: AsRef<str>>(input: S) -> Result<Claim> {
         lazy_static! {
             static ref PARSE: Regex =
-                Regex::new("^#([^ ]+) @ ([0-9]+),([0-9]+): ([0-9]+)x([0-9]+)$").unwrap();
+                Regex::new("^#([^ ]+) @ ([0-9]+),([0-9]+): ([0-9]+)x([0-9]+)$")
+                    .expect("Compile error in Regular Expression");
         }
         if let Some(cap) = PARSE.captures(input.as_ref()) {
             let id = cap.get(1).ok_or("No id?")?.as_str().parse()?;

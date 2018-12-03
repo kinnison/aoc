@@ -20,7 +20,8 @@ fn part1(input: &Vec<i32>) -> i32 {
 
 fn main() -> Result<()> {
     let input = read_input(1)?;
-    let input: Vec<i32> = input.lines().map(|s| s.parse().unwrap()).collect();
+    let input: Result<Vec<i32>> = input.lines().map(|s| s.parse()).collect();
+    let input = input?;
     println!("Part 1: {}", part1(&input));
     println!("Part 2: {}", part2(&input)?);
     Ok(())
