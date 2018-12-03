@@ -5,14 +5,14 @@ fn check_n(input: &str, n: usize) -> bool {
     input
         .chars()
         .for_each(|c| counts[(c as usize) - ('a' as usize)] += 1);
-    counts.iter().filter(|&cn| *cn == n).next().is_some()
+    counts.iter().any(|&cn| cn == n)
 }
 
-fn count_with_n(input: &Vec<&str>, n: usize) -> usize {
+fn count_with_n(input: &[&str], n: usize) -> usize {
     input.iter().filter(|&s| check_n(s, n)).count()
 }
 
-fn part1(input: &Vec<&str>) -> usize {
+fn part1(input: &[&str]) -> usize {
     count_with_n(input, 2) * count_with_n(input, 3)
 }
 
@@ -29,7 +29,7 @@ fn single_common(left: &str, right: &str) -> Option<usize> {
     }
 }
 
-fn part2(input: &Vec<&str>) -> Result<String> {
+fn part2(input: &[&str]) -> Result<String> {
     for l in 0..input.len() - 1 {
         for r in l + 1..input.len() {
             if let Some(ofs) = single_common(input[l], input[r]) {

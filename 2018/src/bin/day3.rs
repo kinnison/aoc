@@ -40,7 +40,7 @@ impl Claim {
     }
 }
 
-fn part1(input: &Vec<Claim>) -> usize {
+fn part1(input: &[Claim]) -> usize {
     let mut seen = HashMap::new();
     for claim in input {
         for coord in claim.all_coords() {
@@ -51,7 +51,7 @@ fn part1(input: &Vec<Claim>) -> usize {
     seen.values().filter(|&v| *v > 1).count()
 }
 
-fn part2(input: &Vec<Claim>) -> Result<usize> {
+fn part2(input: &[Claim]) -> Result<usize> {
     let mut seen = HashMap::new();
     // Fill the map again
     for claim in input {
