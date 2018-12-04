@@ -13,6 +13,9 @@ pub use serde_json::Value;
 
 pub use chrono::prelude::*;
 
+pub use parsebyregex::ParseByRegex;
+pub use parsebyregex_derive::ParseByRegex;
+
 pub fn read_input(day: usize) -> Result<String> {
     Ok(read_to_string(format!("inputs/day{}", day))?)
 }

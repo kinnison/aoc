@@ -14,3 +14,5 @@ lazy_static="1.2"
 permutohedron="0.2.4"
 serde_json="1"
 chrono="0.4"
+parsebyregex = { git="git://git.gitano.org.uk/parsebyregex.git" }
+parsebyregex-derive = { git="git://git.gitano.org.uk/parsebyregex.git" }
