@@ -15,10 +15,11 @@ use self::Action::*;
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
 struct MyDateTime(DateTime<Utc>);
 
-impl ParseByRegex for MyDateTime {
-    fn parse_by_regex<T: AsRef<str>>(input: T) -> Result<MyDateTime> {
+impl std::str::FromStr for MyDateTime {
+    type Err = chrono::format::ParseError;
+    fn from_str(input: &str) -> std::result::Result<MyDateTime, Self::Err> {
         static DATEFMT: &str = "%Y-%m-%d %H:%M";
-        Ok(MyDateTime(Utc.datetime_from_str(input.as_ref(), DATEFMT)?))
+        Ok(MyDateTime(Utc.datetime_from_str(input, DATEFMT)?))
     }
 }
 
