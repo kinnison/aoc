@@ -19,3 +19,18 @@ pub use parsebyregex_derive::ParseByRegex;
 pub fn read_input(day: usize) -> Result<String> {
     Ok(read_to_string(format!("inputs/day{}", day))?)
 }
+
+pub fn read_input_as_vec<T: ParseByRegex>(day: usize) -> Result<Vec<T>> {
+    let plain = read_input(day)?;
+    Ok(input_as_vec(plain)?)
+}
+
+pub fn input_as_vec<T: ParseByRegex, S: AsRef<str>>(plain: S) -> Result<Vec<T>> {
+    let mapped: Result<Vec<T>> = plain
+        .as_ref()
+        .trim()
+        .lines()
+        .map(ParseByRegex::parse_by_regex)
+        .collect();
+    Ok(mapped?)
+}
