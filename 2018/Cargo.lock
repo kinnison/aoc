@@ -81,7 +81,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "parsebyregex"
 version = "0.1.0"
-source = "git+git://git.gitano.org.uk/parsebyregex.git#a8ee97ab7ec2f8a2bc9f46a58bc452b9fcd601f4"
+source = "git+git://git.gitano.org.uk/parsebyregex.git#8fdb14af2e8c6951251d7104245fbf5951db110e"
 dependencies = [
  "lazy_static 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -90,7 +90,7 @@ dependencies = [
 [[package]]
 name = "parsebyregex-derive"
 version = "0.1.0"
-source = "git+git://git.gitano.org.uk/parsebyregex.git#a8ee97ab7ec2f8a2bc9f46a58bc452b9fcd601f4"
+source = "git+git://git.gitano.org.uk/parsebyregex.git#8fdb14af2e8c6951251d7104245fbf5951db110e"
 dependencies = [
  "proc-macro2 0.4.24 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.6.10 (registry+https://github.com/rust-lang/crates.io-index)",
