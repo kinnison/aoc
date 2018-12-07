@@ -96,6 +96,8 @@ fn part2(input: &[Dependency], worker_count: usize, overhead: usize) -> Result<(
         // spare to do it, also tick time...
         if step_todo.is_none() || working == worker_count {
             loop {
+                let mut cont = false;
+                time_passed += 1;
                 for worker in workers.iter_mut() {
                     if worker.1 > 0 {
                         worker.1 -= 1;
@@ -104,10 +106,13 @@ fn part2(input: &[Dependency], worker_count: usize, overhead: usize) -> Result<(
                             ret.push(worker.0);
                             steps_done.insert(worker.0);
                             working -= 1;
-                            time_passed += 1;
-                            continue 'stepping;
+                            cont = true;
+                            //println!("Completed work {} at time {}", worker.0, time_passed);
                         }
                     }
+                }
+                if cont {
+                    continue 'stepping;
                 }
             }
         }
@@ -116,14 +121,21 @@ fn part2(input: &[Dependency], worker_count: usize, overhead: usize) -> Result<(
         steps_todo.remove(step_index);
         for worker in workers.iter_mut() {
             if worker.1 == 0 {
-                worker.0 = step_todo.ok_or("WTF?")?;
+                worker.0 = step_todo.take().ok_or("WTF?")?;
                 worker.1 = overhead + (((worker.0 as u8) - (b'A' as u8)) as usize) + 1;
+                working += 1;
+                //println!("Queued work {} at time {} to run for {} seconds", worker.0, time_passed, worker.1);
+                break;
             }
+        }
+        if step_todo.is_some() {
+            Err("Odd, didn't dispatch work?")?
         }
     }
 
     // We have reached the end, so tick the workers down
     while working > 0 {
+        time_passed += 1;
         for worker in workers.iter_mut() {
             if worker.1 > 0 {
                 worker.1 -= 1;
@@ -145,5 +157,6 @@ fn main() -> Result<()> {
     println!("Test 1: {}", part1(&test_input)?);
     println!("Part 1: {}", part1(&input)?);
     println!("Test 2: {:?}", part2(&test_input, 2, 0)?);
+    println!("Part 2: {:?}", part2(&input, 5, 60)?);
     Ok(())
 }
