@@ -73,10 +73,11 @@ impl Grid {
                 to_erase.insert(n);
             }
         }
-        for i in 0..(self.width * self.height) {
-            if let Some(n) = painted[i] {
+
+        for entry in painted.iter_mut() {
+            if let Some(n) = entry {
                 if to_erase.contains(&n) {
-                    painted[i] = None;
+                    *entry = None;
                 }
             }
         }
