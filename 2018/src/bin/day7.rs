@@ -25,7 +25,7 @@ fn part1(input: &[Dependency]) -> Result<String> {
         steps_left.insert(dep.before);
         steps_left.insert(dep.after);
     }
-    let mut steps_todo: Vec<char> = steps_left.iter().map(|&c| c).collect();
+    let mut steps_todo: Vec<char> = steps_left.iter().cloned().collect();
     steps_todo.sort();
 
     while !steps_todo.is_empty() {
@@ -65,7 +65,7 @@ fn part2(input: &[Dependency], worker_count: usize, overhead: usize) -> Result<(
         steps_left.insert(dep.before);
         steps_left.insert(dep.after);
     }
-    let mut steps_todo: Vec<char> = steps_left.iter().map(|&c| c).collect();
+    let mut steps_todo: Vec<char> = steps_left.iter().cloned().collect();
     steps_todo.sort();
     let mut workers: Vec<(char, usize)> = Vec::new();
     workers.resize(worker_count, ('A', 0));
@@ -122,7 +122,7 @@ fn part2(input: &[Dependency], worker_count: usize, overhead: usize) -> Result<(
         for worker in workers.iter_mut() {
             if worker.1 == 0 {
                 worker.0 = step_todo.take().ok_or("WTF?")?;
-                worker.1 = overhead + (((worker.0 as u8) - (b'A' as u8)) as usize) + 1;
+                worker.1 = overhead + (((worker.0 as u8) - b'A') as usize) + 1;
                 working += 1;
                 //println!("Queued work {} at time {} to run for {} seconds", worker.0, time_passed, worker.1);
                 break;
