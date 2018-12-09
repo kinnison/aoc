@@ -12,18 +12,6 @@ impl Ascii {
         self.0 as char
     }
 
-    fn is_uppercase(self) -> bool {
-        (self.0 & 0x20) == 0
-    }
-
-    fn is_lowercase(self) -> bool {
-        (self.0 & 0x20) != 0
-    }
-
-    fn to_ascii_uppercase(self) -> Ascii {
-        Ascii(self.0 & !0x20)
-    }
-
     fn pairs_with(self, other: Ascii) -> bool {
         // If they're equal *except* capitalisation then
         // xoring the two together should result in exactly 0x20
