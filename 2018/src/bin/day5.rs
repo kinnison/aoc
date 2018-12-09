@@ -38,8 +38,7 @@ fn react(input: &str, dropping: Option<char>) -> String {
             let (f, s) = (ret[i], ret[i + 1]);
             if f.pairs_with(s) {
                 // Annihilate the pair
-                ret.remove(i);
-                ret.remove(i);
+                ret.drain(i..i + 2);
                 changed = true;
                 if ret.is_empty() {
                     break 'outer;
