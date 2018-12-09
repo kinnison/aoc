@@ -8,20 +8,26 @@ impl Ascii {
         Ascii(c as u8)
     }
 
-    fn to_char(&self) -> char {
+    fn to_char(self) -> char {
         self.0 as char
     }
 
-    fn is_uppercase(&self) -> bool {
+    fn is_uppercase(self) -> bool {
         (self.0 & 0x20) == 0
     }
 
-    fn is_lowercase(&self) -> bool {
+    fn is_lowercase(self) -> bool {
         (self.0 & 0x20) != 0
     }
 
-    fn to_ascii_uppercase(&self) -> Ascii {
+    fn to_ascii_uppercase(self) -> Ascii {
         Ascii(self.0 & !0x20)
+    }
+
+    fn pairs_with(self, other: Ascii) -> bool {
+        // If they're equal *except* capitalisation then
+        // xoring the two together should result in exactly 0x20
+        (self.0 ^ other.0) == 0x20
     }
 }
 
@@ -41,16 +47,8 @@ fn react(input: &str, dropping: Option<char>) -> String {
         let mut i = 0;
         let mut changed = false;
         'charagain: while i < ret.len() - 1 {
-            let (f, s) = {
-                let f = ret[i];
-                let s = ret[i + 1];
-                if f.is_uppercase() {
-                    (s, f)
-                } else {
-                    (f, s)
-                }
-            };
-            if f.is_lowercase() && s.is_uppercase() && f.to_ascii_uppercase() == s {
+            let (f, s) = (ret[i], ret[i + 1]);
+            if f.pairs_with(s) {
                 // Annihilate the pair
                 ret.remove(i);
                 ret.remove(i);
