@@ -1,11 +1,37 @@
 use aoc2018::*;
 
+#[derive(PartialEq, Eq, Ord, PartialOrd, Clone, Copy)]
+struct Ascii(u8);
+
+impl Ascii {
+    fn from_char(c: char) -> Ascii {
+        Ascii(c as u8)
+    }
+
+    fn to_char(&self) -> char {
+        self.0 as char
+    }
+
+    fn is_uppercase(&self) -> bool {
+        (self.0 & 0x20) == 0
+    }
+
+    fn is_lowercase(&self) -> bool {
+        (self.0 & 0x20) != 0
+    }
+
+    fn to_ascii_uppercase(&self) -> Ascii {
+        Ascii(self.0 & !0x20)
+    }
+}
+
 fn react(input: &str, dropping: Option<char>) -> String {
-    let mut ret: Vec<char> = match dropping {
-        None => input.chars().collect(),
+    let mut ret: Vec<Ascii> = match dropping {
+        None => input.chars().map(Ascii::from_char).collect(),
         Some(ch) => input
             .chars()
             .filter(|&c| c != ch && c.to_ascii_lowercase() != ch)
+            .map(Ascii::from_char)
             .collect(),
     };
     'outer: loop {
@@ -40,7 +66,7 @@ fn react(input: &str, dropping: Option<char>) -> String {
             break;
         }
     }
-    ret.iter().collect()
+    ret.iter().map(|a| a.to_char()).collect()
 }
 
 fn part1(input: &str) -> usize {
