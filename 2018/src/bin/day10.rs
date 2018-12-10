@@ -62,6 +62,13 @@ impl Grid {
         }
     }
 
+    fn tick_backward(&mut self) {
+        for p in self.points.iter_mut() {
+            p.px -= p.vx;
+            p.py -= p.vy;
+        }
+    }
+
     fn bounds(&self) -> (i32, i32, i32, i32) {
         self.points.iter().fold(
             (std::i32::MAX, std::i32::MAX, std::i32::MIN, std::i32::MIN),
@@ -102,8 +109,6 @@ impl Grid {
 fn find_best(input: &[MessagePoint]) {
     let mut grid = Grid::new(input);
     let mut bestsize = grid.size();
-    let mut bestgrid = grid.clone();
-    let mut besttime = 0;
     let mut seconds = 0;
     loop {
         grid.tick();
@@ -111,15 +116,15 @@ fn find_best(input: &[MessagePoint]) {
         let grsize = grid.size();
         if grsize < bestsize {
             bestsize = grsize;
-            bestgrid = grid.clone();
-            besttime = seconds;
         } else if grsize > bestsize {
             // We've likely finished, so stop now
+            grid.tick_backward();
+            seconds -= 1;
             break;
         }
     }
-    println!("Best grid is after {} seconds:", besttime);
-    bestgrid.print_grid();
+    println!("Best grid is after {} seconds:", seconds);
+    grid.print_grid();
 }
 
 fn main() -> Result<()> {
