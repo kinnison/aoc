@@ -4,9 +4,9 @@ pub type Result<T> = std::result::Result<T, Box<std::error::Error>>;
 
 pub use lazy_static::lazy_static;
 pub use regex::Regex;
+pub use std::cmp::{max, min};
 pub use std::collections::HashMap;
 pub use std::collections::HashSet;
-pub use std::cmp::{min,max};
 
 pub use permutohedron::Heap;
 
