@@ -37,3 +37,26 @@ pub fn input_as_vec<T: ParseByRegex, S: AsRef<str>>(plain: S) -> Result<Vec<T>> 
         .collect();
     Ok(mapped?)
 }
+
+pub fn input_as_vec_and_first<T: ParseByRegex, S: AsRef<str>>(
+    plain: S,
+) -> Result<(Vec<T>, String)> {
+    let mut lines = plain.as_ref().trim().lines();
+    let first = lines.next();
+    let mapped: Result<Vec<T>> = lines
+        .filter(|s| !s.trim().is_empty()) // In case there are any blanks after the first line
+        .map(ParseByRegex::parse_by_regex)
+        .collect();
+    if first.is_none() {
+        Err("No lines at all?")?
+    }
+    Ok((
+        mapped?,
+        first.expect("Something went wrong").trim().to_owned(),
+    ))
+}
+
+pub fn read_input_as_vec_and_first<T: ParseByRegex>(day: usize) -> Result<(Vec<T>, String)> {
+    let plain = read_input(day)?;
+    Ok(input_as_vec_and_first(plain)?)
+}
