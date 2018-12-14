@@ -59,10 +59,8 @@ fn part2(input: &str) -> usize {
         while board.scores.len() < (lastlooked + 10_000) {
             board.tick();
         }
-        for (i, window) in board.scores[lastlooked..].windows(digits.len()).enumerate() {
-            if *window == digits[..] {
-                break 'outer lastlooked + i;
-            }
+        if let Some(idx) = twoway::find_bytes(&board.scores[lastlooked..], &digits) {
+            break 'outer lastlooked + idx;
         }
         lastlooked = board.scores.len() - digits.len();
     }
