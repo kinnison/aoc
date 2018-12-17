@@ -1,56 +1,38 @@
 use aoc2018::*;
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, ParseByRegex)]
 enum Action {
+    #[regex = r"^wakes *up$"]
     WakeUp,
+    #[regex = r"^falls *asleep$"]
     FallAsleep,
+    #[regex = r"^Guard #(\d+) begins shift$"]
     BeginShift(usize),
 }
 
 use self::Action::*;
 
-impl Action {
-    fn from_str(input: &str) -> Result<Action> {
-        let mut splitter = input.split_whitespace();
-        let word = splitter.next().ok_or("No word?")?;
-        Ok(match word {
-            "wakes" => WakeUp,
-            "falls" => FallAsleep,
-            _ => {
-                let hash = splitter.next().ok_or("No Guard?")?;
-                BeginShift(hash[1..].parse()?)
-            }
-        })
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+struct MyDateTime(DateTime<Utc>);
+
+impl std::str::FromStr for MyDateTime {
+    type Err = chrono::format::ParseError;
+    fn from_str(input: &str) -> std::result::Result<MyDateTime, Self::Err> {
+        static DATEFMT: &str = "%Y-%m-%d %H:%M";
+        Ok(MyDateTime(Utc.datetime_from_str(input, DATEFMT)?))
     }
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, ParseByRegex)]
+#[regex = r"^\[(?P<when>[^\]]+)\] (?P<what>.*)$"]
 struct Entry {
-    when: DateTime<Utc>,
+    when: MyDateTime,
     pub what: Action,
 }
 
-static DATEFMT: &str = "%Y-%m-%d %H:%M";
-
 impl Entry {
-    fn from_str<T: AsRef<str>>(input: T) -> Result<Entry> {
-        lazy_static! {
-            static ref PARSE: Regex =
-                Regex::new("^\\[([^\\]]+)\\](.*)$").expect("Unable to compile regular expression");
-        }
-        if let Some(cap) = PARSE.captures(input.as_ref()) {
-            let when = cap.get(1).ok_or("No datetime?")?.as_str();
-            let when = Utc.datetime_from_str(when, DATEFMT)?;
-            let what = cap.get(2).ok_or("No action?")?.as_str();
-            let what = Action::from_str(what)?;
-            Ok(Entry { when, what })
-        } else {
-            Err(format!("Unable to parse {}", input.as_ref()))?
-        }
-    }
-
     fn minute(&self) -> usize {
-        self.when.minute() as usize
+        self.when.0.minute() as usize
     }
 }
 
@@ -75,7 +57,12 @@ static TEST_INPUT: &str = r#"
 "#;
 
 fn sorted_from_str<T: AsRef<str>>(input: T) -> Result<Vec<Entry>> {
-    let res: Result<Vec<Entry>> = input.as_ref().trim().lines().map(Entry::from_str).collect();
+    let res: Result<Vec<Entry>> = input
+        .as_ref()
+        .trim()
+        .lines()
+        .map(ParseByRegex::parse_by_regex)
+        .collect();
     let mut res = res?;
     res.sort();
     Ok(res)
