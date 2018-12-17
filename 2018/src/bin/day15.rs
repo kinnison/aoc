@@ -142,29 +142,11 @@ impl Cave {
             print!("{}", c.as_char());
             if (i % self.width) == (self.width - 1) {
                 println!();
-                if (i < (self.height * self.width) - 1) {
+                if i < (self.height * self.width) - 1 {
                     print!("{:3} ", i + 1);
                 }
             }
         }
-    }
-
-    fn find_elves(&self) -> Vec<usize> {
-        self.cells
-            .iter()
-            .enumerate()
-            .filter(|(_, c)| c.is_elf())
-            .map(|(i, _)| i)
-            .collect()
-    }
-
-    fn find_goblins(&self) -> Vec<usize> {
-        self.cells
-            .iter()
-            .enumerate()
-            .filter(|(_, c)| c.is_goblin())
-            .map(|(i, _)| i)
-            .collect()
     }
 
     fn open_neighbours(&self, pos: usize) -> Vec<usize> {
@@ -186,23 +168,6 @@ impl Cave {
         ret
     }
 
-    fn reset_creatures(&mut self) {
-        for cell in self.cells.iter_mut() {
-            *cell = match cell {
-                Blocked => Blocked,
-                Passable => Passable,
-                Elf { hp, flag: _ } => Elf {
-                    hp: *hp,
-                    flag: false,
-                },
-                Goblin { hp, flag: _ } => Goblin {
-                    hp: *hp,
-                    flag: false,
-                },
-            }
-        }
-    }
-
     fn enemy_nearby(&self, pos: usize) -> bool {
         let is_elf = self.cells[pos].is_elf();
         self.enemy_nearby_(pos, is_elf)
@@ -212,16 +177,6 @@ impl Cave {
             || self.cells[pos + 1].is_hostile(is_elf)
             || self.cells[pos - self.width].is_hostile(is_elf)
             || self.cells[pos + self.width].is_hostile(is_elf)
-    }
-
-    fn find_enemies(&self, pos: usize) -> HashSet<usize> {
-        let is_elf = self.cells[pos].is_elf();
-        self.cells
-            .iter()
-            .enumerate()
-            .filter(|(_, c)| c.is_hostile(is_elf))
-            .map(|(i, _)| i)
-            .collect()
     }
 
     fn find_nearby_enemies(&self, pos: usize) -> Vec<usize> {
@@ -244,31 +199,12 @@ impl Cave {
     }
 
     fn creature_move(&mut self, pos: usize) -> usize {
-        //println!(
-        //    "\n\nCreature at {} is {}",
-        //    pos,
-        //    if self.cells[pos].is_elf() {
-        //        "an elf"
-        //    } else {
-        //        "a goblin"
-        //    }
-        //);
-        //self.display();
         // First creatures identify if they're next to another creature
         // If so, they don't move
         if self.enemy_nearby(pos) {
-            //println!("Creature at {} has an enemy nearby, stands still", pos);
             return pos;
         }
         // Right, so we're moving, let's do that...
-        // Step one is to find every enemy
-        let enemies = self.find_enemies(pos);
-        //println!(
-        //    "Found {} enemies for creature at {} to chase: {:?}",
-        //    enemies.len(),
-        //    pos,
-        //    enemies
-        //);
         let is_elf = self.cells[pos].is_elf();
         // Now we perform a breadth first walk from our position to
         // every possible other position until we find one of the enemies.
@@ -279,23 +215,13 @@ impl Cave {
         let chosenpath = 'outer: loop {
             if paths.len() == 0 {
                 // Enemy is unreachable, give up now
-                //println!("Enemy is unreachable, giving up");
                 return pos;
             }
-            //println!(
-            //    "At start of walk, there are {} paths to consider",
-            //    paths.len()
-            //);
             let mut newpaths = Vec::new();
             for basepath in paths.drain(..) {
                 let open = self.open_neighbours(*basepath.iter().last().expect("Empty path?"));
-                //println!(
-                //    "Path {:?} has the following open neighbours: {:?}",
-                //    basepath, open
-                //);
                 for &next in open.iter() {
                     if visited.contains(&next) {
-                        //println!("No point going to {}, it's already been reached", next);
                         continue;
                     }
                     let mut newpath = basepath.clone();
@@ -304,18 +230,15 @@ impl Cave {
                         // this path reaches an enemy, and since we're breadth
                         // first we can be confident that it's the first which
                         // does.
-                        //println!("Found an enemy nearby {}!", next);
                         break 'outer newpath[1];
                     }
                     // Otherwise we're not there *yet*
-                    //println!("Nope, adding {:?} to consider", newpath);
                     newpaths.push(newpath);
                     visited.insert(next);
                 }
             }
             paths = newpaths;
         };
-        //println!("Found an enemy, next step is {}", chosenpath);
         // We've chosen chosenpath, so let's make the first move along the path
         let creature = self.cells[pos];
         self.cells[pos] = Passable;
@@ -336,20 +259,10 @@ impl Cave {
             return;
         }
         let enemy = enemies[0].1;
-        //println!(
-        //    "Creature at {} is a {}, fighting creature at {} (a {}), deals {} damage",
-        //    pos,
-        //    self.cells[pos].as_char(),
-        //    enemy,
-        //    self.cells[enemy].as_char(),
-        //    attack
-        //);
         if self.cells[enemy].hp() <= attack {
-            //println!("Enemy is vanquished!");
             self.cells[enemy] = Passable;
         } else {
             self.cells[enemy].hit(attack);
-            //println!("Wallopped.  It has {} hp left", self.cells[enemy].hp());
         }
     }
 
@@ -391,32 +304,12 @@ impl Cave {
 
     fn tick_to_death(&mut self, elfdamage: usize) -> usize {
         // Returns complete rounds before we run out creatures/enemies
-        //println!("Initial state:");
-        //self.display();
-        //println!(
-        //    "{} elves doing {} and {} goblins enter the cave...",
-        //    self.count_elves(),
-        //    elfdamage,
-        //    self.count_goblins()
-        //);
         for round in 0.. {
             //println!("Begin round {}", round);
             if !self.tick(elfdamage) {
                 // We've not finished the round, but there're no enemies left
                 // The outcome is rounds times hp left
                 let hpsum: usize = self.cells.iter().map(|c| c.hp()).sum();
-                //println!("After round {}", round);
-                //self.display();
-                //for pos in 0..(self.height * self.width) {
-                //    if self.cells[pos].is_alive() {
-                //        println!(
-                //            "{} at {} has {} hp left",
-                //            self.cells[pos].as_char(),
-                //            pos,
-                //            self.cells[pos].hp()
-                //        );
-                //    }
-                //}
                 return hpsum * round;
             }
         }
@@ -498,17 +391,8 @@ fn part2(input: &Cave) -> usize {
         let trydamage: usize = (maxdamage + mindamage) >> 1;
         let mut newcave = input.clone();
         let outcome = newcave.tick_to_death(trydamage);
-        //println!(
-        //    "Tried damage: {} <= {} <= {} => {}, {} elves alive",
-        //    mindamage,
-        //    trydamage,
-        //    maxdamage,
-        //    outcome,
-        //    newcave.count_elves()
-        //);
         outcomes.insert(trydamage, outcome);
         if newcave.count_elves() == elfcount {
-            //println!("No elves died!");
             // No elves died, update min/max
             maxdamage = trydamage;
             if mindamage == maxdamage {
@@ -516,10 +400,8 @@ fn part2(input: &Cave) -> usize {
             }
         } else {
             // some elves died
-            //println!("Some elves died!");
             mindamage = trydamage;
             if mindamage == maxdamage - 1 {
-                //println!("But, last time they didn't, return that!");
                 break *outcomes.get(&maxdamage).expect("Oddness!");
             }
         }
@@ -561,6 +443,9 @@ fn main() -> Result<()> {
         assert_eq!(part2(&cave), test.0);
     }
     let input = Cave::from_str(&read_input(15)?)?;
+    if cfg!(debug_assertions) {
+        input.display();
+    }
     println!("Part 1: {}", part1(&input));
     println!("Part 2: {}", part2(&input));
     Ok(())
