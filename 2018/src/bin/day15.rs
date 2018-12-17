@@ -13,8 +13,8 @@ impl Cell {
         match self {
             Blocked => '#',
             Passable => '.',
-            Elf { hp: _, flag: _ } => 'E',
-            Goblin { hp: _, flag: _ } => 'G',
+            Elf { .. } => 'E',
+            Goblin { .. } => 'G',
         }
     }
 
@@ -27,14 +27,14 @@ impl Cell {
 
     fn is_elf(&self) -> bool {
         match self {
-            Elf { hp: _, flag: _ } => true,
+            Elf { .. } => true,
             _ => false,
         }
     }
 
     fn is_goblin(&self) -> bool {
         match self {
-            Goblin { hp: _, flag: _ } => true,
+            Goblin { .. } => true,
             _ => false,
         }
     }
@@ -56,40 +56,40 @@ impl Cell {
     fn is_hostile(&self, is_elf: bool) -> bool {
         match self {
             Blocked | Passable => false,
-            Elf { hp: _, flag: _ } => !is_elf,
-            Goblin { hp: _, flag: _ } => is_elf,
+            Elf { .. } => !is_elf,
+            Goblin { .. } => is_elf,
         }
     }
 
     fn set_flag(&mut self, setflag: bool) {
         match self {
             Blocked | Passable => {}
-            Elf { hp: _, flag } => *flag = setflag,
-            Goblin { hp: _, flag } => *flag = setflag,
+            Elf { flag, .. } => *flag = setflag,
+            Goblin { flag, .. } => *flag = setflag,
         };
     }
 
     fn get_flag(&mut self) -> bool {
         match self {
             Blocked | Passable => unreachable!(),
-            Elf { hp: _, flag } => *flag,
-            Goblin { hp: _, flag } => *flag,
+            Elf { flag, .. } => *flag,
+            Goblin { flag, .. } => *flag,
         }
     }
 
     fn hp(&self) -> usize {
         match self {
             Blocked | Passable => 0,
-            Elf { hp, flag: _ } => *hp,
-            Goblin { hp, flag: _ } => *hp,
+            Elf { hp, .. } => *hp,
+            Goblin { hp, .. } => *hp,
         }
     }
 
     fn hit(&mut self, damage: usize) {
         match self {
             Blocked | Passable => unreachable!(),
-            Elf { hp, flag: _ } => *hp -= damage,
-            Goblin { hp, flag: _ } => *hp -= damage,
+            Elf { hp, .. } => *hp -= damage,
+            Goblin { hp, .. } => *hp -= damage,
         }
     }
 }
@@ -213,7 +213,7 @@ impl Cave {
         let mut visited = HashSet::new();
         visited.insert(pos);
         let chosenpath = 'outer: loop {
-            if paths.len() == 0 {
+            if paths.is_empty() {
                 // Enemy is unreachable, give up now
                 return pos;
             }
