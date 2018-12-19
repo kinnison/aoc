@@ -1,3 +1,5 @@
+#![allow(non_snake_case)]
+#![allow(clippy::trivial_regex)]
 use aoc2018::*;
 
 #[derive(PartialOrd, PartialEq, Ord, Eq, Debug, Copy, Clone, Hash, ParseByRegex)]
@@ -198,7 +200,18 @@ fn part2(input: &VM) -> Result<usize> {
     // For explanation of why we stop at 1, and then calculate from there
     // see comment below main
     vm.run(Some(1))?;
-    let target = vm.regs[1] as usize;
+    // Next calculate the target register number (see below as well)
+    let target_reg = 'target: loop {
+        for i in 1..vm.prog.len() {
+            let instr = vm.prog[i];
+            if instr.op == EqRR {
+                let ignore = vm.prog[i - 1].C;
+                break 'target if instr.A == ignore { instr.B } else { instr.A };
+            }
+        }
+    };
+    // Finally calculate the factor sum
+    let target = vm.regs[target_reg as usize] as usize;
     let mut factorsum: usize = 0;
     for i in 1..=target {
         if (target % i) == 0 {
@@ -343,6 +356,15 @@ input 909 has factors:
 Given that, we want to calculate the sum of factors for part 2 when ip=1 and
 the target is in r1
 
+Given we can be confident the inputs will vary, it's reasonable to assume that
+the target value might not be in R1, however puzzle generation means that
+the actual instructions are likely to remain the same, so... we look for an
+eqrr, there'll be 2 possible registers to consider from there, A and B.  The
+instruction before the eqrr will be a mulr and its target is the one to ignore.
+
+So approx.. find index of eqrr, find instruction before, get target register of
+that instruction (C).  Target value is in whichever of A and B of the EQRR is not
+the C of the previous instruction.
 
 
 */
