@@ -113,7 +113,7 @@ type RouteMap = HashMap<(usize, usize, Tool), usize>;
 impl Cave {
     fn new(input: &Input) -> Cave {
         Cave {
-            input: input.clone(),
+            input: *input,
             erosion: HashMap::new(),
         }
     }
@@ -198,33 +198,41 @@ impl Cave {
         best_route
     }
 
-    fn spelunk_(&mut self, x: usize, y: usize, t: Tool, l: usize, r: &mut RouteMap, b: &mut usize) {
+    fn spelunk_(
+        &mut self,
+        x: usize,
+        y: usize,
+        t: Tool,
+        l: usize,
+        rmap: &mut RouteMap,
+        best: &mut usize,
+    ) {
         // We are at x,y holding t
         // We have moved for l minutes
         // The best route to the target is of length b
-        let k = self.get_area_kind(x, y);
-        let swt = t.switch(k);
-        if let Some(rl) = r.get(&(x, y, t)) {
+        let hk = self.get_area_kind(x, y);
+        let swt = t.switch(hk);
+        if let Some(rl) = rmap.get(&(x, y, t)) {
             if *rl <= l {
                 // We've been here before, and earlier than now
                 return;
             } else {
                 // We've not been here before this quickly
-                r.insert((x, y, t), l);
-                let rl = r.get(&(x, y, swt)).expect("Oddness!");
+                rmap.insert((x, y, t), l);
+                let rl = rmap.get(&(x, y, swt)).expect("Oddness!");
                 if *rl > l + 7 {
-                    r.insert((x, y, swt), l + 7);
+                    rmap.insert((x, y, swt), l + 7);
                 }
             }
         } else {
             // We've not been here before, so record the fact for future use
-            r.insert((x, y, t), l);
+            rmap.insert((x, y, t), l);
             // Also since we can switch on entry, it's the same as if we entered
             // with the switched tool, so record that
-            r.insert((x, y, swt), l + 7);
+            rmap.insert((x, y, swt), l + 7);
         }
         // Now have we already taken longer than the best route?
-        if l >= *b {
+        if l >= *best {
             return;
         }
         // Now the best route from here to target could be the manhattan distance
@@ -235,26 +243,26 @@ impl Cave {
         let manhat = ((ix - tx).abs() + (iy - ty).abs()) as usize;
         // if l + manhat (the best possible time from here to target) is already
         // greater than the best chance we have, short-circuit.
-        if (l + manhat) >= *b {
+        if (l + manhat) >= *best {
             return;
         }
         // Okay, we're probably worth spelunking some more...
         if cfg!(debug_assertions) {
             println!("Spelunking! We are at {},{} holding {:?}.  We have taken {} minutes, the best time is {}",
-        x,y,t,l,*b);
+        x,y,t,l,*best);
         }
         // Next, if we're at the target, determine our score
         if x == self.input.target_x && y == self.input.target_y {
             if t == Torch {
                 // We're done, we found the target
-                *b = min(*b, l);
+                *best = min(*best, l);
             } else {
                 // Not the torch, so we'd have to switch
-                *b = min(*b, l + 7);
+                *best = min(*best, l + 7);
             }
             // Either way we've finished our exploration, return
             if cfg!(debug_assertions) {
-                println!("Found target, best score is {}", *b);
+                println!("Found target, best score is {}", *best);
             }
             return;
         }
@@ -275,41 +283,11 @@ impl Cave {
             let newy = (iy + ofs.1) as usize;
             let ok = self.get_area_kind(newx, newy);
             if t.valid_for(ok) {
-                self.spelunk_(newx, newy, t, l + 1, r, b);
+                self.spelunk_(newx, newy, t, l + 1, rmap, best);
             } else {
-                self.spelunk_(newx, newy, swt, l + 8, r, b);
+                self.spelunk_(newx, newy, swt, l + 8, rmap, best);
             }
         }
-        /*
-        let ok = self.get_area_kind(x, y + 1);
-        if t.valid_for(ok) {
-            self.spelunk_(x, y + 1, t, l + 1, r, b);
-        } else {
-            self.spelunk_(x, y + 1, swt, l + 8, r, b);
-        }
-        let ok = self.get_area_kind(x + 1, y);
-        if t.valid_for(ok) {
-            self.spelunk_(x + 1, y, t, l + 1, r, b);
-        } else {
-            self.spelunk_(x + 1, y, swt, l + 8, r, b);
-        }
-        if y > 0 {
-            let ok = self.get_area_kind(x, y - 1);
-            if t.valid_for(ok) {
-                self.spelunk_(x, y - 1, t, l + 1, r, b);
-            } else {
-                self.spelunk_(x, y - 1, swt, l + 8, r, b);
-            }
-        }
-        if x > 0 {
-            let ok = self.get_area_kind(x - 1, y);
-            if t.valid_for(ok) {
-                self.spelunk_(x - 1, y, t, l + 1, r, b);
-            } else {
-                self.spelunk_(x - 1, y, swt, l + 8, r, b);
-            }
-        }
-        */
     }
 }
 
