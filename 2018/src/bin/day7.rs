@@ -129,7 +129,7 @@ fn part2(input: &[Dependency], worker_count: usize, overhead: usize) -> Result<(
             }
         }
         if step_todo.is_some() {
-            Err("Odd, didn't dispatch work?")?
+            return Err("Odd, didn't dispatch work?".into());
         }
     }
 

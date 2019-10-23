@@ -41,7 +41,7 @@ fn part2(input: &[&str]) -> Result<String> {
             }
         }
     }
-    Err("Unable to find two which have a matching single character")?
+    Err("Unable to find two which have a matching single character".into())
 }
 
 fn main() -> Result<()> {

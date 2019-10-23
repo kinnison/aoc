@@ -14,10 +14,10 @@ fn parse_input(input: &str) -> Result<HashMap<(i32, i32), usize>> {
     let mut x = 0;
     let mut y = 0;
     if !input.starts_with('^') {
-        Err("Input regex didn't start with ^")?;
+        return Err("Input regex didn't start with ^".into());
     }
     if !input.ends_with('$') {
-        Err("Input regex didn't end with $")?;
+        return Err("Input regex didn't end with $".into());
     }
     for ch in input[1..input.len() - 1].chars() {
         match ch {
@@ -37,13 +37,13 @@ fn parse_input(input: &str) -> Result<HashMap<(i32, i32), usize>> {
                     'N' | 'S' => x,
                     'W' => x - 1,
                     'E' => x + 1,
-                    _ => Err("Wha?")?,
+                    _ => return Err("Wha?".into()),
                 };
                 let newy = match ch {
                     'N' => y - 1,
                     'S' => y + 1,
                     'E' | 'W' => y,
-                    _ => Err("Wha?")?,
+                    _ => return Err("Wha?".into()),
                 };
                 let curdist = distmap[&(x, y)];
                 let newpos = distmap.entry((newx, newy)).or_insert(curdist + 1);
@@ -51,7 +51,7 @@ fn parse_input(input: &str) -> Result<HashMap<(i32, i32), usize>> {
                 x = newx;
                 y = newy;
             }
-            _ => Err(format!("Unknown input character: '{}'", ch))?,
+            _ => return Err(format!("Unknown input character: '{}'", ch).into()),
         }
     }
     Ok(distmap)

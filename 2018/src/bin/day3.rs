@@ -29,7 +29,7 @@ impl Claim {
                 height,
             })
         } else {
-            Err(format!("Unable to parse '{}'", input.as_ref()))?
+            Err(format!("Unable to parse '{}'", input.as_ref()).into())
         }
     }
 
@@ -68,7 +68,7 @@ fn part2(input: &[Claim]) -> Result<usize> {
         }
         return Ok(claim.id);
     }
-    Err("Unable to find a non-overlapping claim!")?
+    Err("Unable to find a non-overlapping claim!".into())
 }
 
 fn main() -> Result<()> {

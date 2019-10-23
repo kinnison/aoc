@@ -52,15 +52,15 @@ impl Input {
     }
     fn from_lines(input: &[InputLine]) -> Result<Input> {
         if input.len() != 2 {
-            Err("Input is not two lines!")?;
+            return Err("Input is not two lines!".into());
         }
         let depth = match input[0] {
             InputLine::Depth(d) => d,
-            _ => Err("First input line is not a depth indicator")?,
+            _ => return Err("First input line is not a depth indicator".into()),
         };
         let (target_x, target_y) = match input[1] {
             InputLine::Target(x_, y_) => (x_, y_),
-            _ => Err("Second input line is not a target indicator")?,
+            _ => return Err("Second input line is not a target indicator".into()),
         };
         Ok(Input {
             depth,

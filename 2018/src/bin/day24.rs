@@ -19,7 +19,7 @@ impl DamageKind {
             "slashing" => Slashing,
             "radiation" => Radiation,
             "bludgeoning" => Bludgeoning,
-            _ => Err(format!("Unable to parse damage kind: {}", input))?,
+            _ => return Err(format!("Unable to parse damage kind: {}", input).into()),
         })
     }
 }
@@ -70,7 +70,7 @@ impl ArmyGroup {
     }
 }
 
-#[allow(clippy::cyclomatic_complexity)]
+#[allow(clippy::cognitive_complexity)]
 fn run_fight(input: &[ArmyGroup], immuneboost: usize) -> Option<(Side, usize)> {
     let mut fighters: Vec<ArmyGroup> = input.to_vec();
     for f in fighters.iter_mut() {
@@ -267,8 +267,8 @@ fn parse_line(input: &str, side: Side) -> Result<ArmyGroup> {
             let is_immunity = match words.next() {
                 Some("immune") => true,
                 Some("weak") => false,
-                Some(eh) => Err(format!("Unknown modifer kind: {}", eh))?,
-                None => Err(format!("What?! {}", section))?,
+                Some(eh) => return Err(format!("Unknown modifer kind: {}", eh).into()),
+                None => return Err(format!("What?! {}", section).into()),
             };
             words.next(); // skip 'to'
             for w in words {

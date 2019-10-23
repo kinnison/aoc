@@ -107,11 +107,11 @@ impl Cave {
     fn from_str(input: &str) -> Result<Cave> {
         let height = input.lines().count();
         if height < 3 {
-            Err("Odd, the cave isn't at least 3 rows!")?;
+            return Err("Odd, the cave isn't at least 3 rows!".into());
         }
         let width = input.lines().next().expect("Broken?").len();
         if width < 3 {
-            Err("Odd, the cave isn't at least 3 columns!")?;
+            return Err("Odd, the cave isn't at least 3 columns!".into());
         }
         let mut cells = Vec::with_capacity(width * height);
         for c in input.bytes().filter(|&b| b != b'\n') {
@@ -126,7 +126,7 @@ impl Cave {
                     hp: 200,
                     flag: false,
                 },
-                _ => Err(format!("Unexpected cell '{}'", c as char))?,
+                _ => return Err(format!("Unexpected cell '{}'", c as char).into()),
             });
         }
         Ok(Cave {

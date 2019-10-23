@@ -58,7 +58,7 @@ impl VM {
 
     fn exec(&mut self, instr: Op, A: i32, B: i32, C: i32) -> Result<()> {
         if C < 0 || C > 3 {
-            Err(format!("C ({}) is out of range", C))?
+            return Err(format!("C ({}) is out of range", C).into());
         }
         let rA = if A >= 0 && A <= 3 {
             Ok(self.regs[A as usize])
@@ -183,16 +183,16 @@ impl InputLine {
 
 fn count_possibilities(input: &[InputLine]) -> Result<Vec<Op>> {
     if input.len() != 3 {
-        Err("Incorrect input to count_possibilities: Not 3 lines")?
+        return Err("Incorrect input to count_possibilities: Not 3 lines".into());
     }
     if !input[0].is_before() {
-        Err("Incorrect input to count_possibilities: First is not Before")?
+        return Err("Incorrect input to count_possibilities: First is not Before".into());
     }
     if !input[1].is_instr() {
-        Err("Incorrect input to count_possibilities: Middle is not Instr")?
+        return Err("Incorrect input to count_possibilities: Middle is not Instr".into());
     }
     if !input[2].is_after() {
-        Err("Incorrect input to count_possibilities: last is not After")?
+        return Err("Incorrect input to count_possibilities: last is not After".into());
     }
     let mut ret = Vec::new();
     let (A, B, C) = input[1].get_args();
@@ -247,7 +247,8 @@ fn part2(input: &[InputLine]) -> Result<i32> {
             let opnum = chunk[1].get_opnum();
             let curposs = opmap.get(&opnum).unwrap_or(&full_opset);
             let poss: HashSet<Op> = poss.into_iter().collect();
-            opmap.insert(opnum, curposs.intersection(&poss).cloned().collect());
+            let replacement = curposs.intersection(&poss).cloned().collect();
+            opmap.insert(opnum, replacement);
         }
     }
     // Counted every possibility, print them out...
@@ -286,10 +287,7 @@ fn part2(input: &[InputLine]) -> Result<i32> {
             .get(&i)
             .ok_or_else(|| format!("After run, opnum {} undefined!", i))?;
         if opset.len() != 1 {
-            Err(format!(
-                "After run, opnum {} has possibility set: {:?}",
-                i, opset
-            ))?
+            return Err(format!("After run, opnum {} has possibility set: {:?}", i, opset).into());
         }
     }
     let opmap: HashMap<u8, Op> = opmap

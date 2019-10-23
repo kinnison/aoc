@@ -75,7 +75,7 @@ impl VM {
 
     fn exec_(&mut self, instr: Op, A: i32, B: i32, C: i32) -> Result<()> {
         if C < 0 || C > 5 {
-            Err(format!("C ({}) is out of range", C))?
+            return Err(format!("C ({}) is out of range", C).into());
         }
         let rA = if A >= 0 && A <= 5 {
             Ok(self.regs[A as usize])

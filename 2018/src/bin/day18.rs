@@ -15,7 +15,7 @@ impl Acre {
             '.' => Ok(Open),
             '|' => Ok(Wooded),
             '#' => Ok(Lumberyard),
-            _ => Err(format!("Unknown acre character: '{}'", c))?,
+            _ => Err(format!("Unknown acre character: '{}'", c).into()),
         }
     }
 
@@ -67,11 +67,11 @@ impl Area {
         let input = input.trim();
         let height = input.lines().count();
         if height == 0 {
-            Err("No input lines?")?;
+            return Err("No input lines?".into());
         }
         let width = input.lines().next().ok_or("What happened?")?.len();
         if width == 0 {
-            Err("First input line is empty!")?;
+            return Err("First input line is empty!".into());
         }
         let mut spares = Vec::with_capacity(width * height);
         let mut acres = Vec::with_capacity(width * height);
@@ -80,7 +80,7 @@ impl Area {
             spares.push(Acre::Open);
         }
         if acres.len() != width * height {
-            Err("Incorrect number of input characters!")?;
+            return Err("Incorrect number of input characters!".into());
         }
         Ok(Area {
             acres,

@@ -6,7 +6,7 @@ struct Node {
 }
 
 impl Node {
-    fn from_iter(iter: &mut Iterator<Item = &usize>) -> Option<Node> {
+    fn from_iter(iter: &mut dyn Iterator<Item = &usize>) -> Option<Node> {
         let n_children = *iter.next()?;
         let n_metadata = *iter.next()?;
         let mut children = Vec::new();

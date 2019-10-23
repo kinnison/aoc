@@ -11,7 +11,7 @@ fn part2(input: &[i32]) -> Result<i32> {
         }
         seen.insert(cur);
     }
-    Err("Unable to find a cycle ever?")?
+    Err("Unable to find a cycle ever?".into())
 }
 
 fn part1(input: &[i32]) -> i32 {

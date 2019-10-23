@@ -58,11 +58,11 @@ impl TrackGrid {
     fn from_str(input: &str) -> Result<TrackGrid> {
         let height = input.lines().count();
         if height == 0 {
-            Err("No track?")?;
+            return Err("No track?".into());
         }
         let width = input.lines().next().expect("No track?").len();
         if width == 0 {
-            Err("Track is empty?")?;
+            return Err("Track is empty?".into());
         }
 
         let mut entries: Vec<u8> = Vec::new();
@@ -97,10 +97,11 @@ impl TrackGrid {
                             choose: TurnLeft,
                         });
                     }
-                    _ => Err(format!(
-                        "Unknown/unhandlable input character: '{}'",
-                        b as char
-                    ))?,
+                    _ => {
+                        return Err(
+                            format!("Unknown/unhandlable input character: '{}'", b as char).into(),
+                        )
+                    }
                 }
             }
         }
@@ -172,7 +173,7 @@ impl TrackGrid {
                     TurnLeft => (cart.dir.left(), StraightOn),
                     TurnRight => (cart.dir.right(), TurnLeft),
                 },
-                _ => Err("Unknown track entry!")?,
+                _ => return Err("Unknown track entry!".into()),
             };
             let collided = olds.contains(&(newx, newy)) | !seen.insert((newx, newy));
             if collided {
@@ -187,7 +188,7 @@ impl TrackGrid {
                         carts.retain(|c| (c.x, c.y) != (newx, newy));
                         let newlen = carts.len();
                         if oldlen == newlen {
-                            Err("Unable to find old cart to remove")?;
+                            return Err("Unable to find old cart to remove".into());
                         }
                     }
                     seen.remove(&(newx, newy));
@@ -245,7 +246,7 @@ fn part2(input: &TrackGrid) -> Result<(usize, usize)> {
             break Ok((grid.carts[0].x, grid.carts[0].y));
         }
         if grid.carts.is_empty() {
-            Err("No more carts?")?;
+            break Err("No more carts?".into());
         }
     }
 }
