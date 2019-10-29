@@ -50,12 +50,13 @@ pub fn input_as_vec_and_first<T: ParseByRegex, S: AsRef<str>>(
         .map(ParseByRegex::parse_by_regex)
         .collect();
     if first.is_none() {
-        Err("No lines at all?")?
+        Err("No lines at all?".into())
+    } else {
+        Ok((
+            mapped?,
+            first.expect("Something went wrong").trim().to_owned(),
+        ))
     }
-    Ok((
-        mapped?,
-        first.expect("Something went wrong").trim().to_owned(),
-    ))
 }
 
 pub fn read_input_as_vec_and_first<T: ParseByRegex>(day: usize) -> Result<(Vec<T>, String)> {

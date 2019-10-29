@@ -120,7 +120,7 @@ impl Grid {
                 biggest_size = c;
             }
         }
-        biggest.and_then(|n| Some((n, biggest_size)))
+        biggest.map(|n| (n, biggest_size))
     }
 
     fn count_totals_below(&self, v: usize) -> usize {
