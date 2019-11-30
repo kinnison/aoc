@@ -1,0 +1,19 @@
+[package]
+name = "aoc2019"
+version = "0.1.0"
+authors = ["Daniel Silverstone <daniel.silverstone@codethink.co.uk>"]
+edition = "2018"
+
+[profile.release]
+lto = true
+
+[dependencies]
+md5="0.6.0"
+regex="1"
+lazy_static="1.2"
+permutohedron="0.2.4"
+serde_json="1"
+chrono="0.4"
+parsebyregex = { git="git://git.gitano.org.uk/parsebyregex.git" }
+parsebyregex-derive = { git="git://git.gitano.org.uk/parsebyregex.git" }
+twoway = "0.2"
