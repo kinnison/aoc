@@ -1,18 +1,25 @@
 use aoc2019::*;
 
 fn fuel_cost_1(n: usize) -> usize {
-    (n / 3) - 2
+    if n < 9 {
+        0
+    } else {
+        (n / 3) - 2
+    }
 }
 
 fn fuel_cost_2(n: usize) -> usize {
     let mut mod_cost = fuel_cost_1(n);
-    let mut fuel = mod_cost;
-    while fuel > 8 {
-        let cost = fuel_cost_1(fuel);
-        mod_cost += cost;
-        fuel = cost;
-    }
-    mod_cost
+    std::iter::from_fn(|| {
+        let ret = mod_cost;
+        mod_cost = fuel_cost_1(ret);
+        if ret > 0 {
+            Some(ret)
+        } else {
+            None
+        }
+    })
+    .sum()
 }
 
 fn part2(input: &[usize]) -> usize {
