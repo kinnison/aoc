@@ -1,25 +1,15 @@
 use aoc2019::*;
 
-fn fuel_cost_1(n: usize) -> usize {
+fn fuel_cost_1(n: usize) -> Option<usize> {
     if n < 9 {
-        0
+        None
     } else {
-        (n / 3) - 2
+        Some((n / 3) - 2)
     }
 }
 
 fn fuel_cost_2(n: usize) -> usize {
-    let mut mod_cost = fuel_cost_1(n);
-    std::iter::from_fn(|| {
-        let ret = mod_cost;
-        mod_cost = fuel_cost_1(ret);
-        if ret > 0 {
-            Some(ret)
-        } else {
-            None
-        }
-    })
-    .sum()
+    std::iter::successors(fuel_cost_1(n), |&n| fuel_cost_1(n)).sum()
 }
 
 fn part2(input: &[usize]) -> usize {
@@ -27,7 +17,12 @@ fn part2(input: &[usize]) -> usize {
 }
 
 fn part1(input: &[usize]) -> usize {
-    input.iter().copied().map(fuel_cost_1).sum()
+    input
+        .iter()
+        .copied()
+        .map(fuel_cost_1)
+        .map(Option::unwrap)
+        .sum()
 }
 
 #[cfg(test)]
@@ -35,10 +30,10 @@ mod test {
     #[test]
     fn test_cases_1() {
         use super::fuel_cost_1;
-        assert_eq!(fuel_cost_1(12), 2);
-        assert_eq!(fuel_cost_1(14), 2);
-        assert_eq!(fuel_cost_1(1969), 654);
-        assert_eq!(fuel_cost_1(100_756), 33_583);
+        assert_eq!(fuel_cost_1(12).unwrap(), 2);
+        assert_eq!(fuel_cost_1(14).unwrap(), 2);
+        assert_eq!(fuel_cost_1(1969).unwrap(), 654);
+        assert_eq!(fuel_cost_1(100_756).unwrap(), 33_583);
     }
 
     #[test]
