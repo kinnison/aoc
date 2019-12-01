@@ -30,6 +30,7 @@ mod test {
     #[test]
     fn test_cases_1() {
         use super::fuel_cost_1;
+        assert_eq!(fuel_cost_1(8), None);
         assert_eq!(fuel_cost_1(12).unwrap(), 2);
         assert_eq!(fuel_cost_1(14).unwrap(), 2);
         assert_eq!(fuel_cost_1(1969).unwrap(), 654);
