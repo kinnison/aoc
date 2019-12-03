@@ -63,3 +63,23 @@ pub fn read_input_as_vec_and_first<T: ParseByRegex>(day: usize) -> Result<(Vec<T
     let plain = read_input(day)?;
     Ok(input_as_vec_and_first(plain)?)
 }
+
+pub fn line_as_list<T: ParseByRegex, S: AsRef<str>>(line: S) -> Result<Vec<T>> {
+    let mapped: Result<Vec<T>> = line
+        .as_ref()
+        .trim()
+        .split(',')
+        .map(ParseByRegex::parse_by_regex)
+        .collect();
+    Ok(mapped?)
+}
+
+pub fn input_as_lists<T: ParseByRegex, S: AsRef<str>>(input: S) -> Result<Vec<Vec<T>>> {
+    let mapped: Result<Vec<Vec<T>>> = input.as_ref().trim().lines().map(line_as_list).collect();
+    Ok(mapped?)
+}
+
+pub fn read_input_as_lists<T: ParseByRegex>(day: usize) -> Result<Vec<Vec<T>>> {
+    let plain = read_input(day)?;
+    Ok(input_as_lists(plain)?)
+}
