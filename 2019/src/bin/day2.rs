@@ -37,7 +37,7 @@ impl IntCodeMachine {
             }
             pc += 4;
         }
-        return false; // Did not exit cleanly
+        false // Did not exit cleanly
     }
 
     #[cfg(test)]
@@ -78,13 +78,13 @@ fn run_nv(code: &str, noun: usize, verb: usize) -> usize {
 }
 
 fn part1(code: &str) -> usize {
-    run_nv(code, 12, 02)
+    run_nv(code, 12, 2)
 }
 
 fn part2(code: &str) -> usize {
     for noun in 0..=99 {
         for verb in 0..=99 {
-            if run_nv(code, noun, verb) == 19690720 {
+            if run_nv(code, noun, verb) == 19_690_720 {
                 return (100 * noun) + verb;
             }
         }
