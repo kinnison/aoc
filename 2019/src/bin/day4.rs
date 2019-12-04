@@ -25,22 +25,16 @@ fn passcode_from_str(s: &str) -> [u8; 6] {
 }
 
 fn passcode_valid_2(code: &[u8; 6]) -> bool {
-    let mut seqs = Vec::new();
-    let mut cur = code[0];
-    let mut curlen = 1;
     for i in 1..6 {
         if code[i] < code[i - 1] {
             return false;
         }
-        if cur != code[i] {
-            seqs.push(curlen);
-            curlen = 0;
-        }
-        cur = code[i];
-        curlen += 1;
     }
-    seqs.push(curlen);
-    seqs.iter().any(|v| *v == 2)
+    code.iter()
+        .group_by(|v| *v)
+        .into_iter()
+        .map(|(_, g)| g.count())
+        .any(|v| v == 2)
 }
 
 #[cfg(test)]
