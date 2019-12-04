@@ -21,6 +21,8 @@ pub use std::collections::VecDeque;
 
 pub use twoway;
 
+pub use itertools::*;
+
 pub fn read_input(day: usize) -> Result<String> {
     Ok(read_to_string(format!("inputs/day{}", day))?)
 }
