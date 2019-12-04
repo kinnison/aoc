@@ -1,16 +1,14 @@
 use aoc2019::*;
 
-fn passcode_valid_1(code: &[u8; 6]) -> bool {
+fn passcode_valid_1(code: [u8; 6]) -> bool {
     let mut seen_repeat = false;
-    let mut cur = code[0];
-    for i in 1..6 {
-        if code[i] < cur {
+    for win in code.windows(2) {
+        if win[0] > win[1] {
             return false;
         }
-        if cur == code[i] {
+        if win[0] == win[1] {
             seen_repeat = true;
         }
-        cur = code[i];
     }
     seen_repeat
 }
@@ -24,7 +22,7 @@ fn passcode_from_str(s: &str) -> [u8; 6] {
     ret
 }
 
-fn passcode_valid_2(code: &[u8; 6]) -> bool {
+fn passcode_valid_2(code: [u8; 6]) -> bool {
     for i in 1..6 {
         if code[i] < code[i - 1] {
             return false;
@@ -47,34 +45,34 @@ mod test {
 
     #[test]
     fn test_cases_1() {
-        assert!(passcode_valid_1(&passcode_from_str("122345")));
-        assert!(passcode_valid_1(&passcode_from_str("111123")));
-        assert!(passcode_valid_1(&passcode_from_str("111111")));
-        assert!(!passcode_valid_1(&passcode_from_str("223450")));
-        assert!(!passcode_valid_1(&passcode_from_str("123789")));
+        assert!(passcode_valid_1(passcode_from_str("122345")));
+        assert!(passcode_valid_1(passcode_from_str("111123")));
+        assert!(passcode_valid_1(passcode_from_str("111111")));
+        assert!(!passcode_valid_1(passcode_from_str("223450")));
+        assert!(!passcode_valid_1(passcode_from_str("123789")));
     }
 
     #[test]
     fn test_cases_2() {
-        assert!(passcode_valid_2(&passcode_from_str("122345")));
-        assert!(!passcode_valid_2(&passcode_from_str("111123")));
-        assert!(!passcode_valid_2(&passcode_from_str("111111")));
-        assert!(!passcode_valid_2(&passcode_from_str("223450")));
-        assert!(!passcode_valid_2(&passcode_from_str("123789")));
-        assert!(!passcode_valid_2(&passcode_from_str("123444")));
-        assert!(!passcode_valid_2(&passcode_from_str("666999")));
-        assert!(passcode_valid_2(&passcode_from_str("111122")));
-        assert!(passcode_valid_2(&passcode_from_str("112233")));
+        assert!(passcode_valid_2(passcode_from_str("122345")));
+        assert!(!passcode_valid_2(passcode_from_str("111123")));
+        assert!(!passcode_valid_2(passcode_from_str("111111")));
+        assert!(!passcode_valid_2(passcode_from_str("223450")));
+        assert!(!passcode_valid_2(passcode_from_str("123789")));
+        assert!(!passcode_valid_2(passcode_from_str("123444")));
+        assert!(!passcode_valid_2(passcode_from_str("666999")));
+        assert!(passcode_valid_2(passcode_from_str("111122")));
+        assert!(passcode_valid_2(passcode_from_str("112233")));
     }
 }
 
 fn loop_check_codes<F>(first: &str, second: &str, check_valid: F) -> usize
 where
-    F: Fn(&[u8; 6]) -> bool,
+    F: Fn([u8; 6]) -> bool,
 {
     let mut pos = passcode_from_str(first);
     let mut ret = 0;
-    if check_valid(&pos) {
+    if check_valid(pos) {
         ret += 1;
     }
     let stop_at = passcode_from_str(second);
@@ -88,7 +86,7 @@ where
                 break;
             }
         }
-        if check_valid(&pos) {
+        if check_valid(pos) {
             ret += 1;
         }
         if pos == stop_at {
