@@ -30,7 +30,10 @@ pub enum OpCode {
     Mul,
     Input,
     Output,
-
+    JumpIfTrue,
+    JumpIfFalse,
+    LessThan,
+    Equals,
     // Last opcode
     Terminate,
 }
@@ -46,7 +49,10 @@ impl OpCode {
                 2 => Ok(Self::Mul),
                 3 => Ok(Self::Input),
                 4 => Ok(Self::Output),
-
+                5 => Ok(Self::JumpIfTrue),
+                6 => Ok(Self::JumpIfFalse),
+                7 => Ok(Self::LessThan),
+                8 => Ok(Self::Equals),
                 99 => Ok(Self::Terminate),
 
                 _ => Err(Error::UnknownOpCode(opval)),
@@ -113,7 +119,6 @@ impl VM {
     }
 
     pub fn run_add(&mut self) -> Result<i64> {
-        self.debug_instr(3)?;
         let arg1 = self.peek(self.addr_for(0)?)?;
         let arg2 = self.peek(self.addr_for(1)?)?;
         self.poke(self.addr_for(2)?, arg1 + arg2)?;
@@ -121,7 +126,6 @@ impl VM {
     }
 
     pub fn run_mul(&mut self) -> Result<i64> {
-        self.debug_instr(3)?;
         let arg1 = self.peek(self.addr_for(0)?)?;
         let arg2 = self.peek(self.addr_for(1)?)?;
         self.poke(self.addr_for(2)?, arg1 * arg2)?;
@@ -143,6 +147,52 @@ impl VM {
         Ok(self.pc + 2)
     }
 
+    pub fn run_jump_if_true(&self) -> Result<i64> {
+        self.debug_instr(2)?;
+        let arg = self.peek(self.addr_for(0)?)?;
+        if arg == 0 {
+            // false
+            Ok(self.pc + 3)
+        } else {
+            Ok(self.peek(self.addr_for(1)?)?)
+        }
+    }
+
+    pub fn run_jump_if_false(&self) -> Result<i64> {
+        self.debug_instr(2)?;
+        let arg = self.peek(self.addr_for(0)?)?;
+        if arg != 0 {
+            // true
+            Ok(self.pc + 3)
+        } else {
+            Ok(self.peek(self.addr_for(1)?)?)
+        }
+    }
+
+    pub fn run_less_than(&mut self) -> Result<i64> {
+        self.debug_instr(3)?;
+        let arg1 = self.peek(self.addr_for(0)?)?;
+        let arg2 = self.peek(self.addr_for(1)?)?;
+        if arg1 < arg2 {
+            self.poke(self.addr_for(2)?, 1)?;
+        } else {
+            self.poke(self.addr_for(2)?, 0)?;
+        }
+        Ok(self.pc + 4)
+    }
+
+    pub fn run_equals(&mut self) -> Result<i64> {
+        self.debug_instr(3)?;
+        let arg1 = self.peek(self.addr_for(0)?)?;
+        let arg2 = self.peek(self.addr_for(1)?)?;
+        if arg1 == arg2 {
+            self.poke(self.addr_for(2)?, 1)?;
+        } else {
+            self.poke(self.addr_for(2)?, 0)?;
+        }
+        Ok(self.pc + 4)
+    }
+
     pub fn full_interpret(&mut self, input: &[i64], output: &mut Vec<i64>) -> Result<()> {
         let mut input_cursor = 0;
         loop {
@@ -151,6 +201,10 @@ impl VM {
                 OpCode::Mul => self.run_mul(),
                 OpCode::Input => self.run_input(&mut input_cursor, input),
                 OpCode::Output => self.run_output(output),
+                OpCode::JumpIfTrue => self.run_jump_if_true(),
+                OpCode::JumpIfFalse => self.run_jump_if_false(),
+                OpCode::LessThan => self.run_less_than(),
+                OpCode::Equals => self.run_equals(),
                 OpCode::Terminate => break Ok(()),
             }?;
             self.pc = new_pc;
