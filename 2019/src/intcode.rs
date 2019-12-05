@@ -1,5 +1,6 @@
 //! Intcode VM for 2019 AoC
 //!
+//!
 
 /// Errors this stuff can return
 #[derive(Debug)]
@@ -9,6 +10,7 @@ pub enum Error {
     BadOpCode(i64),
     UnknownOpCode(i64),
     UnknownAddressingMode(i64),
+    NoMoreInput(i64),
 }
 
 impl std::fmt::Display for Error {
@@ -85,7 +87,9 @@ impl VM {
 
     pub fn addr_for(&self, operand: i64) -> Result<i64> {
         let opval = self.peek(self.pc)?;
-        let mode = (opval / ((operand + 2) * 10)) % 10;
+        let divisor = 10i64.pow((operand + 2) as u32);
+        let shifted = opval / divisor;
+        let mode = shifted % 10;
         match mode {
             0 => self.peek(self.pc + 1 + operand),
             1 => Ok(self.pc + 1 + operand),
@@ -94,7 +98,7 @@ impl VM {
     }
 
     pub fn debug_instr(&self, args: i64) -> Result<()> {
-        if cfg!(test) {
+        if cfg!(debug_assertions) {
             print!("PC={} OpVal={} ", self.pc, self.peek(self.pc)?);
             print!("OpCode={:?} Args=", self.opcode()?);
             for arg in 0..args {
@@ -124,17 +128,37 @@ impl VM {
         Ok(self.pc + 4)
     }
 
-    pub fn interpret(&mut self) -> Result<()> {
+    pub fn run_input(&mut self, cursor: &mut usize, input: &[i64]) -> Result<i64> {
+        if *cursor >= input.len() {
+            Err(Error::NoMoreInput(self.pc))
+        } else {
+            self.poke(self.addr_for(0)?, input[*cursor])?;
+            *cursor += 1;
+            Ok(self.pc + 2)
+        }
+    }
+
+    pub fn run_output(&self, output: &mut Vec<i64>) -> Result<i64> {
+        output.push(self.peek(self.addr_for(0)?)?);
+        Ok(self.pc + 2)
+    }
+
+    pub fn full_interpret(&mut self, input: &[i64], output: &mut Vec<i64>) -> Result<()> {
+        let mut input_cursor = 0;
         loop {
             let new_pc = match self.opcode()? {
                 OpCode::Add => self.run_add(),
                 OpCode::Mul => self.run_mul(),
-                OpCode::Input => unimplemented!(),
-                OpCode::Output => unimplemented!(),
+                OpCode::Input => self.run_input(&mut input_cursor, input),
+                OpCode::Output => self.run_output(output),
                 OpCode::Terminate => break Ok(()),
             }?;
             self.pc = new_pc;
         }
+    }
+
+    pub fn interpret(&mut self) -> Result<()> {
+        self.full_interpret(&[], &mut Vec::new())
     }
 }
 
