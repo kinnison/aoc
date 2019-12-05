@@ -85,3 +85,9 @@ pub fn read_input_as_lists<T: ParseByRegex>(day: usize) -> Result<Vec<Vec<T>>> {
     let plain = read_input(day)?;
     Ok(input_as_lists(plain)?)
 }
+
+// 2019 specific stuff
+
+pub mod intcode;
+
+pub use std::str::FromStr;
