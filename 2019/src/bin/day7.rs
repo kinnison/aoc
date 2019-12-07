@@ -12,7 +12,7 @@ fn run_amplifier(model: &intcode::VM, phase: i64, input: i64) -> Result<i64> {
     }
 }
 
-fn run_sequence(model: &intcode::VM, sequence: &[i64]) -> Result<i64> {
+fn run_sequence1(model: &intcode::VM, sequence: &[i64]) -> Result<i64> {
     let mut signal = 0;
     for phase in sequence.iter().copied() {
         signal = run_amplifier(model, phase, signal)?;
@@ -20,12 +20,12 @@ fn run_sequence(model: &intcode::VM, sequence: &[i64]) -> Result<i64> {
     Ok(signal)
 }
 
-fn best_sequence(model: &intcode::VM) -> Result<Vec<i64>> {
+fn best_sequence1(model: &intcode::VM) -> Result<Vec<i64>> {
     let mut seq = vec![0, 1, 2, 3, 4];
     let mut best_heap = seq.clone();
-    let mut best_score = run_sequence(model, &best_heap)?;
+    let mut best_score = run_sequence1(model, &best_heap)?;
     for seq in Heap::new(&mut seq) {
-        let score = run_sequence(model, &seq)?;
+        let score = run_sequence1(model, &seq)?;
         if score > best_score {
             best_heap = seq.clone();
             best_score = score;
@@ -58,18 +58,18 @@ mod test {
         for (model, sequence, target) in CASES.iter() {
             let model = intcode::VM::from_str(model).expect("Unable to parse model");
             assert_eq!(
-                run_sequence(&model, sequence).expect("Unable to run sequence"),
+                run_sequence1(&model, sequence).expect("Unable to run sequence"),
                 *target
             );
-            let best = best_sequence(&model).expect("Unable to run model");
+            let best = best_sequence1(&model).expect("Unable to run model");
             assert_eq!(&best, sequence);
         }
     }
 }
 
 fn part1(model: &intcode::VM) -> Result<i64> {
-    let seq = best_sequence(model)?;
-    run_sequence(model, &seq)
+    let seq = best_sequence1(model)?;
+    run_sequence1(model, &seq)
 }
 
 fn main() -> Result<()> {
