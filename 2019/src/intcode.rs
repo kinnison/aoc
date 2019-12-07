@@ -225,8 +225,12 @@ impl VM {
                 }
                 VMState::WaitingOnInput => {
                     assert_eq!(self.opcode()?, OpCode::Input);
-                    self.pc = self.run_input(input.unwrap())?;
-                    self.curstate = VMState::Runnable;
+                    if let Some(input) = input {
+                        self.pc = self.run_input(input)?;
+                        self.curstate = VMState::Runnable;
+                    } else {
+                        // Do nothing, we want input, none was given
+                    }
                 }
                 VMState::GaveOutput(_) => {
                     self.curstate = VMState::Runnable;
