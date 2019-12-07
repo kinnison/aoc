@@ -24,7 +24,7 @@ impl std::error::Error for Error {}
 /// A VM Result
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum OpCode {
     Add,
     Mul,
@@ -61,11 +61,20 @@ impl OpCode {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VMState {
+    Runnable,
+    WaitingOnInput,
+    GaveOutput(i64),
+    Halted,
+}
+
 /// The VM itself
 #[derive(Debug, Clone)]
 pub struct VM {
     ram: Vec<i64>,
     pc: i64,
+    curstate: VMState,
 }
 
 impl VM {
@@ -132,19 +141,13 @@ impl VM {
         Ok(self.pc + 4)
     }
 
-    pub fn run_input(&mut self, cursor: &mut usize, input: &[i64]) -> Result<i64> {
-        if *cursor >= input.len() {
-            Err(Error::NoMoreInput(self.pc))
-        } else {
-            self.poke(self.addr_for(0)?, input[*cursor])?;
-            *cursor += 1;
-            Ok(self.pc + 2)
-        }
+    pub fn run_input(&mut self, input: i64) -> Result<i64> {
+        self.poke(self.addr_for(0)?, input)?;
+        Ok(self.pc + 2)
     }
 
-    pub fn run_output(&self, output: &mut Vec<i64>) -> Result<i64> {
-        output.push(self.peek(self.addr_for(0)?)?);
-        Ok(self.pc + 2)
+    pub fn run_output(&self) -> Result<(i64, i64)> {
+        Ok((self.pc + 2, self.peek(self.addr_for(0)?)?))
     }
 
     pub fn run_jump_if_true(&self) -> Result<i64> {
@@ -193,22 +196,72 @@ impl VM {
         Ok(self.pc + 4)
     }
 
+    pub fn interpreter_step(&mut self, input: Option<i64>) -> Result<VMState> {
+        loop {
+            match self.curstate {
+                VMState::Runnable => {
+                    let new_pc = match self.opcode()? {
+                        OpCode::Add => self.run_add(),
+                        OpCode::Mul => self.run_mul(),
+                        OpCode::Input => {
+                            self.curstate = VMState::WaitingOnInput;
+                            Ok(self.pc)
+                        }
+                        OpCode::Output => {
+                            let (pc, out) = self.run_output()?;
+                            self.curstate = VMState::GaveOutput(out);
+                            Ok(pc)
+                        }
+                        OpCode::JumpIfTrue => self.run_jump_if_true(),
+                        OpCode::JumpIfFalse => self.run_jump_if_false(),
+                        OpCode::LessThan => self.run_less_than(),
+                        OpCode::Equals => self.run_equals(),
+                        OpCode::Terminate => {
+                            self.curstate = VMState::Halted;
+                            Ok(self.pc)
+                        }
+                    }?;
+                    self.pc = new_pc;
+                }
+                VMState::WaitingOnInput => {
+                    assert_eq!(self.opcode()?, OpCode::Input);
+                    self.pc = self.run_input(input.unwrap())?;
+                    self.curstate = VMState::Runnable;
+                }
+                VMState::GaveOutput(_) => {
+                    self.curstate = VMState::Runnable;
+                }
+                VMState::Halted => {
+                    // Do nothing
+                }
+            }
+            if self.curstate != VMState::Runnable {
+                break Ok(self.curstate);
+            }
+        }
+    }
+
     pub fn full_interpret(&mut self, input: &[i64], output: &mut Vec<i64>) -> Result<()> {
         let mut input_cursor = 0;
-        loop {
-            let new_pc = match self.opcode()? {
-                OpCode::Add => self.run_add(),
-                OpCode::Mul => self.run_mul(),
-                OpCode::Input => self.run_input(&mut input_cursor, input),
-                OpCode::Output => self.run_output(output),
-                OpCode::JumpIfTrue => self.run_jump_if_true(),
-                OpCode::JumpIfFalse => self.run_jump_if_false(),
-                OpCode::LessThan => self.run_less_than(),
-                OpCode::Equals => self.run_equals(),
-                OpCode::Terminate => break Ok(()),
-            }?;
-            self.pc = new_pc;
+        let mut vmstate = self.interpreter_step(None)?;
+        while vmstate != VMState::Halted {
+            match vmstate {
+                VMState::Runnable => vmstate = self.interpreter_step(None)?,
+                VMState::WaitingOnInput => {
+                    if input_cursor == input.len() {
+                        return Err(Error::NoMoreInput(self.pc));
+                    }
+                    vmstate = self.interpreter_step(Some(input[input_cursor]))?;
+                    input_cursor += 1;
+                }
+                VMState::GaveOutput(v) => {
+                    output.push(v);
+                    vmstate = self.interpreter_step(None)?;
+                }
+                VMState::Halted => {}
+            }
         }
+        Ok(())
     }
 
     pub fn interpret(&mut self) -> Result<()> {
@@ -222,6 +275,10 @@ impl std::str::FromStr for VM {
     fn from_str(s: &str) -> Result<Self> {
         let ram: Vec<i64> =
             super::line_as_list(s).map_err(|e| Error::ParseError(format!("{}", e)))?;
-        Ok(Self { ram, pc: 0 })
+        Ok(Self {
+            ram,
+            pc: 0,
+            curstate: VMState::Runnable,
+        })
     }
 }
