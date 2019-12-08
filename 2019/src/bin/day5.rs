@@ -91,9 +91,9 @@ fn part1(vm: &intcode::VM) -> Result<i64> {
     let input = [1];
     let mut output = Vec::new();
     vm.full_interpret(&input, &mut output)?;
-    for i in 0..(output.len() - 1) {
-        if output[i] != 0 {
-            println!("Bad output: {} at {}", output[i], i);
+    for (i, v) in output.iter().copied().take(output.len() - 1).enumerate() {
+        if v != 0 {
+            println!("Bad output: {} at {}", v, i);
         }
     }
     Ok(output[output.len() - 1])
@@ -104,9 +104,9 @@ fn part2(vm: &intcode::VM) -> Result<i64> {
     let input = [5];
     let mut output = Vec::new();
     vm.full_interpret(&input, &mut output)?;
-    for i in 0..(output.len() - 1) {
-        if output[i] != 0 {
-            println!("Bad output: {} at {}", output[i], i);
+    for (i, v) in output.iter().copied().take(output.len() - 1).enumerate() {
+        if v != 0 {
+            println!("Bad output: {} at {}", v, i);
         }
     }
     Ok(output[output.len() - 1])

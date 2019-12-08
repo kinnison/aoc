@@ -14,7 +14,7 @@ fn part1(input: &str) -> Result<usize> {
             (zeroes, ones * twos)
         })
         .collect();
-    assert!(layers.len() > 0);
+    assert!(!layers.is_empty());
     layers.sort();
     Ok(layers[0].1)
 }
