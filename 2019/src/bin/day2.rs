@@ -22,19 +22,19 @@ mod test {
     fn test_cases_2() {}
 }
 
-fn run_nv(code: &str, noun: i64, verb: i64) -> i64 {
-    let mut vm = intcode::VM::from_str(code).expect("Unable to parse program");
+fn run_nv(code: &intcode::VM, noun: i64, verb: i64) -> i64 {
+    let mut vm = code.clone();
     vm.poke(1, noun).expect("Unable to poke at 1");
     vm.poke(2, verb).expect("Unable to poke at 1");
     vm.interpret().expect("Unable to interpret");
     vm.peek(0).expect("Error peeking 0")
 }
 
-fn part1(code: &str) -> i64 {
+fn part1(code: &intcode::VM) -> i64 {
     run_nv(code, 12, 2)
 }
 
-fn part2(code: &str) -> i64 {
+fn part2(code: &intcode::VM) -> i64 {
     for noun in 0..=99 {
         for verb in 0..=99 {
             if run_nv(code, noun, verb) == 19_690_720 {
@@ -48,10 +48,11 @@ fn part2(code: &str) -> i64 {
 fn main() -> Result<()> {
     let input = read_input(2)?;
     let input = input.trim();
+    let input = intcode::VM::from_str(input)?;
     if cfg!(debug_assertions) {
         println!("Input: {:?}", input);
     }
-    println!("Part 1: {}", part1(input));
-    println!("Part 2: {}", part2(input));
+    println!("Part 1: {}", part1(&input));
+    println!("Part 2: {}", part2(&input));
     Ok(())
 }
