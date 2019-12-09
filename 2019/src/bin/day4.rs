@@ -109,8 +109,10 @@ fn main() -> Result<()> {
     let input = read_input(4)?;
     let (first, second) = input.split_at(input.find('-').unwrap());
     let second = &second[1..];
-    println!("first: {}", first);
-    println!("second: {}", second);
+    if cfg!(debug_assertions) {
+        println!("first: {}", first);
+        println!("second: {}", second);
+    }
     println!("Part 1: {}", part1(first, second));
     println!("Part 1: {}", part2(first, second));
     Ok(())

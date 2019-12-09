@@ -48,7 +48,9 @@ fn part2(code: &str) -> i64 {
 fn main() -> Result<()> {
     let input = read_input(2)?;
     let input = input.trim();
-    println!("Input: {:?}", input);
+    if cfg!(debug_assertions) {
+        println!("Input: {:?}", input);
+    }
     println!("Part 1: {}", part1(input));
     println!("Part 2: {}", part2(input));
     Ok(())
