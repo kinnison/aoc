@@ -42,7 +42,7 @@ pub enum OpCode {
 }
 
 impl OpCode {
-    pub fn convert(from: i64) -> Result<Self> {
+    fn convert(from: i64) -> Result<Self> {
         if from < 1 {
             Err(Error::BadOpCode(from))
         } else {
@@ -100,12 +100,12 @@ impl VM {
         }
     }
 
-    pub fn opcode(&self) -> Result<OpCode> {
+    fn opcode(&self) -> Result<OpCode> {
         let opval = self.peek(self.pc)?;
         OpCode::convert(opval)
     }
 
-    pub fn addr_for(&self, operand: i64) -> Result<i64> {
+    fn addr_for(&self, operand: i64) -> Result<i64> {
         let opval = self.peek(self.pc)?;
         let divisor = 10i64.pow((operand + 2) as u32);
         let shifted = opval / divisor;
@@ -118,7 +118,7 @@ impl VM {
         }
     }
 
-    pub fn debug_instr(&self, args: i64) -> Result<()> {
+    fn debug_instr(&self, args: i64) -> Result<()> {
         if cfg!(debug_assertions) {
             print!(
                 "RB={} PC={} OpVal={} ",
@@ -138,30 +138,30 @@ impl VM {
         Ok(())
     }
 
-    pub fn run_add(&mut self) -> Result<i64> {
+    fn run_add(&mut self) -> Result<i64> {
         let arg1 = self.peek(self.addr_for(0)?)?;
         let arg2 = self.peek(self.addr_for(1)?)?;
         self.poke(self.addr_for(2)?, arg1 + arg2)?;
         Ok(self.pc + 4)
     }
 
-    pub fn run_mul(&mut self) -> Result<i64> {
+    fn run_mul(&mut self) -> Result<i64> {
         let arg1 = self.peek(self.addr_for(0)?)?;
         let arg2 = self.peek(self.addr_for(1)?)?;
         self.poke(self.addr_for(2)?, arg1 * arg2)?;
         Ok(self.pc + 4)
     }
 
-    pub fn run_input(&mut self, input: i64) -> Result<i64> {
+    fn run_input(&mut self, input: i64) -> Result<i64> {
         self.poke(self.addr_for(0)?, input)?;
         Ok(self.pc + 2)
     }
 
-    pub fn run_output(&self) -> Result<(i64, i64)> {
+    fn run_output(&self) -> Result<(i64, i64)> {
         Ok((self.pc + 2, self.peek(self.addr_for(0)?)?))
     }
 
-    pub fn run_jump_if_true(&self) -> Result<i64> {
+    fn run_jump_if_true(&self) -> Result<i64> {
         self.debug_instr(2)?;
         let arg = self.peek(self.addr_for(0)?)?;
         if arg == 0 {
@@ -172,7 +172,7 @@ impl VM {
         }
     }
 
-    pub fn run_jump_if_false(&self) -> Result<i64> {
+    fn run_jump_if_false(&self) -> Result<i64> {
         self.debug_instr(2)?;
         let arg = self.peek(self.addr_for(0)?)?;
         if arg != 0 {
@@ -183,7 +183,7 @@ impl VM {
         }
     }
 
-    pub fn run_less_than(&mut self) -> Result<i64> {
+    fn run_less_than(&mut self) -> Result<i64> {
         self.debug_instr(3)?;
         let arg1 = self.peek(self.addr_for(0)?)?;
         let arg2 = self.peek(self.addr_for(1)?)?;
@@ -195,7 +195,7 @@ impl VM {
         Ok(self.pc + 4)
     }
 
-    pub fn run_equals(&mut self) -> Result<i64> {
+    fn run_equals(&mut self) -> Result<i64> {
         self.debug_instr(3)?;
         let arg1 = self.peek(self.addr_for(0)?)?;
         let arg2 = self.peek(self.addr_for(1)?)?;
@@ -207,7 +207,7 @@ impl VM {
         Ok(self.pc + 4)
     }
 
-    pub fn run_relative_base(&mut self) -> Result<i64> {
+    fn run_relative_base(&mut self) -> Result<i64> {
         self.debug_instr(1)?;
         let arg1 = self.peek(self.addr_for(0)?)?;
         self.relative_base += arg1;
