@@ -29,24 +29,24 @@ impl WireStep {
 
 #[derive(Debug)]
 struct Wire {
-    steps: Vec<WireStep>,
+    points: Vec<(i32, i32)>,
 }
 
 impl Wire {
     pub fn from_steps(steps: Vec<WireStep>) -> Self {
-        Self { steps }
+        let mut here = (0, 0);
+        let mut points = vec![here];
+        for step in steps {
+            for point in step.points_from(here) {
+                here = point;
+                points.push(here);
+            }
+        }
+        Self { points }
     }
 
     pub fn all_points(&self) -> HashSet<(i32, i32)> {
-        let mut here = (0, 0);
-        let mut ret = HashSet::new();
-        for step in &self.steps {
-            for point in step.points_from(here) {
-                here = point;
-                ret.insert(here);
-            }
-        }
-        ret
+        self.points.iter().skip(1).copied().collect()
     }
 
     pub fn overlap_distance(&self, other: &Wire) -> i32 {
@@ -64,17 +64,13 @@ impl Wire {
     }
 
     pub fn all_points_with_distance(&self) -> HashMap<(i32, i32), usize> {
-        let mut here = (0, 0);
-        let mut distance = 0;
-        let mut ret = HashMap::new();
-        for step in &self.steps {
-            for point in step.points_from(here) {
-                here = point;
-                distance += 1;
-                ret.entry(here).or_insert(distance);
-            }
-        }
-        ret
+        self.points
+            .iter()
+            .copied()
+            .enumerate()
+            .skip(1)
+            .map(|(a, b)| (b, a))
+            .collect()
     }
 
     pub fn stepwise_overlap_distance(&self, other: &Wire) -> usize {
