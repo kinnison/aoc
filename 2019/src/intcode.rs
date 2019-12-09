@@ -36,6 +36,7 @@ pub enum OpCode {
     JumpIfFalse,
     LessThan,
     Equals,
+    SetRelativeBase,
     // Last opcode
     Terminate,
 }
@@ -55,6 +56,7 @@ impl OpCode {
                 6 => Ok(Self::JumpIfFalse),
                 7 => Ok(Self::LessThan),
                 8 => Ok(Self::Equals),
+                9 => Ok(Self::SetRelativeBase),
                 99 => Ok(Self::Terminate),
 
                 _ => Err(Error::UnknownOpCode(opval)),
@@ -77,6 +79,7 @@ pub struct VM {
     ram: BTreeMap<i64, i64>,
     pc: i64,
     curstate: VMState,
+    relative_base: i64,
 }
 
 impl VM {
@@ -110,13 +113,19 @@ impl VM {
         match mode {
             0 => self.peek(self.pc + 1 + operand),
             1 => Ok(self.pc + 1 + operand),
+            2 => Ok(self.peek(self.pc + 1 + operand)? + self.relative_base),
             _ => Err(Error::UnknownAddressingMode(mode)),
         }
     }
 
     pub fn debug_instr(&self, args: i64) -> Result<()> {
         if cfg!(debug_assertions) {
-            print!("PC={} OpVal={} ", self.pc, self.peek(self.pc)?);
+            print!(
+                "RB={} PC={} OpVal={} ",
+                self.relative_base,
+                self.pc,
+                self.peek(self.pc)?
+            );
             print!("OpCode={:?} Args=", self.opcode()?);
             for arg in 0..args {
                 let argval = self.peek(self.pc + 1 + arg)?;
@@ -198,6 +207,13 @@ impl VM {
         Ok(self.pc + 4)
     }
 
+    pub fn run_relative_base(&mut self) -> Result<i64> {
+        self.debug_instr(1)?;
+        let arg1 = self.peek(self.addr_for(0)?)?;
+        self.relative_base += arg1;
+        Ok(self.pc + 2)
+    }
+
     pub fn interpreter_step(&mut self, input: Option<i64>) -> Result<VMState> {
         loop {
             match self.curstate {
@@ -218,6 +234,7 @@ impl VM {
                         OpCode::JumpIfFalse => self.run_jump_if_false(),
                         OpCode::LessThan => self.run_less_than(),
                         OpCode::Equals => self.run_equals(),
+                        OpCode::SetRelativeBase => self.run_relative_base(),
                         OpCode::Terminate => {
                             self.curstate = VMState::Halted;
                             Ok(self.pc)
@@ -290,6 +307,7 @@ impl std::str::FromStr for VM {
             ram,
             pc: 0,
             curstate: VMState::Runnable,
+            relative_base: 0,
         })
     }
 }
