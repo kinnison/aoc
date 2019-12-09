@@ -2,6 +2,8 @@
 //!
 //!
 
+use std::collections::BTreeMap;
+
 /// Errors this stuff can return
 #[derive(Debug)]
 pub enum Error {
@@ -72,25 +74,25 @@ pub enum VMState {
 /// The VM itself
 #[derive(Debug, Clone)]
 pub struct VM {
-    ram: Vec<i64>,
+    ram: BTreeMap<i64, i64>,
     pc: i64,
     curstate: VMState,
 }
 
 impl VM {
     pub fn peek(&self, addr: i64) -> Result<i64> {
-        if addr < 0 || (addr as usize) >= self.ram.len() {
+        if addr < 0 {
             Err(Error::BadAddress(addr))
         } else {
-            Ok(self.ram[addr as usize])
+            Ok(self.ram.get(&addr).copied().unwrap_or(0))
         }
     }
 
     pub fn poke(&mut self, addr: i64, value: i64) -> Result<()> {
-        if addr < 0 || (addr as usize) >= self.ram.len() {
+        if addr < 0 {
             Err(Error::BadAddress(addr))
         } else {
-            self.ram[addr as usize] = value;
+            *self.ram.entry(addr).or_insert(0) = value;
             Ok(())
         }
     }
@@ -279,6 +281,11 @@ impl std::str::FromStr for VM {
     fn from_str(s: &str) -> Result<Self> {
         let ram: Vec<i64> =
             super::line_as_list(s).map_err(|e| Error::ParseError(format!("{}", e)))?;
+        let ram: BTreeMap<i64, i64> = ram
+            .into_iter()
+            .enumerate()
+            .map(|(idx, val)| (idx as i64, val))
+            .collect();
         Ok(Self {
             ram,
             pc: 0,
