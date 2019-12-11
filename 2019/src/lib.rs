@@ -91,3 +91,46 @@ pub fn read_input_as_lists<T: ParseByRegex>(day: usize) -> Result<Vec<Vec<T>>> {
 pub mod intcode;
 
 pub use std::str::FromStr;
+
+#[derive(Debug, Copy, Clone)]
+pub enum Facing {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+impl Facing {
+    pub fn rotate_left(self) -> Self {
+        use Facing::*;
+        match self {
+            Up => Left,
+            Down => Right,
+            Left => Down,
+            Right => Up,
+        }
+    }
+
+    pub fn rotate_right(self) -> Self {
+        use Facing::*;
+        match self {
+            Up => Right,
+            Down => Left,
+            Left => Up,
+            Right => Down,
+        }
+    }
+
+    pub fn move_by<N>(&self, pos: (N, N)) -> (N, N)
+    where
+        N: num_traits::Num,
+    {
+        use Facing::*;
+        match self {
+            Up => (pos.0, pos.1 - N::one()),
+            Down => (pos.0, pos.1 + N::one()),
+            Left => (pos.0 - N::one(), pos.1),
+            Right => (pos.0 + N::one(), pos.1),
+        }
+    }
+}

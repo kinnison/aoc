@@ -16,6 +16,7 @@ dependencies = [
  "itertools 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "md5 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parsebyregex 0.1.0 (git+git://git.gitano.org.uk/parsebyregex.git)",
  "parsebyregex-derive 0.1.0 (git+git://git.gitano.org.uk/parsebyregex.git)",
  "permutohedron 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
