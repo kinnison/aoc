@@ -75,44 +75,35 @@ fn part1(input: &[Moon]) -> i32 {
 fn part2(input: &[Moon]) -> usize {
     let mut moons = input.to_owned();
     let mut steps = 0;
-    let mut xseen = HashSet::new();
-    let mut yseen = HashSet::new();
-    let mut zseen = HashSet::new();
     let mut xcount = 0;
     let mut ycount = 0;
     let mut zcount = 0;
     loop {
         if xcount == 0 {
-            let xdata: Vec<i32> = moons
+            if moons
                 .iter()
-                .flat_map(|moon| vec![moon.pos.x, moon.vel.x])
-                .collect();
-            if xseen.contains(&xdata) {
+                .zip(input.iter())
+                .all(|(a, b)| a.pos.x == b.pos.x && a.vel.x == b.vel.x)
+            {
                 xcount = steps;
-            } else {
-                xseen.insert(xdata);
             }
         }
         if ycount == 0 {
-            let ydata: Vec<i32> = moons
+            if moons
                 .iter()
-                .flat_map(|moon| vec![moon.pos.y, moon.vel.y])
-                .collect();
-            if yseen.contains(&ydata) {
+                .zip(input.iter())
+                .all(|(a, b)| a.pos.y == b.pos.y && a.vel.y == b.vel.y)
+            {
                 ycount = steps;
-            } else {
-                yseen.insert(ydata);
             }
         }
         if zcount == 0 {
-            let zdata: Vec<i32> = moons
+            if moons
                 .iter()
-                .flat_map(|moon| vec![moon.pos.z, moon.vel.z])
-                .collect();
-            if zseen.contains(&zdata) {
+                .zip(input.iter())
+                .all(|(a, b)| a.pos.z == b.pos.z && a.vel.z == b.vel.z)
+            {
                 zcount = steps;
-            } else {
-                zseen.insert(zdata);
             }
         }
         if (xcount != 0) && (ycount != 0) && (zcount != 0) {
