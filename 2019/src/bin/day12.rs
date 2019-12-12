@@ -1,0 +1,143 @@
+use aoc2019::*;
+
+#[derive(ParseByRegex, Clone, Debug, Default, PartialEq, Hash, Eq)]
+#[regex = r"<x=(?P<x>-?\d+), y=(?P<y>-?\d+), z=(?P<z>-?\d+)>"]
+struct Position {
+    x: i32,
+    y: i32,
+    z: i32,
+}
+
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
+struct Moon {
+    pos: Position,
+    vel: Position,
+}
+
+impl Moon {
+    fn new(pos: Position) -> Self {
+        Self {
+            pos,
+            vel: Position::default(),
+        }
+    }
+
+    fn adjust_velocites(&mut self, other: &mut Moon) {
+        if self.pos.x < other.pos.x {
+            self.vel.x += 1;
+            other.vel.x -= 1;
+        } else if self.pos.x > other.pos.x {
+            self.vel.x -= 1;
+            other.vel.x += 1;
+        }
+        if self.pos.y < other.pos.y {
+            self.vel.y += 1;
+            other.vel.y -= 1;
+        } else if self.pos.y > other.pos.y {
+            self.vel.y -= 1;
+            other.vel.y += 1;
+        }
+        if self.pos.z < other.pos.z {
+            self.vel.z += 1;
+            other.vel.z -= 1;
+        } else if self.pos.z > other.pos.z {
+            self.vel.z -= 1;
+            other.vel.z += 1;
+        }
+    }
+
+    fn apply_velocity(&mut self) {
+        self.pos.x += self.vel.x;
+        self.pos.y += self.vel.y;
+        self.pos.z += self.vel.z;
+    }
+
+    fn energy(&self) -> i32 {
+        (self.pos.x.abs() + self.pos.y.abs() + self.pos.z.abs())
+            * (self.vel.x.abs() + self.vel.y.abs() + self.vel.z.abs())
+    }
+}
+
+fn part1(input: &[Moon]) -> i32 {
+    let mut moons = input.to_owned();
+    for _ in 0..1000 {
+        for moon1 in 0..input.len() - 1 {
+            for moon2 in moon1 + 1..input.len() {
+                let (left, right) = moons.split_at_mut(moon2);
+                left[moon1].adjust_velocites(&mut right[0]);
+            }
+        }
+        moons.iter_mut().for_each(|moon| moon.apply_velocity());
+    }
+    moons.iter().map(|m| m.energy()).sum()
+}
+
+fn part2(input: &[Moon]) -> usize {
+    let mut moons = input.to_owned();
+    let mut steps = 0;
+    let mut xseen = HashSet::new();
+    let mut yseen = HashSet::new();
+    let mut zseen = HashSet::new();
+    let mut xcount = 0;
+    let mut ycount = 0;
+    let mut zcount = 0;
+    loop {
+        if xcount == 0 {
+            let xdata: Vec<i32> = moons
+                .iter()
+                .flat_map(|moon| vec![moon.pos.x, moon.vel.x])
+                .collect();
+            if xseen.contains(&xdata) {
+                xcount = steps;
+            } else {
+                xseen.insert(xdata);
+            }
+        }
+        if ycount == 0 {
+            let ydata: Vec<i32> = moons
+                .iter()
+                .flat_map(|moon| vec![moon.pos.y, moon.vel.y])
+                .collect();
+            if yseen.contains(&ydata) {
+                ycount = steps;
+            } else {
+                yseen.insert(ydata);
+            }
+        }
+        if zcount == 0 {
+            let zdata: Vec<i32> = moons
+                .iter()
+                .flat_map(|moon| vec![moon.pos.z, moon.vel.z])
+                .collect();
+            if zseen.contains(&zdata) {
+                zcount = steps;
+            } else {
+                zseen.insert(zdata);
+            }
+        }
+        if (xcount != 0) && (ycount != 0) && (zcount != 0) {
+            break;
+        }
+        steps += 1;
+        for moon1 in 0..input.len() - 1 {
+            for moon2 in moon1 + 1..input.len() {
+                let (left, right) = moons.split_at_mut(moon2);
+                left[moon1].adjust_velocites(&mut right[0]);
+            }
+        }
+        moons.iter_mut().for_each(|moon| moon.apply_velocity());
+    }
+    // Each of x, y, and z repeated, so the lcm of all those repeats
+    // should be the repeat for all three...
+    lcm(lcm(xcount, ycount), zcount)
+}
+
+fn main() -> Result<()> {
+    let input: Vec<Position> = read_input_as_vec(12)?;
+    let input: Vec<Moon> = input.into_iter().map(Moon::new).collect();
+
+    println!("Part 1: {}", part1(&input));
+    println!("Part 2: {}", part2(&input));
+
+    Ok(())
+}
