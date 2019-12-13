@@ -19,3 +19,4 @@ parsebyregex-derive = { git="git://git.gitano.org.uk/parsebyregex.git" }
 twoway = "0.2"
 itertools = "0.8"
 num-traits = "0.2"
+color-backtrace = "0.3"
