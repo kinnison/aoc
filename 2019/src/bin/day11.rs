@@ -33,6 +33,10 @@ impl PaintingBot {
             match self.prog.interpreter_step(next_input)? {
                 Runnable => {}
                 WaitingOnInput => {
+                    assert!(
+                        awaiting_paint,
+                        "Odd, we're between painting and moving and yet the bot requested input"
+                    );
                     let panel_white = *self.panels.entry(cursor).or_insert(false);
                     let panel_num = if panel_white { 1 } else { 0 };
                     pending_input = Some(panel_num);
