@@ -79,36 +79,37 @@ fn part2(input: &[Moon]) -> usize {
     let mut ycount = 0;
     let mut zcount = 0;
     loop {
-        if xcount == 0 {
-            if moons
+        if xcount == 0
+            && moons
                 .iter()
                 .zip(input.iter())
                 .all(|(a, b)| a.pos.x == b.pos.x && a.vel.x == b.vel.x)
-            {
-                xcount = steps;
-            }
+        {
+            xcount = steps;
         }
-        if ycount == 0 {
-            if moons
+
+        if ycount == 0
+            && moons
                 .iter()
                 .zip(input.iter())
                 .all(|(a, b)| a.pos.y == b.pos.y && a.vel.y == b.vel.y)
-            {
-                ycount = steps;
-            }
+        {
+            ycount = steps;
         }
-        if zcount == 0 {
-            if moons
+
+        if zcount == 0
+            && moons
                 .iter()
                 .zip(input.iter())
                 .all(|(a, b)| a.pos.z == b.pos.z && a.vel.z == b.vel.z)
-            {
-                zcount = steps;
-            }
+        {
+            zcount = steps;
         }
+
         if (xcount != 0) && (ycount != 0) && (zcount != 0) {
             break;
         }
+
         steps += 1;
         for moon1 in 0..input.len() - 1 {
             for moon2 in moon1 + 1..input.len() {
