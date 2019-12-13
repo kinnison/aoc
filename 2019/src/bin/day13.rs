@@ -28,7 +28,6 @@ fn part1(input: &intcode::VM) -> Result<usize> {
 }
 
 fn part2(input: &intcode::VM) -> Result<i64> {
-    let mut screen: HashMap<(i64, i64), i64> = HashMap::new();
     let mut x = None;
     let mut y = None;
     let mut ballx = 0;
@@ -52,13 +51,10 @@ fn part2(input: &intcode::VM) -> Result<i64> {
                     let y = y.take().unwrap();
                     if (x == -1) && (y == 0) {
                         score = v;
-                    } else {
-                        screen.insert((x, y), v);
-                        if v == 3 {
-                            padx = x;
-                        } else if v == 4 {
-                            ballx = x;
-                        }
+                    } else if v == 3 {
+                        padx = x;
+                    } else if v == 4 {
+                        ballx = x;
                     }
                 }
             }
