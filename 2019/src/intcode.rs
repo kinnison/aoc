@@ -41,24 +41,23 @@ pub enum OpCode {
 
 impl OpCode {
     fn convert(from: i64) -> Result<Self> {
-        if from < 1 {
-            Err(Error::BadOpCode(from))
-        } else {
-            let opval = from % 100;
-            match opval {
-                1 => Ok(Self::Add),
-                2 => Ok(Self::Mul),
-                3 => Ok(Self::Input),
-                4 => Ok(Self::Output),
-                5 => Ok(Self::JumpIfTrue),
-                6 => Ok(Self::JumpIfFalse),
-                7 => Ok(Self::LessThan),
-                8 => Ok(Self::Equals),
-                9 => Ok(Self::SetRelativeBase),
-                99 => Ok(Self::Terminate),
+        if cfg!(debug_assertions) && from < 1 {
+            return Err(Error::BadOpCode(from));
+        }
+        let opval = from % 100;
+        match opval {
+            1 => Ok(Self::Add),
+            2 => Ok(Self::Mul),
+            3 => Ok(Self::Input),
+            4 => Ok(Self::Output),
+            5 => Ok(Self::JumpIfTrue),
+            6 => Ok(Self::JumpIfFalse),
+            7 => Ok(Self::LessThan),
+            8 => Ok(Self::Equals),
+            9 => Ok(Self::SetRelativeBase),
+            99 => Ok(Self::Terminate),
 
-                _ => Err(Error::UnknownOpCode(opval)),
-            }
+            _ => Err(Error::UnknownOpCode(opval)),
         }
     }
 }
@@ -81,17 +80,32 @@ pub struct VM {
 }
 
 impl VM {
+    #[inline]
     pub fn peek(&self, addr: i64) -> Result<i64> {
-        if addr < 0 {
-            Err(Error::BadAddress(addr))
-        } else {
-            Ok(self.ram.get(addr as usize).copied().unwrap_or(0))
+        if cfg!(debug_assertions) && addr < 0 {
+            return Err(Error::BadAddress(addr));
         }
+        let addr = addr as usize;
+        Ok(if addr < self.ram.len() {
+            self.ram[addr]
+        } else {
+            0
+        })
     }
 
+    #[inline]
     pub fn poke(&mut self, addr: i64, value: i64) -> Result<()> {
-        if addr < 0 {
-            Err(Error::BadAddress(addr))
+        if cfg!(debug_assertions) {
+            if addr < 0 {
+                Err(Error::BadAddress(addr))
+            } else {
+                let addr = addr as usize;
+                while addr >= self.ram.len() {
+                    self.ram.resize(addr + 1024, 0);
+                }
+                self.ram[addr] = value;
+                Ok(())
+            }
         } else {
             let addr = addr as usize;
             while addr >= self.ram.len() {
@@ -120,23 +134,27 @@ impl VM {
         }
     }
 
+    #[cfg(feature = "debug_intcode")]
     fn debug_instr(&self, args: i64) -> Result<()> {
-        if cfg!(debug_assertions) {
-            print!(
-                "RB={} PC={} OpVal={} ",
-                self.relative_base,
-                self.pc,
-                self.peek(self.pc)?
-            );
-            print!("OpCode={:?} Args=", self.opcode()?);
-            for arg in 0..args {
-                let argval = self.peek(self.pc + 1 + arg)?;
-                let argaddr = self.addr_for(arg)?;
-                let argres = self.peek(self.addr_for(arg)?)?;
-                print!(" {}[@{} => {}]", argval, argaddr, argres);
-            }
-            println!();
+        print!(
+            "RB={} PC={} OpVal={} ",
+            self.relative_base,
+            self.pc,
+            self.peek(self.pc)?
+        );
+        print!("OpCode={:?} Args=", self.opcode()?);
+        for arg in 0..args {
+            let argval = self.peek(self.pc + 1 + arg)?;
+            let argaddr = self.addr_for(arg)?;
+            let argres = self.peek(self.addr_for(arg)?)?;
+            print!(" {}[@{} => {}]", argval, argaddr, argres);
         }
+        println!();
+        Ok(())
+    }
+
+    #[cfg(not(feature = "debug_intcode"))]
+    fn debug_instr(&self, _args: i64) -> Result<()> {
         Ok(())
     }
 

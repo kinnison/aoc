@@ -4,8 +4,12 @@ version = "0.1.0"
 authors = ["Daniel Silverstone <daniel.silverstone@codethink.co.uk>"]
 edition = "2018"
 
+[features]
+debug_intcode = []
+
 [profile.release]
 lto = true
+debug = true
 
 [dependencies]
 md5="0.6.0"
