@@ -29,6 +29,7 @@ impl WireStep {
 #[derive(Debug)]
 struct Wire {
     points: Vec<(i32, i32)>,
+    pointmap: HashMap<(i32, i32), usize>,
 }
 
 impl Wire {
@@ -41,18 +42,20 @@ impl Wire {
                 points.push(here);
             }
         }
-        Self { points }
-    }
-
-    pub fn all_points(&self) -> HashSet<(i32, i32)> {
-        self.points.iter().skip(1).copied().collect()
+        let pointmap = points
+            .iter()
+            .copied()
+            .enumerate()
+            .skip(1)
+            .map(|(a, b)| (b, a))
+            .collect();
+        Self { points, pointmap }
     }
 
     pub fn overlap_distance(&self, other: &Wire) -> i32 {
-        let theirpoints = other.all_points();
         let mut closest = std::i32::MAX;
         for (x, y) in self.points.iter().skip(1).copied() {
-            if theirpoints.contains(&(x, y)) {
+            if other.pointmap.contains_key(&(x, y)) {
                 let distance = x.abs() + y.abs();
                 if distance < closest {
                     closest = distance;
@@ -62,21 +65,10 @@ impl Wire {
         closest
     }
 
-    pub fn all_points_with_distance(&self) -> HashMap<(i32, i32), usize> {
-        self.points
-            .iter()
-            .copied()
-            .enumerate()
-            .skip(1)
-            .map(|(a, b)| (b, a))
-            .collect()
-    }
-
     pub fn stepwise_overlap_distance(&self, other: &Wire) -> usize {
-        let otherpoints = other.all_points_with_distance();
         let mut distance = std::usize::MAX;
         for (mysteps, point) in self.points.iter().copied().enumerate().skip(1) {
-            if let Some(othersteps) = otherpoints.get(&point) {
+            if let Some(othersteps) = other.pointmap.get(&point) {
                 if (mysteps + othersteps) < distance {
                     distance = mysteps + othersteps;
                 }
