@@ -3,24 +3,23 @@ use aoc2019::*;
 #[derive(Debug, ParseByRegex)]
 enum WireStep {
     #[regex = r"U(\d+)"]
-    Up(i32),
+    Up(usize),
     #[regex = r"D(\d+)"]
-    Down(i32),
+    Down(usize),
     #[regex = r"L(\d+)"]
-    Left(i32),
+    Left(usize),
     #[regex = r"R(\d+)"]
-    Right(i32),
+    Right(usize),
 }
 
 impl WireStep {
     pub fn points_from(&self, start: (i32, i32)) -> impl Iterator<Item = (i32, i32)> {
         let (xstep, ystep, count) = match self {
-            Self::Up(n) => (0, -1, n),
-            Self::Down(n) => (0, 1, n),
-            Self::Left(n) => (-1, 0, n),
-            Self::Right(n) => (1, 0, n),
+            Self::Up(n) => (0, -1, *n),
+            Self::Down(n) => (0, 1, *n),
+            Self::Left(n) => (-1, 0, *n),
+            Self::Right(n) => (1, 0, *n),
         };
-        let count: usize = *count as usize;
         std::iter::successors(Some(start), move |(x, y)| Some((x + xstep, y + ystep)))
             .skip(1)
             .take(count)
