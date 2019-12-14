@@ -50,14 +50,14 @@ impl Wire {
     }
 
     pub fn overlap_distance(&self, other: &Wire) -> i32 {
-        let mypoints = self.all_points();
         let theirpoints = other.all_points();
-        let matches = mypoints.intersection(&theirpoints);
         let mut closest = std::i32::MAX;
-        for (x, y) in matches {
-            let distance = x.abs() + y.abs();
-            if distance < closest {
-                closest = distance;
+        for (x, y) in self.points.iter().skip(1).copied() {
+            if theirpoints.contains(&(x, y)) {
+                let distance = x.abs() + y.abs();
+                if distance < closest {
+                    closest = distance;
+                }
             }
         }
         closest
@@ -74,17 +74,13 @@ impl Wire {
     }
 
     pub fn stepwise_overlap_distance(&self, other: &Wire) -> usize {
-        let mypoints = self.all_points_with_distance();
         let otherpoints = other.all_points_with_distance();
-        let mypoints_set: HashSet<(i32, i32)> = mypoints.keys().copied().collect();
-        let otherpoints_set: HashSet<(i32, i32)> = otherpoints.keys().copied().collect();
-        let overlap = mypoints_set.intersection(&otherpoints_set);
         let mut distance = std::usize::MAX;
-        for point in overlap {
-            let mysteps = mypoints[point];
-            let othersteps = otherpoints[point];
-            if (mysteps + othersteps) < distance {
-                distance = mysteps + othersteps;
+        for (mysteps, point) in self.points.iter().copied().enumerate().skip(1) {
+            if let Some(othersteps) = otherpoints.get(&point) {
+                if (mysteps + othersteps) < distance {
+                    distance = mysteps + othersteps;
+                }
             }
         }
         distance
