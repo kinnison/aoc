@@ -1,6 +1,6 @@
 use aoc2019::*;
 
-#[derive(ParseByRegex, Clone, Debug, Default, PartialEq, Hash, Eq)]
+#[derive(ParseByRegex, Copy, Clone, Debug, Default, PartialEq, Hash, Eq)]
 #[regex = r"<x=(?P<x>-?\d+), y=(?P<y>-?\d+), z=(?P<z>-?\d+)>"]
 struct Position {
     x: i32,
@@ -8,7 +8,7 @@ struct Position {
     z: i32,
 }
 
-#[derive(Debug, Clone, PartialEq, Hash, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq)]
 struct Moon {
     pos: Position,
     vel: Position,
