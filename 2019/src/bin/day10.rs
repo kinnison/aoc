@@ -72,14 +72,12 @@ impl AsteroidField {
         for (_, v) in angles.iter_mut() {
             v.sort_by_cached_key(|other| -manhat(roid, *other));
         }
-        eprintln!("{:?}", angles);
         let mut ret = Vec::new();
         let mut oldlen = 1;
         while ret.len() != oldlen {
             oldlen = ret.len();
-            for (angle, roidlist) in angles.iter_mut() {
+            for (_angle, roidlist) in angles.iter_mut() {
                 if let Some(roid) = roidlist.pop() {
-                    println!("Angle: {} zapping {:?}", angle, roid);
                     ret.push(roid);
                 }
             }
@@ -243,7 +241,6 @@ fn part2(input: &AsteroidField, roid: (i32, i32)) -> (i32, i32) {
 
 fn main() -> Result<()> {
     let input = AsteroidField::parse_string(&read_input(10)?)?;
-    println!("Input: {:?}", input);
     let p1 = part1(&input);
     println!("Part 1: {:?}", p1);
     println!("Part 2: {:?}", part2(&input, p1.0));
