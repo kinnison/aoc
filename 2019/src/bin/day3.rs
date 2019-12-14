@@ -139,6 +139,6 @@ fn main() -> Result<()> {
     let input: Vec<Vec<WireStep>> = read_input_as_lists(3)?;
     let input: Vec<Wire> = input.into_iter().map(Wire::from_steps).collect();
     println!("Part 1: {}", part1(&input));
-    println!("Part 1: {}", part2(&input));
+    println!("Part 2: {}", part2(&input));
     Ok(())
 }
