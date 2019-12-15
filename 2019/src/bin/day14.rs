@@ -148,12 +148,12 @@ fn part2(input: &ReactionPool) -> Result<usize> {
     let cost1 = run_reactor(input, 1)?;
     // Ignoring leftovers, we can definitely create:
     let mut fuel_count = TRILLION / cost1;
-    let mut addend = 1000000;
+    let mut addend = 1_000_000;
     loop {
         let ore = run_reactor(input, fuel_count + addend)?;
         if ore >= TRILLION {
             if addend > 1 {
-                addend = addend / 10;
+                addend /= 10;
                 continue;
             } else {
                 break;
@@ -218,8 +218,8 @@ mod test {
 7 XCVML => 6 RJRHP
 5 BHXH, 4 VRPVC => 5 LTCX";
         let input = load_data(INPUT).expect("Unable to parse input reactions");
-        assert_eq!(part1(&input).expect("Factory exploded?"), 2210736);
-        assert_eq!(part2(&input).expect("Factory exploded?"), 460664);
+        assert_eq!(part1(&input).expect("Factory exploded?"), 2_210_736);
+        assert_eq!(part2(&input).expect("Factory exploded?"), 460_664);
     }
 }
 
