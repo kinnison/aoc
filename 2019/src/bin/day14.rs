@@ -33,6 +33,7 @@ impl TryFrom<InputReaction> for Reaction {
 }
 
 type ChemicalSoup = HashMap<String, usize>;
+type ChemicalSoupBorrow<'a> = HashMap<&'a str, usize>;
 
 struct SoupyReaction {
     output: String,
@@ -72,28 +73,22 @@ fn load_data(s: &str) -> Result<ReactionPool> {
     Ok(ret)
 }
 
-fn run_reactor(reactions: &ReactionPool, fuel: usize) -> Result<usize> {
-    let mut factory: ChemicalSoup = HashMap::new();
-    let mut spares: ChemicalSoup = HashMap::new();
+fn run_reactor<'a>(reactions: &'a ReactionPool, fuel: usize) -> Result<usize> {
+    let mut factory: ChemicalSoupBorrow<'a> = HashMap::new();
+    let mut spares: ChemicalSoupBorrow<'a> = HashMap::new();
 
     // Our goal is to make one fuel, so that's the factory's target
-    factory.insert("FUEL".to_owned(), fuel);
+    factory.insert("FUEL", fuel);
     // We keep working backwards producing something the factory needs
     // until we've run back to ORE only
     while let Some(target) = factory
         .iter()
-        .filter_map(|(k, v)| {
-            if k.as_str() != "ORE" && *v > 0 {
-                Some(k)
-            } else {
-                None
-            }
-        })
+        .filter_map(|(k, v)| if *k != "ORE" && *v > 0 { Some(k) } else { None })
         .next()
-        .cloned()
+        .copied()
     {
         let wanted = factory[&target];
-        let reaction = &reactions[&target];
+        let reaction = &reactions[target];
         // To make the target, we need some number of the reaction applied
         //println!("Applying reaction to make {} of {}", wanted, target);
         // How many of the reaction do we need?
@@ -110,7 +105,7 @@ fn run_reactor(reactions: &ReactionPool, fuel: usize) -> Result<usize> {
         // First, remove the goal from the factory and add spares to the
         // spares holder
         factory.remove(&target);
-        *spares.entry(target.clone()).or_default() += spare;
+        *spares.entry(target).or_default() += spare;
         // Now add multiplied up reagent set to the factory
         for (reagent, eachcount) in reaction.inputs.iter() {
             //println!(
@@ -118,7 +113,7 @@ fn run_reactor(reactions: &ReactionPool, fuel: usize) -> Result<usize> {
             //    eachcount * multiplier,
             //    reagent
             //);
-            *factory.entry(reagent.clone()).or_default() += eachcount * multiplier;
+            *factory.entry(reagent).or_default() += eachcount * multiplier;
         }
         // Next, reduce spares onto the factory
         for (chemical, count) in spares.iter_mut() {
@@ -128,7 +123,7 @@ fn run_reactor(reactions: &ReactionPool, fuel: usize) -> Result<usize> {
                     let xfer = min(*count, wanted);
                     //println!("Transferring {} of {} from the spares", wanted, chemical);
                     *count -= xfer;
-                    *factory.entry(chemical.clone()).or_default() -= xfer;
+                    *factory.entry(chemical).or_default() -= xfer;
                 }
             }
         }
