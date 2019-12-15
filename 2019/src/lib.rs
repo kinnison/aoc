@@ -157,3 +157,12 @@ pub fn gcd(a: usize, b: usize) -> usize {
 pub fn lcm(a: usize, b: usize) -> usize {
     a * b / gcd(a, b)
 }
+
+pub fn surrounds(pos: (i32, i32)) -> [(i32, i32); 4] {
+    [
+        (pos.0, pos.1 - 1),
+        (pos.0, pos.1 + 1),
+        (pos.0 - 1, pos.1),
+        (pos.0 + 1, pos.1),
+    ]
+}
