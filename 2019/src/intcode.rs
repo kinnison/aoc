@@ -159,6 +159,7 @@ impl VM {
     }
 
     fn run_add(&mut self) -> Result<i64> {
+        self.debug_instr(3)?;
         let arg1 = self.peek(self.addr_for(0)?)?;
         let arg2 = self.peek(self.addr_for(1)?)?;
         self.poke(self.addr_for(2)?, arg1 + arg2)?;
@@ -166,6 +167,7 @@ impl VM {
     }
 
     fn run_mul(&mut self) -> Result<i64> {
+        self.debug_instr(3)?;
         let arg1 = self.peek(self.addr_for(0)?)?;
         let arg2 = self.peek(self.addr_for(1)?)?;
         self.poke(self.addr_for(2)?, arg1 * arg2)?;
@@ -173,11 +175,13 @@ impl VM {
     }
 
     fn run_input(&mut self, input: i64) -> Result<i64> {
+        self.debug_instr(1)?;
         self.poke(self.addr_for(0)?, input)?;
         Ok(self.pc + 2)
     }
 
     fn run_output(&self) -> Result<(i64, i64)> {
+        self.debug_instr(1)?;
         Ok((self.pc + 2, self.peek(self.addr_for(0)?)?))
     }
 
@@ -234,8 +238,8 @@ impl VM {
         Ok(self.pc + 2)
     }
 
-    pub fn interpreter_step(&mut self, input: Option<i64>) -> Result<VMState> {
-        loop {
+    pub fn interpreter_step(&mut self, mut input: Option<i64>) -> Result<VMState> {
+        'outer: loop {
             match self.curstate {
                 VMState::Runnable => {
                     let new_pc = match self.opcode()? {
@@ -243,6 +247,9 @@ impl VM {
                         OpCode::Mul => self.run_mul(),
                         OpCode::Input => {
                             self.curstate = VMState::WaitingOnInput;
+                            if input.is_some() {
+                                continue 'outer;
+                            }
                             Ok(self.pc)
                         }
                         OpCode::Output => {
@@ -264,7 +271,7 @@ impl VM {
                 }
                 VMState::WaitingOnInput => {
                     assert_eq!(self.opcode()?, OpCode::Input);
-                    if let Some(input) = input {
+                    if let Some(input) = input.take() {
                         self.pc = self.run_input(input)?;
                         self.curstate = VMState::Runnable;
                     } else {
