@@ -8,6 +8,7 @@ pub use std::cmp::{max, min};
 pub use std::collections::HashMap;
 pub use std::collections::HashSet;
 pub use std::convert::{TryFrom, TryInto};
+pub use std::fmt;
 pub use std::iter::successors;
 
 pub use permutohedron::Heap;
