@@ -224,16 +224,23 @@ impl Maze {
             trimmings.insert((current_key, keys_held), pathlen);
             // We're doing a depth-first search from current_key toward goal_set
             let cur_keys = keys_held;
-            for key in (KEY_OFFSET..=max_key)
+            let cur_routes = &routes[&current_key];
+            for (key, route) in (KEY_OFFSET..=max_key)
                 // Remove keys which we already have
                 .filter(|k| !cur_keys.get(*k as usize))
                 // Now remove keys which are not reachable from this location
-                .filter(|k| routes[&current_key].contains_key(k))
+                // As a side-effect, cache the route for use later
+                .filter_map(|k| {
+                    if let Some(route) = cur_routes.get(&k) {
+                        Some((k, route))
+                    } else {
+                        None
+                    }
+                })
                 // And now remove keys which can't be reached right now doorwise
-                .filter(|k| can_reach(cur_keys, routes[&current_key][k].1))
+                .filter(|(_, route)| can_reach(cur_keys, route.1))
             {
                 // key is a candidate
-                let route = &routes[&current_key][&key];
                 let newpath = pathlen + route.0;
                 if newpath < *best_path {
                     // And it's potentially still shorter than the best path
