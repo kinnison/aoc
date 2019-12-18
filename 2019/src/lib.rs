@@ -5,6 +5,7 @@ pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub use lazy_static::lazy_static;
 pub use regex::Regex;
 pub use std::cmp::{max, min};
+pub use std::collections::hash_map::Entry;
 pub use std::collections::HashMap;
 pub use std::collections::HashSet;
 pub use std::convert::{TryFrom, TryInto};
@@ -159,11 +160,14 @@ pub fn lcm(a: usize, b: usize) -> usize {
     a * b / gcd(a, b)
 }
 
-pub fn surrounds(pos: (i32, i32)) -> [(i32, i32); 4] {
+pub fn surrounds<N>(pos: (N, N)) -> [(N, N); 4]
+where
+    N: num_traits::Num + Copy,
+{
     [
-        (pos.0, pos.1 - 1),
-        (pos.0, pos.1 + 1),
-        (pos.0 - 1, pos.1),
-        (pos.0 + 1, pos.1),
+        (pos.0, pos.1 - N::one()),
+        (pos.0, pos.1 + N::one()),
+        (pos.0 - N::one(), pos.1),
+        (pos.0 + N::one(), pos.1),
     ]
 }
