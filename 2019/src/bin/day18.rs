@@ -24,50 +24,44 @@ impl TryFrom<char> for CellKind {
 }
 
 #[derive(PartialEq, Eq, Debug, Default, Copy, Clone, Hash)]
-struct KeySet([bool; 30]);
+struct KeySet(u32);
 static KEY_OFFSET: u8 = 4;
 
 impl fmt::Display for KeySet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "[")?;
-        for i in 0..30 {
-            write!(f, "{}", if self.0[i] { 'X' } else { '_' })?;
+        for i in 0..32 {
+            write!(f, "{}", if self.get(i) { 'X' } else { '_' })?;
         }
         write!(f, "]")
     }
 }
 
-impl From<[bool; 30]> for KeySet {
-    fn from(value: [bool; 30]) -> Self {
-        Self(value)
+impl KeySet {
+    fn get(self, idx: usize) -> bool {
+        (self.0 & (1 << idx)) != 0
     }
-}
 
-impl std::ops::Deref for KeySet {
-    type Target = [bool; 30];
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::DerefMut for KeySet {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-fn can_reach(keys_held: &KeySet, doors: &KeySet) -> bool {
-    for (key, door) in keys_held
-        .iter()
-        .skip(1)
-        .copied()
-        .zip(doors.iter().skip(1).copied())
-    {
-        if door && !key {
-            return false;
+    fn set(&mut self, idx: usize, val: bool) {
+        if val {
+            self.0 |= 1 << idx;
+        } else {
+            self.0 &= !(1 << idx);
         }
     }
-    true
+
+    fn mask_off(self, other: KeySet) -> KeySet {
+        KeySet(self.0 & !other.0)
+    }
+
+    fn is_zero(self) -> bool {
+        self.0 == 0
+    }
+}
+
+fn can_reach(keys_held: KeySet, doors: KeySet) -> bool {
+    // We can reach if the doors, minus the keys held is zero
+    doors.mask_off(keys_held).is_zero()
 }
 
 // impl CellKind {
@@ -183,7 +177,7 @@ impl Maze {
                     }
                     let mut newdoors = doors;
                     if let CellKind::Door(d) = self.cell_at(newloc.0, newloc.1) {
-                        newdoors[d as usize] = true;
+                        newdoors.set(d as usize, true);
                     }
                     match visited.entry(*newloc) {
                         ve @ Entry::Vacant(_) => {
@@ -214,7 +208,7 @@ impl Maze {
         bot_keys: &[u8],
         max_key: u8,
         mut keys_held: KeySet,
-        goal_set: &KeySet,
+        goal_set: KeySet,
         pathlen: usize,
         best_path: &mut usize,
         trimmings: &mut HashMap<(u8, KeySet), usize>,
@@ -232,19 +226,19 @@ impl Maze {
             let cur_keys = keys_held;
             for key in (KEY_OFFSET..=max_key)
                 // Remove keys which we already have
-                .filter(|k| !cur_keys[*k as usize])
+                .filter(|k| !cur_keys.get(*k as usize))
                 // Now remove keys which are not reachable from this location
                 .filter(|k| routes[&current_key].contains_key(k))
                 // And now remove keys which can't be reached right now doorwise
-                .filter(|k| can_reach(&cur_keys, &routes[&current_key][k].1))
+                .filter(|k| can_reach(cur_keys, routes[&current_key][k].1))
             {
                 // key is a candidate
                 let route = &routes[&current_key][&key];
                 let newpath = pathlen + route.0;
                 if newpath < *best_path {
                     // And it's potentially still shorter than the best path
-                    keys_held[key as usize] = true;
-                    if keys_held == *goal_set {
+                    keys_held.set(key as usize, true);
+                    if keys_held == goal_set {
                         // We've found a path
                         *best_path = newpath
                     } else {
@@ -257,7 +251,7 @@ impl Maze {
                         );
                     }
                     // And relinquish the key to proceed
-                    keys_held[key as usize] = false;
+                    keys_held.set(key as usize, false);
                 }
             }
         }
@@ -300,7 +294,7 @@ impl Maze {
         let target_keys = {
             let mut keys = KeySet::default();
             for i in KEY_OFFSET..=self.biggest_key {
-                keys[i as usize] = true;
+                keys.set(i as usize, true);
             }
             keys
         };
@@ -312,7 +306,7 @@ impl Maze {
             &bots[0..self.bots],
             self.biggest_key,
             KeySet::default(),
-            &target_keys,
+            target_keys,
             0,
             &mut best_len,
             &mut HashMap::new(),

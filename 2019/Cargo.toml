@@ -8,7 +8,7 @@ edition = "2018"
 debug_intcode = []
 
 [profile.release]
-lto = true
+lto = false
 debug = true
 
 [dependencies]
