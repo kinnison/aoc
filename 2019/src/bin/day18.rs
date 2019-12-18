@@ -88,6 +88,7 @@ struct Maze {
     height: usize,
     biggest_key: u8,
     key_locations: Vec<(usize, usize)>,
+    bots: usize,
     cells: Vec<CellKind>,
 }
 
@@ -98,18 +99,18 @@ impl Maze {
         let mut height = 0;
         let mut key_locations = Vec::new();
         key_locations.resize(30, (0, 0));
-        let mut keys_found = 0;
+        let mut bots = 0;
         let mut biggest_key = 0;
         for l in s.lines() {
             for (col, ch) in l.chars().enumerate() {
                 if ch == '@' {
-                    key_locations[keys_found] = (col, height);
-                    if keys_found == 0 {
+                    key_locations[bots] = (col, height);
+                    if bots == 0 {
                         key_locations[1] = key_locations[0];
                         key_locations[2] = key_locations[1];
                         key_locations[3] = key_locations[2];
                     }
-                    keys_found += 1;
+                    bots += 1;
                 }
                 let cell = CellKind::try_from(ch)?;
                 if let CellKind::Key(k) = cell {
@@ -127,6 +128,7 @@ impl Maze {
             height,
             cells,
             biggest_key,
+            bots,
             key_locations,
         })
     }
@@ -139,7 +141,7 @@ impl Maze {
         &self,
         start: (usize, usize),
         target: (usize, usize),
-    ) -> (usize, KeySet) {
+    ) -> Option<(usize, KeySet)> {
         // We want to do a breadth-first search from key to target_key
         // noting any doors we pass through.  We want the shortest route
         // If on our route we pass by another key, we ignore that
@@ -199,13 +201,17 @@ impl Maze {
             }
         }
 
-        (best_len, best_doors)
+        if best_len == std::usize::MAX {
+            None
+        } else {
+            Some((best_len, best_doors))
+        }
     }
 
     #[allow(clippy::too_many_arguments)]
     fn collect_dfs(
         routes: &HashMap<u8, HashMap<u8, (usize, KeySet)>>,
-        current_key: u8,
+        bot_keys: &[u8],
         max_key: u8,
         mut keys_held: KeySet,
         goal_set: &KeySet,
@@ -213,66 +219,74 @@ impl Maze {
         best_path: &mut usize,
         trimmings: &mut HashMap<(u8, KeySet), usize>,
     ) {
-        // If our current state is worse than the trimmings, then abort
-        if let Some(depth) = trimmings.get(&(current_key, keys_held)) {
-            if pathlen >= *depth {
-                // We were already here before, sooner
-                return;
-            }
-        }
-        trimmings.insert((current_key, keys_held), pathlen);
-        // We're doing a depth-first search from current_key toward goal_set
-        let cur_keys = keys_held;
-        for key in (KEY_OFFSET..=max_key)
-            // Remove keys which we already have
-            .filter(|k| !cur_keys[*k as usize])
-            // Now remove keys which are not reachable from this location
-            .filter(|k| can_reach(&cur_keys, &routes[&current_key][k].1))
-        {
-            // key is a candidate
-            let route = &routes[&current_key][&key];
-            let newpath = pathlen + route.0;
-            if newpath < *best_path {
-                // And it's potentially still shorter than the best path
-                keys_held[key as usize] = true;
-                if keys_held == *goal_set {
-                    // We've found a path
-                    *best_path = newpath
-                } else {
-                    // We need to recurse
-                    Maze::collect_dfs(
-                        routes, key, max_key, keys_held, goal_set, newpath, best_path, trimmings,
-                    );
+        for (key_idx, current_key) in bot_keys.iter().copied().enumerate() {
+            // If our current state is worse than the trimmings, then abort
+            if let Some(depth) = trimmings.get(&(current_key, keys_held)) {
+                if pathlen >= *depth {
+                    // We were already here before, sooner
+                    return;
                 }
-                // And relinquish the key to proceed
-                keys_held[key as usize] = false;
+            }
+            trimmings.insert((current_key, keys_held), pathlen);
+            // We're doing a depth-first search from current_key toward goal_set
+            let cur_keys = keys_held;
+            for key in (KEY_OFFSET..=max_key)
+                // Remove keys which we already have
+                .filter(|k| !cur_keys[*k as usize])
+                // Now remove keys which are not reachable from this location
+                .filter(|k| routes[&current_key].contains_key(k))
+                // And now remove keys which can't be reached right now doorwise
+                .filter(|k| can_reach(&cur_keys, &routes[&current_key][k].1))
+            {
+                // key is a candidate
+                let route = &routes[&current_key][&key];
+                let newpath = pathlen + route.0;
+                if newpath < *best_path {
+                    // And it's potentially still shorter than the best path
+                    keys_held[key as usize] = true;
+                    if keys_held == *goal_set {
+                        // We've found a path
+                        *best_path = newpath
+                    } else {
+                        // We need to recurse
+                        let mut keys = bot_keys.to_owned();
+                        keys[key_idx] = key;
+                        Maze::collect_dfs(
+                            routes, &keys, max_key, keys_held, goal_set, newpath, best_path,
+                            trimmings,
+                        );
+                    }
+                    // And relinquish the key to proceed
+                    keys_held[key as usize] = false;
+                }
             }
         }
     }
 
     fn collect_keys(&self) -> Result<usize> {
         // Since we *MUST* visit every key, that means we need to route
-        // from any key to any other key, that's 27*26 routes though
+        // from any key to any other key, that's 27*26 routes for part 1 though
         // obviously the fastest route from a->b is the same b->a
         // We can then analyse that reduced dataset to determine the
         // fastest way to collect all the keys
         let mut routes: HashMap<u8, HashMap<u8, (usize, KeySet)>> = HashMap::new();
         for key in 0..=self.biggest_key {
             for target_key in key + 1..=self.biggest_key {
-                let route = self.find_shortest_route(
+                if let Some(route) = self.find_shortest_route(
                     self.key_locations[key as usize],
                     self.key_locations[target_key as usize],
-                );
-                *routes
-                    .entry(key)
-                    .or_default()
-                    .entry(target_key)
-                    .or_default() = route;
-                *routes
-                    .entry(target_key)
-                    .or_default()
-                    .entry(key)
-                    .or_default() = route;
+                ) {
+                    *routes
+                        .entry(key)
+                        .or_default()
+                        .entry(target_key)
+                        .or_default() = route;
+                    *routes
+                        .entry(target_key)
+                        .or_default()
+                        .entry(key)
+                        .or_default() = route;
+                }
             }
         }
 
@@ -292,9 +306,10 @@ impl Maze {
         };
         // As such we do a depth-first search, trimming whenever we exceed
         // best_len
+        let bots = [0, 1, 2, 3];
         Maze::collect_dfs(
             &routes,
-            0,
+            &bots[0..self.bots],
             self.biggest_key,
             KeySet::default(),
             &target_keys,
@@ -333,16 +348,81 @@ mod test {
         println!("Maze: {:?}", maze);
         assert_eq!(maze.collect_keys().expect("Unable to collect keys?"), 86);
     }
+
+    #[test]
+    fn test_3() {
+        static MAP: &str = r"
+#######
+#a.#Cd#
+##@#@##
+#######
+##@#@##
+#cB#Ab#
+#######";
+        let maze = Maze::new(MAP.trim()).expect("Unable to parse maze");
+        println!("Maze: {:?}", maze);
+        assert_eq!(maze.collect_keys().expect("Unable to collect keys"), 8);
+    }
+
+    #[test]
+    fn test_4() {
+        static MAP: &str = r"
+###############
+#d.ABC.#.....a#
+######@#@######
+###############
+######@#@######
+#b.....#.....c#
+###############";
+        let maze = Maze::new(MAP.trim()).expect("Unable to parse maze");
+        println!("Maze: {:?}", maze);
+        assert_eq!(maze.collect_keys().expect("Unable to collect keys"), 24);
+    }
+    #[test]
+    fn test_5() {
+        static MAP: &str = r"
+#############
+#DcBa.#.GhKl#
+#.###@#@#I###
+#e#d#####j#k#
+###C#@#@###J#
+#fEbA.#.FgHi#
+#############";
+        let maze = Maze::new(MAP.trim()).expect("Unable to parse maze");
+        println!("Maze: {:?}", maze);
+        assert_eq!(maze.collect_keys().expect("Unable to collect keys"), 32);
+    }
 }
 
-fn part1(input: &Maze) -> Result<usize> {
+fn part1(input: &str) -> Result<usize> {
+    let input = Maze::new(input)?;
+    input.collect_keys()
+}
+
+#[allow(clippy::identity_op)]
+fn part2(input: &str) -> Result<usize> {
+    // We have to replace the '...'/'.@.'/'...' with '@#@'/'###'/'@#@'
+    let width = input.lines().next().unwrap().len() + 1;
+    let at_pos = input.find('@').unwrap();
+    let mut input = input.as_bytes().to_owned();
+    input[at_pos - 1 - width] = b'@';
+    input[at_pos + 0 - width] = b'#';
+    input[at_pos + 1 - width] = b'@';
+    input[at_pos - 1] = b'#';
+    input[at_pos + 0] = b'#';
+    input[at_pos + 1] = b'#';
+    input[at_pos - 1 + width] = b'@';
+    input[at_pos + 0 + width] = b'#';
+    input[at_pos + 1 + width] = b'@';
+
+    let input = String::from_utf8(input)?;
+    let input = Maze::new(&input)?;
     input.collect_keys()
 }
 
 fn main() -> Result<()> {
     let input = read_input(18)?;
-    let input = Maze::new(&input)?;
-
     println!("Part 1: {}", part1(&input)?);
+    println!("Part 2: {}", part2(&input)?);
     Ok(())
 }
