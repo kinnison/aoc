@@ -215,13 +215,21 @@ impl Maze {
     ) {
         for (key_idx, current_key) in bot_keys.iter().copied().enumerate() {
             // If our current state is worse than the trimmings, then abort
-            if let Some(depth) = trimmings.get(&(current_key, keys_held)) {
-                if pathlen >= *depth {
-                    // We were already here before, sooner
-                    return;
+            match trimmings.entry((current_key, keys_held)) {
+                Entry::Occupied(mut oe) => {
+                    if pathlen >= *oe.get() {
+                        // We were already here before, sooner than now
+                        return;
+                    } else {
+                        // We're faster than before, save that
+                        oe.insert(pathlen);
+                    }
+                }
+                Entry::Vacant(ve) => {
+                    // Not been here before, so insert this path now
+                    ve.insert(pathlen);
                 }
             }
-            trimmings.insert((current_key, keys_held), pathlen);
             // We're doing a depth-first search from current_key toward goal_set
             let cur_keys = keys_held;
             let cur_routes = &routes[&current_key];
