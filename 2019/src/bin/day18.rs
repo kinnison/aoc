@@ -16,34 +16,35 @@ impl TryFrom<char> for CellKind {
         match value {
             '#' => Ok(Wall),
             '@' | '.' => Ok(Open),
-            _ if value >= 'a' && value <= 'z' => Ok(Key(1 + (value as u8) - b'a')),
-            _ if value >= 'A' && value <= 'Z' => Ok(Door(1 + (value as u8) - b'A')),
+            _ if value >= 'a' && value <= 'z' => Ok(Key(KEY_OFFSET + (value as u8) - b'a')),
+            _ if value >= 'A' && value <= 'Z' => Ok(Door(KEY_OFFSET + (value as u8) - b'A')),
             _ => Err(format!("Unknown maze character: {:?}", value).into()),
         }
     }
 }
 
 #[derive(PartialEq, Eq, Debug, Default, Copy, Clone, Hash)]
-struct KeySet([bool; 27]);
+struct KeySet([bool; 30]);
+static KEY_OFFSET: u8 = 4;
 
 impl fmt::Display for KeySet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "[")?;
-        for i in 0..27 {
+        for i in 0..30 {
             write!(f, "{}", if self.0[i] { 'X' } else { '_' })?;
         }
         write!(f, "]")
     }
 }
 
-impl From<[bool; 27]> for KeySet {
-    fn from(value: [bool; 27]) -> Self {
+impl From<[bool; 30]> for KeySet {
+    fn from(value: [bool; 30]) -> Self {
         Self(value)
     }
 }
 
 impl std::ops::Deref for KeySet {
-    type Target = [bool; 27];
+    type Target = [bool; 30];
     fn deref(&self) -> &Self::Target {
         &self.0
     }
@@ -96,12 +97,19 @@ impl Maze {
         let mut width = 0;
         let mut height = 0;
         let mut key_locations = Vec::new();
-        key_locations.resize(27, (0, 0));
+        key_locations.resize(30, (0, 0));
+        let mut keys_found = 0;
         let mut biggest_key = 0;
         for l in s.lines() {
             for (col, ch) in l.chars().enumerate() {
                 if ch == '@' {
-                    key_locations[0] = (col, height);
+                    key_locations[keys_found] = (col, height);
+                    if keys_found == 0 {
+                        key_locations[1] = key_locations[0];
+                        key_locations[2] = key_locations[1];
+                        key_locations[3] = key_locations[2];
+                    }
+                    keys_found += 1;
                 }
                 let cell = CellKind::try_from(ch)?;
                 if let CellKind::Key(k) = cell {
@@ -136,7 +144,7 @@ impl Maze {
         // noting any doors we pass through.  We want the shortest route
         // If on our route we pass by another key, we ignore that
         let mut best_len = std::usize::MAX;
-        let mut best_doors = [false; 27].into();
+        let mut best_doors = KeySet::default();
 
         let mut visited: HashMap<(usize, usize), usize> = (0..self.width)
             .flat_map(|x| {
@@ -151,7 +159,7 @@ impl Maze {
         // To do the BFS, we store a set of tip,length,doors and we trim whenever
         // length is longer than best_len, and we set best_len and best_doors
         // when we find the target key
-        let mut tips: Vec<((usize, usize), usize, KeySet)> = vec![(start, 0, [false; 27].into())];
+        let mut tips: Vec<((usize, usize), usize, KeySet)> = vec![(start, 0, KeySet::default())];
         visited.insert(start, 0);
         while !tips.is_empty() {
             let old_tips: Vec<_> = tips.drain(..).collect();
@@ -215,7 +223,7 @@ impl Maze {
         trimmings.insert((current_key, keys_held), pathlen);
         // We're doing a depth-first search from current_key toward goal_set
         let cur_keys = keys_held;
-        for key in (1..=max_key)
+        for key in (KEY_OFFSET..=max_key)
             // Remove keys which we already have
             .filter(|k| !cur_keys[*k as usize])
             // Now remove keys which are not reachable from this location
@@ -277,7 +285,7 @@ impl Maze {
         let mut best_len = std::usize::MAX;
         let target_keys = {
             let mut keys = KeySet::default();
-            for i in 1..=self.biggest_key {
+            for i in KEY_OFFSET..=self.biggest_key {
                 keys[i as usize] = true;
             }
             keys
