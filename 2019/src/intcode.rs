@@ -26,17 +26,17 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum OpCode {
-    Add,
-    Mul,
-    Input,
-    Output,
-    JumpIfTrue,
-    JumpIfFalse,
-    LessThan,
-    Equals,
-    SetRelativeBase,
+    Add = 1,
+    Mul = 2,
+    Input = 3,
+    Output = 4,
+    JumpIfTrue = 5,
+    JumpIfFalse = 6,
+    LessThan = 7,
+    Equals = 8,
+    SetRelativeBase = 9,
     // Last opcode
-    Terminate,
+    Terminate = 99,
 }
 
 impl OpCode {
