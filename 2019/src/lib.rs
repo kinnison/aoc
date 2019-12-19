@@ -5,7 +5,7 @@ pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 pub use lazy_static::lazy_static;
 pub use regex::Regex;
-pub use std::cmp::{max, min};
+pub use std::cmp::{max, min, Ordering};
 pub use std::collections::hash_map::Entry;
 pub use std::collections::HashMap;
 pub use std::collections::HashSet;

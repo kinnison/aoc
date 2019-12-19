@@ -59,12 +59,10 @@ fn part2(input: &intcode::VM) -> Result<i64> {
                 }
             }
             WaitingOnInput => {
-                let joystick = if padx == ballx {
-                    0
-                } else if padx < ballx {
-                    1
-                } else {
-                    -1
+                let joystick = match padx.cmp(&ballx) {
+                    Ordering::Equal => 0,
+                    Ordering::Less => -1,
+                    Ordering::Greater => 1,
                 };
                 next_input = Some(joystick);
             }

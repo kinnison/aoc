@@ -34,7 +34,7 @@ mod test {
         vm.full_interpret(&input, &mut output)
             .expect("Unable to run");
         assert_eq!(output[0], 1);
-        vm = base_vm.clone();
+        vm = base_vm;
         let input = [7];
         output.drain(..);
         vm.full_interpret(&input, &mut output)
@@ -47,7 +47,7 @@ mod test {
         vm.full_interpret(&input, &mut output)
             .expect("Unable to run");
         assert_eq!(output[0], 1);
-        vm = base_vm.clone();
+        vm = base_vm;
         let input = [7];
         output.drain(..);
         vm.full_interpret(&input, &mut output)
@@ -64,7 +64,7 @@ mod test {
         vm.full_interpret(&input, &mut output)
             .expect("Unable to run");
         assert_eq!(output[0], 0);
-        vm = base_vm.clone();
+        vm = base_vm;
         let input = [7];
         output.drain(..);
         vm.full_interpret(&input, &mut output)
@@ -77,7 +77,7 @@ mod test {
         vm.full_interpret(&input, &mut output)
             .expect("Unable to run");
         assert_eq!(output[0], 0);
-        vm = base_vm.clone();
+        vm = base_vm;
         let input = [7];
         output.drain(..);
         vm.full_interpret(&input, &mut output)

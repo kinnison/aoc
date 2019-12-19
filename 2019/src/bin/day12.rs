@@ -23,26 +23,38 @@ impl Moon {
     }
 
     fn adjust_velocites(&mut self, other: &mut Moon) {
-        if self.pos.x < other.pos.x {
-            self.vel.x += 1;
-            other.vel.x -= 1;
-        } else if self.pos.x > other.pos.x {
-            self.vel.x -= 1;
-            other.vel.x += 1;
+        match self.pos.y.cmp(&other.pos.y) {
+            Ordering::Less => {
+                self.vel.y += 1;
+                other.vel.y -= 1;
+            }
+            Ordering::Greater => {
+                self.vel.y -= 1;
+                other.vel.y += 1;
+            }
+            Ordering::Equal => {}
         }
-        if self.pos.y < other.pos.y {
-            self.vel.y += 1;
-            other.vel.y -= 1;
-        } else if self.pos.y > other.pos.y {
-            self.vel.y -= 1;
-            other.vel.y += 1;
+        match self.pos.y.cmp(&other.pos.y) {
+            Ordering::Less => {
+                self.vel.y += 1;
+                other.vel.y -= 1;
+            }
+            Ordering::Greater => {
+                self.vel.y -= 1;
+                other.vel.y += 1;
+            }
+            Ordering::Equal => {}
         }
-        if self.pos.z < other.pos.z {
-            self.vel.z += 1;
-            other.vel.z -= 1;
-        } else if self.pos.z > other.pos.z {
-            self.vel.z -= 1;
-            other.vel.z += 1;
+        match self.pos.z.cmp(&other.pos.z) {
+            Ordering::Less => {
+                self.vel.z += 1;
+                other.vel.z -= 1;
+            }
+            Ordering::Greater => {
+                self.vel.z -= 1;
+                other.vel.z += 1;
+            }
+            Ordering::Equal => {}
         }
     }
 
