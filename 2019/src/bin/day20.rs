@@ -158,6 +158,15 @@ impl Maze {
         while !tips.is_empty() {
             let old_tips: Vec<_> = tips.drain(..).collect();
             for (pos, level, pathlen) in old_tips {
+                if pathlen >= best_length {
+                    // No point continuing this tip, we already beat it
+                    continue;
+                }
+                if pos == self.finish && level == 0 {
+                    // We made it!
+                    best_length = pathlen;
+                    continue;
+                }
                 match shortest_here.entry((pos.0, pos.1, level)) {
                     Entry::Vacant(ve) => {
                         ve.insert(pathlen);
@@ -169,15 +178,6 @@ impl Maze {
                             continue;
                         }
                     }
-                }
-                if pathlen >= best_length {
-                    // No point continuing this tip, we already beat it
-                    continue;
-                }
-                if pos == self.finish && level == 0 {
-                    // We made it!
-                    best_length = pathlen;
-                    continue;
                 }
                 for adj in surrounds(pos).iter().copied() {
                     if self.cell_at(adj).is_open() {
@@ -343,6 +343,6 @@ fn main() -> Result<()> {
     let input = Maze::from_str(&input)?;
 
     println!("Part 1: {}", part1(&input));
-    println!("Part 1: {}", part2(&input));
+    println!("Part 2: {}", part2(&input));
     Ok(())
 }
