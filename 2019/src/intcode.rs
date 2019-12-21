@@ -11,6 +11,7 @@ pub enum Error {
     UnknownOpCode(i64),
     UnknownAddressingMode(i64),
     NoMoreInput(i64),
+    IOError(std::io::Error),
 }
 
 impl std::fmt::Display for Error {
@@ -20,6 +21,12 @@ impl std::fmt::Display for Error {
 }
 
 impl std::error::Error for Error {}
+
+impl std::convert::From<std::io::Error> for Error {
+    fn from(value: std::io::Error) -> Self {
+        Error::IOError(value)
+    }
+}
 
 /// A VM Result
 pub type Result<T> = std::result::Result<T, Error>;
@@ -316,6 +323,39 @@ impl VM {
 
     pub fn interpret(&mut self) -> Result<()> {
         self.full_interpret(&[], &mut Vec::new())
+    }
+
+    /// ASCII machines run until they output a non-ASCII value
+    /// at which point that is saved and they run to termination
+    pub fn run_ascii_machine(&mut self) -> Result<i64> {
+        use std::io::{Read, Write};
+        let mut ret = 0;
+        let mut input = None;
+        loop {
+            match self.interpreter_step(input.take())? {
+                VMState::Halted => break,
+                VMState::Runnable => continue,
+                VMState::GaveOutput(o) => {
+                    if o > 0 && o < 255 {
+                        std::io::stdout().write_all(&[o as u8])?;
+                        if o == b'\n' as i64 {
+                            std::io::stdout().flush()?;
+                        }
+                    } else {
+                        ret = o
+                    }
+                }
+                VMState::WaitingOnInput => {
+                    if input.is_none() {
+                        let mut ch: [u8; 1] = [0];
+                        std::io::stdin().read_exact(&mut ch)?;
+                        input = Some(ch[0] as i64);
+                    }
+                }
+            }
+        }
+
+        Ok(ret)
     }
 }
 

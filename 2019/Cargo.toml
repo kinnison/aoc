@@ -6,6 +6,7 @@ edition = "2018"
 
 [features]
 debug_intcode = []
+interactive = []
 
 [profile.release]
 lto = false
