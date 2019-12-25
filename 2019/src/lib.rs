@@ -174,3 +174,36 @@ where
         (pos.0 + N::one(), pos.1),
     ]
 }
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum Direction {
+    North,
+    South,
+    East,
+    West,
+}
+
+impl FromStr for Direction {
+    type Err = String;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        match s {
+            "north" => Ok(Self::North),
+            "south" => Ok(Self::South),
+            "east" => Ok(Self::East),
+            "west" => Ok(Self::West),
+            _ => Err(format!("Unknown direction: {}", s)),
+        }
+    }
+}
+
+impl Direction {
+    pub fn opposite(self) -> Self {
+        match self {
+            Self::North => Self::South,
+            Self::South => Self::North,
+            Self::East => Self::West,
+            Self::West => Self::East,
+        }
+    }
+}
