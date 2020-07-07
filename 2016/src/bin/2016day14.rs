@@ -69,7 +69,7 @@ fn problem1(label: &str) -> usize {
     let _chs = [
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
     ];
-    'outer: loop {
+    loop {
         hash.reset();
         hash.update(label.as_bytes());
         hash.update(idx.to_string().as_bytes());
@@ -94,7 +94,6 @@ fn problem1(label: &str) -> usize {
         }
         idx += 1;
     }
-    0
 }
 
 fn stretched_result(
@@ -138,7 +137,7 @@ fn problem2(label: &str) -> usize {
     let _chs = [
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
     ];
-    'outer: loop {
+    loop {
         hash.reset();
         hash.update(label.as_bytes());
         hash.update(idx.to_string().as_bytes());
@@ -164,7 +163,6 @@ fn problem2(label: &str) -> usize {
         }
         idx += 1;
     }
-    0
 }
 
 fn main() {

@@ -2,7 +2,6 @@
 extern crate lazy_static;
 extern crate regex;
 
-
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;

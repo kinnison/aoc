@@ -72,6 +72,7 @@ impl KnotHash {
         }
     }
 
+    #[allow(dead_code)]
     fn check_value(&self) -> usize {
         self.entries[0] * self.entries[1]
     }
@@ -82,6 +83,7 @@ impl KnotHash {
         }
     }
 
+    #[allow(dead_code)]
     fn dense_hash(&self) -> String {
         let mut ret = String::new();
         for base in 0..16 {

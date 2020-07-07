@@ -1,8 +1,6 @@
-
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
-
 
 fn load_compressed() -> String {
     let infile = File::open("day9.input").unwrap();

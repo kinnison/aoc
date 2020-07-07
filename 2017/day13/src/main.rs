@@ -96,6 +96,7 @@ impl Firewall {
         total
     }
 
+    #[allow(dead_code)]
     fn print_firewall(&self, pos: usize) {
         for depth in 0..self.maxdepth {
             for layer in 0..self.scanners.len() {

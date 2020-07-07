@@ -113,16 +113,6 @@ struct Move {
     carry2: Carry,
 }
 
-impl Move {
-    fn new() -> Move {
-        Move {
-            up: true,
-            carry1: Carry::Nothing,
-            carry2: Carry::Nothing,
-        }
-    }
-}
-
 #[derive(Debug, Clone, Eq, Hash)]
 struct RTGFacility {
     liftat: usize,
