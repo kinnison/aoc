@@ -1,31 +1,33 @@
-
 use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
-#[derive(Clone,Copy, Eq, PartialEq, Debug)]
+#[derive(Clone, Copy, Eq, PartialEq, Debug)]
 enum Dir {
-    Up, Down, Left, Right
+    Up,
+    Down,
+    Left,
+    Right,
 }
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 struct Grid {
     content: Vec<Vec<char>>,
     rowcount: usize,
-    colcount: usize
+    colcount: usize,
 }
 
 impl Grid {
-    fn new () -> Grid {
+    fn new() -> Grid {
         Grid {
             content: Vec::new(),
             rowcount: 0,
-            colcount: 0
+            colcount: 0,
         }
     }
 
-    fn normalise (&mut self) {
+    fn normalise(&mut self) {
         let mut maxw = 0;
         for row in 0..self.content.len() {
             if self.content[row].len() > maxw {
@@ -41,7 +43,7 @@ impl Grid {
         self.rowcount = self.content.len();
     }
 
-    fn next_pos (&self, row: usize, col: usize, dir: Dir) -> Option<(usize, usize, Dir)> {
+    fn next_pos(&self, row: usize, col: usize, dir: Dir) -> Option<(usize, usize, Dir)> {
         // None if can't continue, otherwise new row/col
         let curch = self.content[row][col];
         let mut nextrow = row;
@@ -51,10 +53,10 @@ impl Grid {
             Dir::Up | Dir::Down => {
                 if curch == '+' {
                     // Look left/right
-                    if col > 0 && self.content[row][col-1] != ' ' {
+                    if col > 0 && self.content[row][col - 1] != ' ' {
                         nextcol = col - 1;
                         nextdir = Dir::Left;
-                    } else if col < (self.colcount - 1) && self.content[row][col+1] != ' ' {
+                    } else if col < (self.colcount - 1) && self.content[row][col + 1] != ' ' {
                         nextcol = col + 1;
                         nextdir = Dir::Right;
                     } else {
@@ -71,7 +73,7 @@ impl Grid {
                         return None;
                     }
                 }
-            },
+            }
             Dir::Left | Dir::Right => {
                 if curch == '+' {
                     // Look Up/Down
@@ -95,7 +97,7 @@ impl Grid {
                         return None;
                     }
                 }
-            },
+            }
         }
         assert!((row != nextrow) || (col != nextcol));
         if self.content[nextrow][nextcol] == ' ' {
@@ -105,7 +107,7 @@ impl Grid {
         }
     }
 
-    fn problem (&self, tell: bool) -> (String, usize) {
+    fn problem(&self, tell: bool) -> (String, usize) {
         let mut ret = String::new();
         let mut currow = 0;
         let mut curcol = 0;
@@ -121,8 +123,14 @@ impl Grid {
             let curch = self.content[currow][curcol];
             if tell {
                 println!("Output currently {:?}", ret);
-                println!("At row={}, col={}, dir={:?}, ch={}", currow, curcol, curdir, curch);
-                println!(" => row={}, col={}, dir={:?}, ch={}", nextrow, nextcol, nextdir, self.content[nextrow][nextcol]);
+                println!(
+                    "At row={}, col={}, dir={:?}, ch={}",
+                    currow, curcol, curdir, curch
+                );
+                println!(
+                    " => row={}, col={}, dir={:?}, ch={}",
+                    nextrow, nextcol, nextdir, self.content[nextrow][nextcol]
+                );
             }
             if (curch as u8) >= ('A' as u8) && (curch as u8) <= ('Z' as u8) {
                 ret.push(curch);
@@ -136,12 +144,14 @@ impl Grid {
         if (curch as u8) >= ('A' as u8) && (curch as u8) <= ('Z' as u8) {
             ret.push(curch);
         }
-        if tell { println!("finished!"); }
+        if tell {
+            println!("finished!");
+        }
         (ret, steps)
     }
 }
 
-fn load_instructions (s: &str) -> Grid {
+fn load_instructions(s: &str) -> Grid {
     let infile = File::open(s).unwrap();
     let freader = BufReader::new(&infile);
     let mut ret = Grid::new();
@@ -153,12 +163,17 @@ fn load_instructions (s: &str) -> Grid {
     ret
 }
 
-
 fn main() {
     let example = load_instructions("example");
-    println!("Loaded example which is {}x{}", example.rowcount, example.colcount);
+    println!(
+        "Loaded example which is {}x{}",
+        example.rowcount, example.colcount
+    );
     println!("Puzzle for example: {:?}", example.problem(true));
     let input = load_instructions("input");
-    println!("Loaded input which is {}x{}", input.rowcount, input.colcount);
+    println!(
+        "Loaded input which is {}x{}",
+        input.rowcount, input.colcount
+    );
     println!("Puzzle for input: {:?}", input.problem(false));
 }

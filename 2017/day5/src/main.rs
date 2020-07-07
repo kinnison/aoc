@@ -1,9 +1,9 @@
 use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
-fn load_instructions () -> Vec<i32> {
+fn load_instructions() -> Vec<i32> {
     let infile = File::open("input").unwrap();
     let freader = BufReader::new(&infile);
     let mut ret = Vec::new();
@@ -14,7 +14,7 @@ fn load_instructions () -> Vec<i32> {
     ret
 }
 
-fn problem1 (istr_: &Vec<i32>) -> usize {
+fn problem1(istr_: &Vec<i32>) -> usize {
     let mut prog: Vec<i32> = istr_.clone();
     let mut ip = 0;
     let mut ret = 0;
@@ -30,7 +30,7 @@ fn problem1 (istr_: &Vec<i32>) -> usize {
     }
 }
 
-fn problem2 (istr_: &Vec<i32>) -> usize {
+fn problem2(istr_: &Vec<i32>) -> usize {
     let mut prog: Vec<i32> = istr_.clone();
     let mut ip = 0;
     let mut ret = 0;

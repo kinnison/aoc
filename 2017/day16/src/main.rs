@@ -2,22 +2,22 @@
 extern crate lazy_static;
 extern crate regex;
 
-use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
-use std::io::prelude::*;
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
 use regex::Regex;
 
 enum Inst {
     Spin(usize),
-    Exch(usize,usize),
-    Part(char, char)
+    Exch(usize, usize),
+    Part(char, char),
 }
 
 impl Inst {
-    fn new (s: &str) -> Inst {
+    fn new(s: &str) -> Inst {
         lazy_static! {
             static ref SPIN_RE: Regex = Regex::new(r"^s([0-9]+)$").unwrap();
             static ref EXCH_RE: Regex = Regex::new(r"^x([0-9]+)/([0-9]+)$").unwrap();
@@ -40,7 +40,7 @@ impl Inst {
     }
 }
 
-fn load_instructions () -> Vec<Inst> {
+fn load_instructions() -> Vec<Inst> {
     let infile = File::open("input").unwrap();
     let freader = BufReader::new(&infile);
     let mut ret = Vec::new();
@@ -54,36 +54,40 @@ fn load_instructions () -> Vec<Inst> {
 }
 
 struct Lineup {
-    progs: [char; 16]
+    progs: [char; 16],
 }
 
 impl Lineup {
-    fn new () -> Lineup {
-        Lineup { progs: ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p'] }
-    }
-
-    fn do_instr (&mut self, inst: &Inst) {
-        match inst {
-            &Inst::Spin(count) => self.do_spin(count),
-            &Inst::Exch(a,b) => self.do_exch(a,b),
-            &Inst::Part(a,b) => self.do_part(a,b)
+    fn new() -> Lineup {
+        Lineup {
+            progs: [
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+            ],
         }
     }
 
-    fn do_spin (&mut self, count: usize) {
+    fn do_instr(&mut self, inst: &Inst) {
+        match inst {
+            &Inst::Spin(count) => self.do_spin(count),
+            &Inst::Exch(a, b) => self.do_exch(a, b),
+            &Inst::Part(a, b) => self.do_part(a, b),
+        }
+    }
+
+    fn do_spin(&mut self, count: usize) {
         let old_lineup = self.progs;
         for i in 0..self.progs.len() {
             self.progs[i] = old_lineup[((self.progs.len() - count) + i) % 16];
         }
     }
 
-    fn do_exch (&mut self, a: usize, b: usize) {
+    fn do_exch(&mut self, a: usize, b: usize) {
         let temp = self.progs[a];
         self.progs[a] = self.progs[b];
         self.progs[b] = temp;
     }
 
-    fn do_part (&mut self, a: char, b: char) {
+    fn do_part(&mut self, a: char, b: char) {
         for i in 0..self.progs.len() {
             if self.progs[i] == a {
                 self.progs[i] = b;
@@ -100,13 +104,13 @@ impl Lineup {
     }
 }
 
-fn problem1 (input: &Vec<Inst>) -> String {
+fn problem1(input: &Vec<Inst>) -> String {
     let mut lineup = Lineup::new();
     lineup.run_instr_vec(input);
     lineup.progs.iter().collect()
 }
 
-fn cycle_size (input: &Vec<Inst>) -> usize {
+fn cycle_size(input: &Vec<Inst>) -> usize {
     let mut lineup = Lineup::new();
     let mut maps: HashMap<String, usize> = HashMap::new();
     let mut i = 0;
@@ -127,7 +131,7 @@ fn cycle_size (input: &Vec<Inst>) -> usize {
     i
 }
 
-fn problem2 (input: &Vec<Inst>) -> String {
+fn problem2(input: &Vec<Inst>) -> String {
     let cyc = cycle_size(input);
     let mut lineup = Lineup::new();
     for _ in 0..(1_000_000_000 % cyc) {

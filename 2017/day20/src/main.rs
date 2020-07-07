@@ -4,22 +4,28 @@ extern crate regex;
 
 use std::collections::HashSet;
 use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
 use regex::Regex;
 
-#[derive(Debug,Clone,Copy)]
+#[derive(Debug, Clone, Copy)]
 struct Particle {
     n: usize,
-    px: i64, py: i64, pz: i64,
-    vx: i64, vy: i64, vz: i64,
-    ax: i64, ay: i64, az: i64
+    px: i64,
+    py: i64,
+    pz: i64,
+    vx: i64,
+    vy: i64,
+    vz: i64,
+    ax: i64,
+    ay: i64,
+    az: i64,
 }
 
 impl Particle {
-    fn new (n: usize, s: &str) -> Particle {
+    fn new(n: usize, s: &str) -> Particle {
         lazy_static! {
             static ref PART_RE: Regex = Regex::new(r"p=<(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)>, v=<(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)>, a=<(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)>").unwrap();
         }
@@ -45,19 +51,18 @@ impl Particle {
         self.ax.abs() + self.ay.abs() + self.az.abs()
     }
 
-    fn tick (&mut self) {
+    fn tick(&mut self) {
         self.vx += self.ax;
         self.vy += self.ay;
         self.vz += self.az;
-        
+
         self.px += self.vx;
         self.py += self.vy;
         self.pz += self.vz;
     }
-
 }
 
-fn load_instructions () -> Vec<Particle> {
+fn load_instructions() -> Vec<Particle> {
     let infile = File::open("input").unwrap();
     let freader = BufReader::new(&infile);
     let mut ret = Vec::new();
@@ -74,21 +79,21 @@ struct GPU {
 }
 
 impl GPU {
-    fn new (input: &Vec<Particle>) -> GPU {
+    fn new(input: &Vec<Particle>) -> GPU {
         GPU {
             particles: input.clone(),
         }
     }
 
-    fn tick (&mut self) {
+    fn tick(&mut self) {
         for i in 0..self.particles.len() {
             self.particles[i].tick();
         }
     }
 
-    fn collide (&mut self) {
-        let mut seenpos: HashSet<(i64,i64,i64)> = HashSet::new();
-        let mut collided: HashSet<(i64,i64,i64)> = HashSet::new();
+    fn collide(&mut self) {
+        let mut seenpos: HashSet<(i64, i64, i64)> = HashSet::new();
+        let mut collided: HashSet<(i64, i64, i64)> = HashSet::new();
         let mut oldparts = self.particles.clone();
 
         for part in &oldparts {
@@ -101,19 +106,21 @@ impl GPU {
         }
 
         if collided.len() > 0 {
-            self.particles = oldparts.drain(..).filter(|p| !collided.contains(&(p.px, p.py, p.pz))).collect();
+            self.particles = oldparts
+                .drain(..)
+                .filter(|p| !collided.contains(&(p.px, p.py, p.pz)))
+                .collect();
         }
     }
-
 }
 
-fn problem1 (input: &Vec<Particle>) -> usize {
+fn problem1(input: &Vec<Particle>) -> usize {
     let mut parts = input.clone();
-    parts.sort_by(|a,b| a.absacc().cmp(&b.absacc()));
+    parts.sort_by(|a, b| a.absacc().cmp(&b.absacc()));
     parts[0].n
 }
 
-fn problem2 (input: &Vec<Particle>) -> usize {
+fn problem2(input: &Vec<Particle>) -> usize {
     let mut gpu = GPU::new(input);
     let mut count = 1;
     let mut lastlen = gpu.particles.len();

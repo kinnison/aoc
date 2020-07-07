@@ -1,8 +1,8 @@
-use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
-use std::io::prelude::*;
 use std::collections::HashSet;
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
 #[derive(Debug)]
 struct Maze {
@@ -152,8 +152,10 @@ fn load_maze(pth: &str) -> Maze {
 
 fn test() {
     let maze = load_maze("test.input");
-    println!("test maze shortest route is {} long",
-             maze.shortest_route(false));
+    println!(
+        "test maze shortest route is {} long",
+        maze.shortest_route(false)
+    );
 }
 
 fn problem1() -> usize {

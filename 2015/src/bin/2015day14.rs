@@ -9,7 +9,7 @@ struct Reindeer {
 
 impl Reindeer {
     fn from_str(input: &str) -> Reindeer {
-        lazy_static!{
+        lazy_static! {
             static ref PARSE: Regex = Regex::new("^([^ ]+) can fly ([0-9]+) km/s for ([0-9]+) seconds, but then must rest for ([0-9]+) seconds\\.$").unwrap();
         }
         if let Some(cap) = PARSE.captures(input) {

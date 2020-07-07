@@ -1,22 +1,16 @@
-extern crate crypto;
-
-use crypto::md5::Md5;
-use crypto::digest::Digest;
-
+use md5::{Digest, Md5};
 struct Doors {
     up: bool,
     down: bool,
     left: bool,
-    right: bool
+    right: bool,
 }
 
 fn possible_doors(passcode: &str, route: &str) -> Doors {
     let mut hash = Md5::new();
-    hash.reset();
-    hash.input(passcode.as_bytes());
-    hash.input(route.as_bytes());
-    let mut output = [0; 16];
-    hash.result(&mut output);
+    hash.update(passcode.as_bytes());
+    hash.update(route.as_bytes());
+    let output = hash.finalize();
     Doors {
         up: (output[0] & 0xf0) > 0xa0,
         down: (output[0] & 0x0f) > 0x0a,
@@ -26,10 +20,18 @@ fn possible_doors(passcode: &str, route: &str) -> Doors {
 }
 
 fn filter_doors(posx: usize, posy: usize, doors: &mut Doors) {
-    if posx == 1 { doors.left = false; }
-    if posx == 4 { doors.right = false; }
-    if posy == 1 { doors.up = false; }
-    if posy == 4 { doors.down = false; }
+    if posx == 1 {
+        doors.left = false;
+    }
+    if posx == 4 {
+        doors.right = false;
+    }
+    if posy == 1 {
+        doors.up = false;
+    }
+    if posy == 4 {
+        doors.down = false;
+    }
 }
 
 fn find_route(passcode: &str) -> String {
@@ -38,7 +40,9 @@ fn find_route(passcode: &str) -> String {
     loop {
         let mut newroutes: Vec<(String, usize, usize)> = Vec::new();
         for (oldroute, posx, posy) in routes.drain(..) {
-            if (posx == 4) && (posy == 4) { return oldroute; }
+            if (posx == 4) && (posy == 4) {
+                return oldroute;
+            }
             let mut doors: Doors = possible_doors(passcode, &oldroute);
             filter_doors(posx, posy, &mut doors);
             if doors.up {

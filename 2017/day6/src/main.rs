@@ -1,11 +1,11 @@
-use std::collections::HashSet;
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
-fn load_instructions () -> Vec<usize> {
+fn load_instructions() -> Vec<usize> {
     let infile = File::open("input").unwrap();
     let freader = BufReader::new(&infile);
     let mut ret = Vec::new();
@@ -18,7 +18,7 @@ fn load_instructions () -> Vec<usize> {
     ret
 }
 
-fn problem1 (input_: &Vec<usize>) -> usize {
+fn problem1(input_: &Vec<usize>) -> usize {
     let mut seen: HashSet<Vec<usize>> = HashSet::new();
     let mut cur = input_.clone();
     let mut redists = 0;
@@ -41,13 +41,15 @@ fn problem1 (input_: &Vec<usize>) -> usize {
         }
         // New state created
         redists += 1;
-        if seen.contains(&cur) { break; }
+        if seen.contains(&cur) {
+            break;
+        }
         seen.insert(cur.clone());
     }
     redists
 }
 
-fn problem2 (input_: &Vec<usize>) -> usize {
+fn problem2(input_: &Vec<usize>) -> usize {
     let mut seen: HashMap<Vec<usize>, usize> = HashMap::new();
     let mut cur = input_.clone();
     let mut redists = 0;
@@ -70,7 +72,9 @@ fn problem2 (input_: &Vec<usize>) -> usize {
         }
         // New state created
         redists += 1;
-        if seen.contains_key(&cur) { break; }
+        if seen.contains_key(&cur) {
+            break;
+        }
         seen.insert(cur.clone(), redists);
     }
     // at this point, we know the current cycle count (redists) and

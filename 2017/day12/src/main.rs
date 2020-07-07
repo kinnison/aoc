@@ -5,19 +5,19 @@ extern crate regex;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
 use regex::Regex;
 
 struct Prog {
     id: usize,
-    pipes: Vec<usize>
+    pipes: Vec<usize>,
 }
 
 impl Prog {
-    fn new (line: &str) -> Prog {
+    fn new(line: &str) -> Prog {
         lazy_static! {
             static ref LINE_RE: Regex = Regex::new(r"^([0-9]+) <-> (.*)$").unwrap();
         }
@@ -31,15 +31,15 @@ impl Prog {
             }
             return Prog {
                 id: id_,
-                pipes: pipes_
-            }
+                pipes: pipes_,
+            };
         }
         panic!("Unable to parse line at all")
     }
 
     fn connected_progs(start: usize, all: &HashMap<usize, Prog>) -> HashSet<usize> {
         let mut ret = HashSet::new();
-        let mut to_check = vec!(start);
+        let mut to_check = vec![start];
         while to_check.len() > 0 {
             let id = to_check.pop().unwrap();
             let dis = all.get(&id).unwrap();
@@ -70,7 +70,7 @@ impl Prog {
     }
 }
 
-fn load_instructions () -> HashMap<usize, Prog> {
+fn load_instructions() -> HashMap<usize, Prog> {
     let infile = File::open("input").unwrap();
     let freader = BufReader::new(&infile);
     let mut ret = HashMap::new();

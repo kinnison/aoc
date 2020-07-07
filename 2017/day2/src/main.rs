@@ -1,20 +1,20 @@
-use std::str::FromStr;
 use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
+use std::str::FromStr;
+use std::vec::Vec;
 
 struct Sheet {
-    cells: Vec<Vec<usize>>
+    cells: Vec<Vec<usize>>,
 }
 
-fn load_instructions () -> Sheet {
+fn load_instructions() -> Sheet {
     let infile = File::open("input").unwrap();
     let freader = BufReader::new(&infile);
-    let mut ret : Sheet = Sheet { cells: Vec::new() };
+    let mut ret: Sheet = Sheet { cells: Vec::new() };
     for line_ in freader.lines() {
         let line = line_.unwrap();
-        let mut row : Vec<usize> = Vec::new();
+        let mut row: Vec<usize> = Vec::new();
         for num_ in line.split_whitespace() {
             row.push(usize::from_str(num_).unwrap());
         }
@@ -23,37 +23,41 @@ fn load_instructions () -> Sheet {
     return ret;
 }
 
-fn problem1 (sheet: &Sheet) -> usize {
+fn problem1(sheet: &Sheet) -> usize {
     let mut sum = 0;
     for row in &sheet.cells {
         let mut mincol: usize = row[0];
         let mut maxcol: usize = row[0];
         for col_ in row {
             let col: usize = *col_;
-            if col < mincol { mincol = col }
-            if col > maxcol { maxcol = col }
+            if col < mincol {
+                mincol = col
+            }
+            if col > maxcol {
+                maxcol = col
+            }
         }
         sum += maxcol - mincol;
     }
     sum
 }
 
-fn problem2 (sheet: &Sheet) -> usize {
+fn problem2(sheet: &Sheet) -> usize {
     let mut sum = 0;
     'rows: for row in &sheet.cells {
-        for ai in 0..row.len()-1 {
+        for ai in 0..row.len() - 1 {
             for bi in 0..row.len() {
                 if ai != bi {
                     let a: usize = row[ai];
                     let b: usize = row[bi];
                     if a > b {
                         if (a % b) == 0 {
-                            sum += a/b;
+                            sum += a / b;
                             continue 'rows;
                         }
                     } else {
                         if (b % a) == 0 {
-                            sum += b/a;
+                            sum += b / a;
                             continue 'rows;
                         }
                     }

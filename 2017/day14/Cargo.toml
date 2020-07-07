@@ -4,4 +4,4 @@ version = "0.1.0"
 authors = ["Daniel Silverstone <daniel.silverstone@codethink.co.uk>"]
 
 [dependencies]
-itertools = "0.7.4"
+itertools = "0.9"

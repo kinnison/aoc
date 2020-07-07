@@ -1,29 +1,33 @@
-
 use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
 #[derive(Debug)]
 enum Move {
-    N, S, NE, NW, SE, SW
+    N,
+    S,
+    NE,
+    NW,
+    SE,
+    SW,
 }
 
 impl Move {
     fn from_str(s: &str) -> Move {
         match s {
-            "n"  => Move::N,
-            "s"  => Move::S,
+            "n" => Move::N,
+            "s" => Move::S,
             "ne" => Move::NE,
             "nw" => Move::NW,
             "se" => Move::SE,
             "sw" => Move::SW,
-            _    => panic!("Unknown move: {}", s)
+            _ => panic!("Unknown move: {}", s),
         }
     }
 }
 
-fn load_instructions () -> Vec<Move> {
+fn load_instructions() -> Vec<Move> {
     let infile = File::open("input").unwrap();
     let freader = BufReader::new(&infile);
     let mut ret = Vec::new();
@@ -55,12 +59,30 @@ impl HexPos {
 
     fn domove(&mut self, move_: &Move) {
         match *move_ {
-            Move::N  => { self.y += 1; self.z -= 1 },
-            Move::S  => { self.y -= 1; self.z += 1 },
-            Move::NE => { self.x += 1; self.z -= 1 },
-            Move::SW => { self.x -= 1; self.z += 1 },
-            Move::SE => { self.x += 1; self.y -= 1 },
-            Move::NW => { self.x -= 1; self.y += 1 }
+            Move::N => {
+                self.y += 1;
+                self.z -= 1
+            }
+            Move::S => {
+                self.y -= 1;
+                self.z += 1
+            }
+            Move::NE => {
+                self.x += 1;
+                self.z -= 1
+            }
+            Move::SW => {
+                self.x -= 1;
+                self.z += 1
+            }
+            Move::SE => {
+                self.x += 1;
+                self.y -= 1
+            }
+            Move::NW => {
+                self.x -= 1;
+                self.y += 1
+            }
         }
     }
 
@@ -141,18 +163,20 @@ fn runtest1(seq: Vec<Move>, expdist: usize) {
     let mut pos = HexPos::new(0, 0, 0);
     pos.doseq(&seq);
     let dist = pos.dist_to_origin();
-    println!("After seq, coords are: {:?} which is {} from orig (want {})",
-             pos, dist, expdist);
+    println!(
+        "After seq, coords are: {:?} which is {} from orig (want {})",
+        pos, dist, expdist
+    );
     assert!(dist == expdist);
 }
 
-fn problem1 (input: &Vec<Move>) -> usize {
+fn problem1(input: &Vec<Move>) -> usize {
     let mut pos = HexPos::new(0, 0, 0);
     pos.doseq(input);
     pos.dist_to_origin()
 }
 
-fn problem2 (input: &Vec<Move>) -> usize {
+fn problem2(input: &Vec<Move>) -> usize {
     let mut pos = HexPos::new(0, 0, 0);
     pos.doseq_farthest(input)
 }

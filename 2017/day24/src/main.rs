@@ -1,29 +1,29 @@
 use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
 #[derive(Clone, PartialEq, Eq)]
 struct Part {
     a: usize,
-    b: usize
+    b: usize,
 }
 
 impl Part {
-    fn new (s: &str) -> Part {
+    fn new(s: &str) -> Part {
         let parts: Vec<usize> = s.split("/").map(|s| s.trim().parse().unwrap()).collect();
         assert!(parts.len() == 2);
         Part {
             a: parts[0],
-            b: parts[1]
+            b: parts[1],
         }
     }
 
-    fn has (&self, n: usize) -> bool {
+    fn has(&self, n: usize) -> bool {
         self.a == n || self.b == n
     }
 
-    fn other (&self, n: usize) -> usize {
+    fn other(&self, n: usize) -> usize {
         if self.a == n {
             self.b
         } else {
@@ -31,12 +31,12 @@ impl Part {
         }
     }
 
-    fn strength (&self) -> usize {
+    fn strength(&self) -> usize {
         self.a + self.b
     }
 }
 
-fn load_instructions (s: &str) -> Vec<Part> {
+fn load_instructions(s: &str) -> Vec<Part> {
     let infile = File::open(s).unwrap();
     let freader = BufReader::new(&infile);
     let mut ret = Vec::new();
@@ -51,12 +51,15 @@ fn load_instructions (s: &str) -> Vec<Part> {
 #[derive(Clone)]
 struct Bridge {
     seq: Vec<Part>,
-    desired: usize
+    desired: usize,
 }
 
 impl Bridge {
     fn new() -> Bridge {
-        Bridge { seq: Vec::new(), desired: 0 }
+        Bridge {
+            seq: Vec::new(),
+            desired: 0,
+        }
     }
 
     fn add_part(&self, part: &Part) -> Bridge {
@@ -65,13 +68,17 @@ impl Bridge {
         ret.desired = part.other(self.desired);
         ret
     }
-    
+
     fn build_all(&self, remaining: &Vec<Part>, bridges: &mut Vec<Bridge>) {
         for nextpart in remaining.iter().filter(|p| p.has(self.desired)) {
             // Construct a bridge out of self, nextpart
             let nextbridge = self.add_part(nextpart);
             bridges.push(nextbridge.clone());
-            let nextset = remaining.iter().filter(|p| *p != nextpart).map(|p| p.clone()).collect();
+            let nextset = remaining
+                .iter()
+                .filter(|p| *p != nextpart)
+                .map(|p| p.clone())
+                .collect();
             nextbridge.build_all(&nextset, bridges);
         }
     }
@@ -90,7 +97,7 @@ impl Bridge {
     }
 }
 
-fn problem (input: &Vec<Part>) -> (usize, usize) {
+fn problem(input: &Vec<Part>) -> (usize, usize) {
     let mut all_valid = Vec::new();
     let base = Bridge::new();
     base.build_all(&input, &mut all_valid);

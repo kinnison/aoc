@@ -3,13 +3,13 @@ extern crate lazy_static;
 extern crate regex;
 
 use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
 use regex::Regex;
 
-#[derive(Debug,Clone,Copy)]
+#[derive(Debug, Clone, Copy)]
 enum Reg {
     A,
     B,
@@ -17,13 +17,13 @@ enum Reg {
     D,
 }
 
-#[derive(Debug,Clone,Copy)]
+#[derive(Debug, Clone, Copy)]
 enum Arg {
     AReg(Reg),
     AVal(i32),
 }
 
-#[derive(Debug,Clone,Copy)]
+#[derive(Debug, Clone, Copy)]
 enum Instr {
     Inc(Arg),
     Dec(Arg),
@@ -59,32 +59,32 @@ impl Instr {
         }
 
         if let Some(cap) = CPY_RE.captures(&t_) {
-            let ref src_ = cap.at(1);
-            let ref tgt_ = cap.at(2);
-            let src = arg_from(src_.unwrap());
-            let tgt = arg_from(tgt_.unwrap());
+            let ref src_ = cap.get(1);
+            let ref tgt_ = cap.get(2);
+            let src = arg_from(src_.unwrap().as_str());
+            let tgt = arg_from(tgt_.unwrap().as_str());
             Instr::Cpy(src, tgt)
         } else if let Some(cap) = JNZ_RE.captures(&t_) {
-            let ref tst_ = cap.at(1);
-            let ref ofs_ = cap.at(2);
-            let tst = arg_from(tst_.unwrap());
-            let ofs = arg_from(ofs_.unwrap());
+            let ref tst_ = cap.get(1);
+            let ref ofs_ = cap.get(2);
+            let tst = arg_from(tst_.unwrap().as_str());
+            let ofs = arg_from(ofs_.unwrap().as_str());
             Instr::Jnz(tst, ofs)
         } else if let Some(cap) = INC_RE.captures(&t_) {
-            let ref tgt_ = cap.at(1);
-            let tgt = arg_from(tgt_.unwrap());
+            let ref tgt_ = cap.get(1);
+            let tgt = arg_from(tgt_.unwrap().as_str());
             Instr::Inc(tgt)
         } else if let Some(cap) = DEC_RE.captures(&t_) {
-            let ref tgt_ = cap.at(1);
-            let tgt = arg_from(tgt_.unwrap());
+            let ref tgt_ = cap.get(1);
+            let tgt = arg_from(tgt_.unwrap().as_str());
             Instr::Dec(tgt)
         } else if let Some(cap) = TGL_RE.captures(&t_) {
-            let ref tgt_ = cap.at(1);
-            let tgt = arg_from(tgt_.unwrap());
+            let ref tgt_ = cap.get(1);
+            let tgt = arg_from(tgt_.unwrap().as_str());
             Instr::Tgl(tgt)
         } else if let Some(cap) = OUT_RE.captures(&t_) {
-            let ref tgt_ = cap.at(1);
-            let tgt = arg_from(tgt_.unwrap());
+            let ref tgt_ = cap.get(1);
+            let tgt = arg_from(tgt_.unwrap().as_str());
             Instr::Out(tgt)
         } else {
             unreachable!();

@@ -1,4 +1,3 @@
-
 fn curve_step(i: &str) -> String {
     let mut s: String = String::new();
     s.push_str(i);
@@ -20,7 +19,9 @@ fn fill_disc(i: &str, tlen: usize) -> String {
 
 fn checksum(i: &str) -> String {
     let mut s = String::new();
-    if (i.len() & 1) != 0 { return i.to_string(); }
+    if (i.len() & 1) != 0 {
+        return i.to_string();
+    }
     let ref mut chs = i.chars();
     'lo: loop {
         if let Some(c1) = chs.next() {
@@ -43,7 +44,13 @@ fn checksum(i: &str) -> String {
     }
 }
 
-fn main () {
-    println!("Problem 1 -> {}", checksum(&fill_disc("10111011111001111", 272)));
-    println!("Problem 1 -> {}", checksum(&fill_disc("10111011111001111", 35651584)));
+fn main() {
+    println!(
+        "Problem 1 -> {}",
+        checksum(&fill_disc("10111011111001111", 272))
+    );
+    println!(
+        "Problem 1 -> {}",
+        checksum(&fill_disc("10111011111001111", 35651584))
+    );
 }

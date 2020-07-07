@@ -1,8 +1,7 @@
-
 struct Generator {
     curval: usize,
     factor: usize,
-    divisor: usize
+    divisor: usize,
 }
 
 impl Generator {
@@ -10,11 +9,11 @@ impl Generator {
         Generator {
             curval: init,
             factor: fact,
-            divisor: 2147483647
+            divisor: 2147483647,
         }
     }
 
-    fn next (&mut self) -> usize {
+    fn next(&mut self) -> usize {
         self.curval = (self.curval * self.factor) % self.divisor;
         self.curval
     }
@@ -29,7 +28,7 @@ impl Generator {
     }
 }
 
-fn problem1 (facts: &(usize, usize), inits: &(usize, usize)) -> usize {
+fn problem1(facts: &(usize, usize), inits: &(usize, usize)) -> usize {
     let mut gen_a = Generator::new(inits.0, facts.0);
     let mut gen_b = Generator::new(inits.1, facts.1);
     let mut total = 0;
@@ -43,7 +42,7 @@ fn problem1 (facts: &(usize, usize), inits: &(usize, usize)) -> usize {
     total
 }
 
-fn problem2 (facts: &(usize, usize), inits: &(usize, usize)) -> usize {
+fn problem2(facts: &(usize, usize), inits: &(usize, usize)) -> usize {
     let mut gen_a = Generator::new(inits.0, facts.0);
     let mut gen_b = Generator::new(inits.1, facts.1);
     let mut total = 0;
@@ -60,8 +59,14 @@ fn problem2 (facts: &(usize, usize), inits: &(usize, usize)) -> usize {
 fn main() {
     let factors: (usize, usize) = (16807, 48271);
     let example: (usize, usize) = (65, 8921);
-    println!("Example answer for problem1: {}", problem1(&factors, &example));
-    println!("Example answer for problem2: {}", problem2(&factors, &example));
+    println!(
+        "Example answer for problem1: {}",
+        problem1(&factors, &example)
+    );
+    println!(
+        "Example answer for problem2: {}",
+        problem2(&factors, &example)
+    );
     let input: (usize, usize) = (277, 349);
     println!("Problem1: {}", problem1(&factors, &input));
     println!("Problem2: {}", problem2(&factors, &input));

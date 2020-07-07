@@ -4,7 +4,7 @@ extern crate itertools;
 use std::collections::HashSet;
 use std::vec::Vec;
 
-fn instr_from_str (s: &str) -> Vec<usize> {
+fn instr_from_str(s: &str) -> Vec<usize> {
     let mut ret = Vec::new();
     for ch in s.chars() {
         ret.push(ch as usize);
@@ -22,16 +22,16 @@ struct KnotHash {
     size: usize,
     entries: Vec<usize>,
     curpos: usize,
-    skip: usize
+    skip: usize,
 }
 
 impl KnotHash {
-    fn new (size: usize) -> KnotHash {
+    fn new(size: usize) -> KnotHash {
         let mut ret = KnotHash {
             size: size,
             entries: Vec::new(),
             curpos: 0,
-            skip: 0
+            skip: 0,
         };
         for v in 0..size {
             ret.entries.push(v);
@@ -39,7 +39,7 @@ impl KnotHash {
         ret
     }
 
-    fn print (&self) {
+    fn print(&self) {
         for i in 0..self.size {
             if self.curpos == i {
                 print!("[{}] ", self.entries[i]);
@@ -51,7 +51,8 @@ impl KnotHash {
     }
 
     fn run_instruction(&mut self, len: usize) {
-        let revvec: Vec<usize> = (0..len).rev()
+        let revvec: Vec<usize> = (0..len)
+            .rev()
             .map(|v| (self.curpos + v) % self.size)
             .map(|p| self.entries[p])
             .collect();
@@ -86,7 +87,7 @@ impl KnotHash {
         for base in 0..16 {
             let mut val = 0;
             for sub in 0..16 {
-                val ^= self.entries[(base*16) + sub];
+                val ^= self.entries[(base * 16) + sub];
             }
             ret.push_str(&format!("{:02x}", val));
         }
@@ -98,7 +99,7 @@ impl KnotHash {
         for base in 0..16 {
             let mut val = 0;
             for sub in 0..16 {
-                val ^= self.entries[(base*16) + sub];
+                val ^= self.entries[(base * 16) + sub];
             }
             ret.push((val & 0x80) != 0);
             ret.push((val & 0x40) != 0);
@@ -114,12 +115,14 @@ impl KnotHash {
 }
 
 struct Disk {
-    contents: Vec<Vec<bool>>
+    contents: Vec<Vec<bool>>,
 }
 
 impl Disk {
-    fn new (seed: &str) -> Disk {
-        let mut ret = Disk { contents: Vec::new() };
+    fn new(seed: &str) -> Disk {
+        let mut ret = Disk {
+            contents: Vec::new(),
+        };
         for i in 0..128 {
             let rowseed = format!("{}-{}", seed, i);
             let mut hash = KnotHash::new(256);
@@ -131,7 +134,7 @@ impl Disk {
         ret
     }
 
-    fn occupancy (&self) -> usize {
+    fn occupancy(&self) -> usize {
         let mut total = 0;
         for row in &self.contents {
             for col in row {
@@ -143,16 +146,16 @@ impl Disk {
         total
     }
 
-    fn bit_at (&self, row: usize, col: usize) -> bool {
+    fn bit_at(&self, row: usize, col: usize) -> bool {
         self.contents[row][col]
     }
-    
-    fn count_groups (&self) -> usize {
-        let mut coords: HashSet<(usize,usize)> = iproduct!(0..128, 0..128).collect();
+
+    fn count_groups(&self) -> usize {
+        let mut coords: HashSet<(usize, usize)> = iproduct!(0..128, 0..128).collect();
         let mut groups = 0;
         while coords.len() > 0 {
-            let mut consider: HashSet<(usize,usize)> = HashSet::new();
-            let coord: (usize,usize) = coords.iter().next().unwrap().clone();
+            let mut consider: HashSet<(usize, usize)> = HashSet::new();
+            let coord: (usize, usize) = coords.iter().next().unwrap().clone();
             coords.remove(&coord);
             if !self.bit_at(coord.0, coord.1) {
                 continue;
@@ -162,12 +165,13 @@ impl Disk {
             while consider.len() > 0 {
                 let ponder: (usize, usize) = consider.iter().next().unwrap().clone();
                 consider.remove(&ponder);
-                for (rowofs, colofs) in vec![(-1,0),(1,0),(0,-1),(0,1)] {
+                for (rowofs, colofs) in vec![(-1, 0), (1, 0), (0, -1), (0, 1)] {
                     if (ponder.0 as i32) >= -rowofs {
                         if (ponder.1 as i32) >= -colofs {
-                            let newc: (usize, usize) =
-                                (((ponder.0 as i32) + rowofs) as usize,
-                                 ((ponder.1 as i32) + colofs) as usize);
+                            let newc: (usize, usize) = (
+                                ((ponder.0 as i32) + rowofs) as usize,
+                                ((ponder.1 as i32) + colofs) as usize,
+                            );
                             if coords.contains(&newc) {
                                 coords.remove(&newc);
                                 if self.bit_at(newc.0, newc.1) {

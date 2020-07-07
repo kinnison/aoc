@@ -1,73 +1,165 @@
-use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
-use std::io::prelude::*;
 use std::collections::HashSet;
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
 #[derive(Debug, Copy, Clone)]
 enum Instruction {
-    Up, Down, Left, Right
+    Up,
+    Down,
+    Left,
+    Right,
 }
 
 impl Instruction {
-    pub fn new (c : char) -> Instruction {
-        if c == 'U'      {return Instruction::Up}
-        else if c == 'D' {return Instruction::Down}
-        else if c == 'L' {return Instruction::Left}
-        else             {return Instruction::Right}
+    pub fn new(c: char) -> Instruction {
+        if c == 'U' {
+            return Instruction::Up;
+        } else if c == 'D' {
+            return Instruction::Down;
+        } else if c == 'L' {
+            return Instruction::Left;
+        } else {
+            return Instruction::Right;
+        }
     }
-    fn go (&self, pos : i32) -> i32 {
+    fn go(&self, pos: i32) -> i32 {
         match self {
-            &Instruction::Up => if pos < 4 { pos } else { pos - 3 },
-            &Instruction::Down => if pos > 6 { pos } else { pos + 3 },
-            &Instruction::Left => if (pos % 3) == 1 { pos } else { pos - 1 },
-            &Instruction::Right => if (pos % 3) == 0 { pos } else { pos + 1}
+            &Instruction::Up => {
+                if pos < 4 {
+                    pos
+                } else {
+                    pos - 3
+                }
+            }
+            &Instruction::Down => {
+                if pos > 6 {
+                    pos
+                } else {
+                    pos + 3
+                }
+            }
+            &Instruction::Left => {
+                if (pos % 3) == 1 {
+                    pos
+                } else {
+                    pos - 1
+                }
+            }
+            &Instruction::Right => {
+                if (pos % 3) == 0 {
+                    pos
+                } else {
+                    pos + 1
+                }
+            }
         }
     }
 
-    fn go2 (&self, pos : i32) -> i32 {
+    fn go2(&self, pos: i32) -> i32 {
         if pos == 1 {
             match self {
                 &Instruction::Down => 3,
-                _ => 1
+                _ => 1,
             }
         } else if pos < 5 {
             match self {
-                &Instruction::Up => if pos == 3 { 1 } else { pos },
+                &Instruction::Up => {
+                    if pos == 3 {
+                        1
+                    } else {
+                        pos
+                    }
+                }
                 &Instruction::Down => pos + 4,
-                &Instruction::Left => if pos == 2 { pos } else { pos - 1 },
-                &Instruction::Right => if pos == 4 { pos } else { pos + 1 }
+                &Instruction::Left => {
+                    if pos == 2 {
+                        pos
+                    } else {
+                        pos - 1
+                    }
+                }
+                &Instruction::Right => {
+                    if pos == 4 {
+                        pos
+                    } else {
+                        pos + 1
+                    }
+                }
             }
         } else if pos < 10 {
             match self {
-                &Instruction::Up => if (pos == 5) || (pos == 9) { pos } else { pos - 4 },
-                &Instruction::Down => if (pos == 5) || (pos == 9) { pos } else { pos + 4 },
-                &Instruction::Left => if pos == 5 { pos } else { pos - 1 },
-                &Instruction::Right => if pos == 9 { pos } else { pos + 1 }
+                &Instruction::Up => {
+                    if (pos == 5) || (pos == 9) {
+                        pos
+                    } else {
+                        pos - 4
+                    }
+                }
+                &Instruction::Down => {
+                    if (pos == 5) || (pos == 9) {
+                        pos
+                    } else {
+                        pos + 4
+                    }
+                }
+                &Instruction::Left => {
+                    if pos == 5 {
+                        pos
+                    } else {
+                        pos - 1
+                    }
+                }
+                &Instruction::Right => {
+                    if pos == 9 {
+                        pos
+                    } else {
+                        pos + 1
+                    }
+                }
             }
         } else if pos < 13 {
             match self {
                 &Instruction::Up => pos - 4,
-                &Instruction::Down => if pos == 11 { 13 } else { pos },
-                &Instruction::Left => if pos == 10 { 10 } else { pos - 1 },
-                &Instruction::Right => if pos == 12 { 12 } else { pos + 1 }
+                &Instruction::Down => {
+                    if pos == 11 {
+                        13
+                    } else {
+                        pos
+                    }
+                }
+                &Instruction::Left => {
+                    if pos == 10 {
+                        10
+                    } else {
+                        pos - 1
+                    }
+                }
+                &Instruction::Right => {
+                    if pos == 12 {
+                        12
+                    } else {
+                        pos + 1
+                    }
+                }
             }
         } else {
             match self {
                 &Instruction::Up => 11,
-                _ => 13
+                _ => 13,
             }
         }
     }
 }
 
-fn load_instructions () -> Vec<Vec<Instruction>> {
+fn load_instructions() -> Vec<Vec<Instruction>> {
     let infile = File::open("day2.input").unwrap();
     let freader = BufReader::new(&infile);
-    let mut ret : Vec<Vec<Instruction>> = Vec::new();
+    let mut ret: Vec<Vec<Instruction>> = Vec::new();
     for line_ in freader.lines() {
         let line = line_.unwrap();
-        let mut lvec : Vec<Instruction> = Vec::new();
+        let mut lvec: Vec<Instruction> = Vec::new();
         for instr in line.chars() {
             lvec.push(Instruction::new(instr));
         }
@@ -76,7 +168,7 @@ fn load_instructions () -> Vec<Vec<Instruction>> {
     return ret;
 }
 
-fn problem1 () {
+fn problem1() {
     let instructions = load_instructions();
     print!("Result of problem 1: ");
     for lvec in instructions.iter() {
@@ -89,7 +181,7 @@ fn problem1 () {
     println!("");
 }
 
-fn problem2 () {
+fn problem2() {
     let instructions = load_instructions();
     print!("Result of problem 2: ");
     let buttons = "-123456789ABCD";
@@ -104,7 +196,7 @@ fn problem2 () {
     println!("");
 }
 
-fn main () {
+fn main() {
     problem1();
     problem2();
 }

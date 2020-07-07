@@ -8,5 +8,5 @@ edition = "2018"
 
 [dependencies]
 lazy_static = "1.4"
-regex = "0.1"
-rust-crypto = "0.2"
+regex = "1"
+md-5="0.9"

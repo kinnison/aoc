@@ -3,7 +3,7 @@
 // which means the "winner" is the elf in position 2l-1 where
 // l is the number of elves minus the top set bit.
 
-fn winner1 (elves: u32) -> u32 {
+fn winner1(elves: u32) -> u32 {
     let l = elves - (elves.next_power_of_two() >> 1);
     (2 * l) + 1
 }
@@ -29,10 +29,9 @@ fn winner2 (elves: u32) -> u32 {
 }
 */
 
-
-fn winner2 (n_elves: u32) -> u32 {
+fn winner2(n_elves: u32) -> u32 {
     let mut elves: Vec<u32> = Vec::new();
-    for n in 1..(n_elves+1) {
+    for n in 1..(n_elves + 1) {
         elves.push(n);
     }
     let mut ofs = 0;
@@ -43,14 +42,15 @@ fn winner2 (n_elves: u32) -> u32 {
         // Elf at ofs eliminates elf across from them which is elf at:
         let elim = ((elves.len() >> 1) + ofs) % elves.len();
         elves.remove(elim);
-        if elim < ofs { ofs -= 1; }
+        if elim < ofs {
+            ofs -= 1;
+        }
         ofs = (ofs + 1) % elves.len();
     }
     elves[0]
 }
 
-
-fn main () {
+fn main() {
     println!("Test: 5 elves, winner: {}", winner1(5));
     println!("Problem 1: {}", winner1(3018458));
     println!("Test: 5 elves, winner: {}", winner2(5));

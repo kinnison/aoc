@@ -1,26 +1,25 @@
-
 use std::vec::Vec;
 
 struct Hurricane {
     entries: Vec<usize>,
     cap: usize,
     pos: usize,
-    step: usize
+    step: usize,
 }
 
 impl Hurricane {
-    fn new (cap: usize, step: usize) -> Hurricane {
+    fn new(cap: usize, step: usize) -> Hurricane {
         let mut ret = Hurricane {
             entries: Vec::with_capacity(cap),
             cap: cap,
             pos: 0,
-            step: step
+            step: step,
         };
         ret.entries.push(0);
         ret
     }
 
-    fn run (&mut self) {
+    fn run(&mut self) {
         for v in 1..self.cap {
             // First we step through
             self.pos = (self.pos + self.step) % self.entries.len();
@@ -36,14 +35,13 @@ impl Hurricane {
     }
 }
 
-fn problem1 (input: usize) -> usize {
+fn problem1(input: usize) -> usize {
     let mut hurricane = Hurricane::new(2018, input);
     hurricane.run();
     hurricane.entries[(hurricane.pos + 1) % hurricane.entries.len()]
 }
 
-
-fn problem2 (input: usize) -> usize {
+fn problem2(input: usize) -> usize {
     // Faking the hurricane instead is funsies
     // Since we only care about the value at location 1 which is only
     // ever changed if pos is zero on insertion, we can fake the

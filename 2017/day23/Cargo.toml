@@ -4,6 +4,6 @@ version = "0.1.0"
 authors = ["Daniel Silverstone <dsilvers@digital-scurf.org>"]
 
 [dependencies]
-regex = "0.2"
+regex = "1"
 lazy_static = "~1"
 primal = "0.2"

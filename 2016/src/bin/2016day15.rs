@@ -1,22 +1,22 @@
-
-
 macro_rules! DISC_N {
-    () => (6)
+    () => {
+        6
+    };
 }
 
-static PUZZLE_INPUT:[(usize,usize,usize,usize); DISC_N!()] = [
+static PUZZLE_INPUT: [(usize, usize, usize, usize); DISC_N!()] = [
     // (disc, posn, time, pos)
-    (1,5,0,2),
-    (2,13,0,7),
-    (3,17,0,10),
-    (4,3,0,2),
-    (5,19,0,9),
-    (6,7,0,0)
-    ];
+    (1, 5, 0, 2),
+    (2, 13, 0, 7),
+    (3, 17, 0, 10),
+    (4, 3, 0, 2),
+    (5, 19, 0, 9),
+    (6, 7, 0, 0),
+];
 
 struct PuzzleState {
     sizes: [usize; DISC_N!() + 1],
-    offsets: [usize; DISC_N!() + 1]
+    offsets: [usize; DISC_N!() + 1],
 }
 
 /*
@@ -28,10 +28,10 @@ struct PuzzleState {
  * in the future...
  */
 
-fn initial_state () -> PuzzleState {
+fn initial_state() -> PuzzleState {
     let mut ret: PuzzleState = PuzzleState {
         sizes: [0; DISC_N!() + 1],
-        offsets: [0; DISC_N!() + 1]
+        offsets: [0; DISC_N!() + 1],
     };
 
     for i in 0..DISC_N!() {
@@ -39,8 +39,8 @@ fn initial_state () -> PuzzleState {
         // Since we're hoping to make it so that at time N the value
         // we store in the puzzle state is such that (N+offset)%size == 0
         // if the disc would be in the right place when we release at N
-        ret.sizes[discn-1] = size;
-        ret.offsets[discn-1] = (ofs + discn + size - at) % size;
+        ret.sizes[discn - 1] = size;
+        ret.offsets[discn - 1] = (ofs + discn + size - at) % size;
     }
 
     // the last disc is initialised to something which will always be safe...
@@ -49,8 +49,8 @@ fn initial_state () -> PuzzleState {
     ret
 }
 
-fn aligned (s: &PuzzleState, at: usize) -> bool {
-    for i in 0..DISC_N!()+1 {
+fn aligned(s: &PuzzleState, at: usize) -> bool {
+    for i in 0..DISC_N!() + 1 {
         if ((at + s.offsets[i]) % s.sizes[i]) != 0 {
             return false;
         }
@@ -58,12 +58,12 @@ fn aligned (s: &PuzzleState, at: usize) -> bool {
     true
 }
 
-fn prob_opt (s: &PuzzleState) -> (usize, usize) {
+fn prob_opt(s: &PuzzleState) -> (usize, usize) {
     // to optimise we select a start N and step which means we only
     // test values where the largest disc might be in alignment...
     let mut dn: usize = 0;
     let mut ds: usize = s.sizes[0];
-    for i in 1..DISC_N!()+1 {
+    for i in 1..DISC_N!() + 1 {
         if s.sizes[i] > ds {
             ds = s.sizes[i];
             dn = i;
@@ -77,24 +77,28 @@ fn prob_opt (s: &PuzzleState) -> (usize, usize) {
     (ds - dofs, ds)
 }
 
-fn problem1 () -> usize {
+fn problem1() -> usize {
     let state = initial_state();
     let (mut n, step) = prob_opt(&state);
-    while !aligned(&state, n) { n += step; }
+    while !aligned(&state, n) {
+        n += step;
+    }
     n
 }
 
-fn problem2 () -> usize {
+fn problem2() -> usize {
     let mut state = initial_state();
     // Add in the final disc
     state.sizes[DISC_N!()] = 11;
     state.offsets[DISC_N!()] = (0 + DISC_N!() + 1 + 11 + 0) % 11;
     let (mut n, step) = prob_opt(&state);
-    while !aligned(&state, n) { n += 1; }
+    while !aligned(&state, n) {
+        n += 1;
+    }
     n
 }
 
-fn main () {
+fn main() {
     println!("Problem 1: {}", problem1());
     println!("Problem 2: {}", problem2());
 }

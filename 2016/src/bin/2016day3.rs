@@ -1,18 +1,18 @@
-use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
-use std::io::prelude::*;
 use std::collections::HashSet;
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
 #[derive(Debug, Copy, Clone)]
 struct Triangle {
-    a : i32,
-    b : i32,
-    c : i32
+    a: i32,
+    b: i32,
+    c: i32,
 }
 
 impl Triangle {
-    pub fn new(t_ : String) -> Triangle {
+    pub fn new(t_: String) -> Triangle {
         let t = t_.trim();
         let ns: Vec<i32> = t
             .split(" ")
@@ -34,10 +34,10 @@ impl Triangle {
     }
 }
 
-fn load_triangles () -> Vec<Triangle> {
+fn load_triangles() -> Vec<Triangle> {
     let infile = File::open("day3.input").unwrap();
     let freader = BufReader::new(&infile);
-    let mut ret : Vec<Triangle> = Vec::new();
+    let mut ret: Vec<Triangle> = Vec::new();
     for line_ in freader.lines() {
         let line = line_.unwrap();
         ret.push(Triangle::new(line));
@@ -45,19 +45,17 @@ fn load_triangles () -> Vec<Triangle> {
     return ret;
 }
 
-fn problem1 () -> usize {
+fn problem1() -> usize {
     let mut triangles = load_triangles();
     triangles.retain(|t| t.is_valid());
-    return triangles.len()
+    return triangles.len();
 }
 
-fn load_triangles2 () -> Vec<Triangle> {
+fn load_triangles2() -> Vec<Triangle> {
     let infile = File::open("day3.input").unwrap();
     let freader = BufReader::new(&infile);
-    let mut ret : Vec<Triangle> = Vec::new();
-    let mut lines : Vec<String> = freader.lines()
-        .map(&std::result::Result::unwrap)
-        .collect();
+    let mut ret: Vec<Triangle> = Vec::new();
+    let mut lines: Vec<String> = freader.lines().map(&std::result::Result::unwrap).collect();
     while lines.len() > 0 {
         let l1 = lines.pop().unwrap();
         let l2 = lines.pop().unwrap();
@@ -66,19 +64,22 @@ fn load_triangles2 () -> Vec<Triangle> {
          * We need to take three lines of the form "  XXX  XXX  XXX  "
          * And make it so the vertical components are in that form instead
          */
-        let ns1: Vec<i32> = l1.trim()
+        let ns1: Vec<i32> = l1
+            .trim()
             .split(" ")
             .filter(|x| (x.trim() != ""))
             .map(&str::parse::<i32>)
             .map(&std::result::Result::unwrap)
             .collect();
-        let ns2: Vec<i32> = l2.trim()
+        let ns2: Vec<i32> = l2
+            .trim()
             .split(" ")
             .filter(|x| (x.trim() != ""))
             .map(&str::parse::<i32>)
             .map(&std::result::Result::unwrap)
             .collect();
-        let ns3: Vec<i32> = l3.trim()
+        let ns3: Vec<i32> = l3
+            .trim()
             .split(" ")
             .filter(|x| (x.trim() != ""))
             .map(&str::parse::<i32>)
@@ -94,13 +95,13 @@ fn load_triangles2 () -> Vec<Triangle> {
     return ret;
 }
 
-fn problem2 () -> usize {
+fn problem2() -> usize {
     let mut triangles = load_triangles2();
     triangles.retain(|t| t.is_valid());
-    return triangles.len()
+    return triangles.len();
 }
 
-fn main () {
+fn main() {
     println!("Result 1: {}", problem1());
     println!("Result 2: {}", problem2());
 }

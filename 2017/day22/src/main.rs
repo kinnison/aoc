@@ -1,22 +1,28 @@
 use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
 use std::collections::HashMap;
 
 #[derive(Clone, PartialEq, Eq)]
 enum St {
-    C, W, I, F
+    C,
+    W,
+    I,
+    F,
 }
 
 #[derive(Debug, Clone)]
 enum Dir {
-    U, D, L, R
+    U,
+    D,
+    L,
+    R,
 }
 
 impl Dir {
-    fn left (&self) -> Dir {
+    fn left(&self) -> Dir {
         match *self {
             Dir::U => Dir::L,
             Dir::D => Dir::R,
@@ -25,7 +31,7 @@ impl Dir {
         }
     }
 
-    fn right (&self) -> Dir {
+    fn right(&self) -> Dir {
         match *self {
             Dir::U => Dir::R,
             Dir::D => Dir::L,
@@ -34,7 +40,7 @@ impl Dir {
         }
     }
 
-    fn rev (&self) -> Dir {
+    fn rev(&self) -> Dir {
         match *self {
             Dir::U => Dir::D,
             Dir::D => Dir::U,
@@ -46,21 +52,21 @@ impl Dir {
 
 #[derive(Clone)]
 struct Grid {
-    infected: HashMap<(i32,i32), St>,
+    infected: HashMap<(i32, i32), St>,
     workerx: i32,
     workery: i32,
-    dir: Dir
+    dir: Dir,
 }
 
 impl Grid {
-    fn new (lines: Vec<String>) -> Grid {
+    fn new(lines: Vec<String>) -> Grid {
         let midx: i32 = ((lines[0].len() + 1) >> 1) as i32;
         let midy: i32 = ((lines.len() + 1) >> 1) as i32;
         let mut ret: Grid = Grid {
             infected: HashMap::new(),
             workerx: 0,
             workery: 0,
-            dir: Dir::U
+            dir: Dir::U,
         };
         for (rown, row) in (1..).zip(lines.iter()) {
             for (coln, ch) in (1..).zip(row.chars()) {
@@ -72,7 +78,7 @@ impl Grid {
         ret
     }
 
-    fn burst1 (&mut self) -> bool {
+    fn burst1(&mut self) -> bool {
         let workerpos = (self.workerx, self.workery);
         let curinfected = self.infected.contains_key(&workerpos);
         let newdir = if curinfected {
@@ -86,14 +92,14 @@ impl Grid {
             Dir::U => self.workery -= 1,
             Dir::D => self.workery += 1,
             Dir::L => self.workerx -= 1,
-            Dir::R => self.workerx += 1
+            Dir::R => self.workerx += 1,
         }
         self.dir = newdir;
         // Return if we chose to infect the cell
         !curinfected
     }
 
-    fn burst2 (&mut self) -> bool {
+    fn burst2(&mut self) -> bool {
         let workerpos = (self.workerx, self.workery);
         let curstate = self.infected.get(&workerpos).unwrap_or(&St::C).clone();
         let newdir = match curstate {
@@ -101,17 +107,17 @@ impl Grid {
                 // Clean cells are weakened, we turn left
                 self.infected.insert(workerpos, St::W);
                 self.dir.left()
-            },
+            }
             St::W => {
                 // Weakened cells are infected, we do not change direction
                 self.infected.insert(workerpos, St::I);
                 self.dir.clone()
-            },
+            }
             St::I => {
                 // Infected cells are flagged, we turn right
                 self.infected.insert(workerpos, St::F);
                 self.dir.right()
-            },
+            }
             St::F => {
                 // Flagged cells are cleaned, we reverse direction
                 self.infected.remove(&workerpos);
@@ -122,7 +128,7 @@ impl Grid {
             Dir::U => self.workery -= 1,
             Dir::D => self.workery += 1,
             Dir::L => self.workerx -= 1,
-            Dir::R => self.workerx += 1
+            Dir::R => self.workerx += 1,
         }
         self.dir = newdir;
         // Return if we chose to infect the cell
@@ -130,13 +136,13 @@ impl Grid {
     }
 }
 
-fn load_instructions (s: &str) -> Grid {
+fn load_instructions(s: &str) -> Grid {
     let infile = File::open(s).unwrap();
     let freader = BufReader::new(&infile);
     Grid::new(freader.lines().map(|l| l.unwrap()).collect())
 }
 
-fn problem1 (g: &Grid, n: usize) -> usize {
+fn problem1(g: &Grid, n: usize) -> usize {
     let mut grid = g.clone();
     let mut count = 0;
     for _ in 0..n {
@@ -147,7 +153,7 @@ fn problem1 (g: &Grid, n: usize) -> usize {
     count
 }
 
-fn problem2 (g: &Grid, n: usize) -> usize {
+fn problem2(g: &Grid, n: usize) -> usize {
     let mut grid = g.clone();
     let mut count = 0;
     for i in 0..n {
@@ -164,7 +170,7 @@ fn main() {
     assert!(problem1(&example, 70) == 41);
     assert!(problem1(&example, 10_000) == 5587);
     assert!(problem2(&example, 100) == 26);
-//    assert!(problem2(&example, 10_000_000) == 2_511_944);
+    //    assert!(problem2(&example, 10_000_000) == 2_511_944);
     let input = load_instructions("input");
     println!("Problem 1: {}", problem1(&input, 10_000));
     println!("Problem 2: {}", problem2(&input, 10_000_000));

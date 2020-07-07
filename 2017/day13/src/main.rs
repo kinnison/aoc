@@ -1,30 +1,28 @@
-
 use std::fs::File;
-use std::vec::Vec;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
+use std::vec::Vec;
 
 #[derive(Debug, Clone)]
 struct Firewall {
     scanners: Vec<usize>,
     depths: Vec<usize>,
     directions: Vec<bool>,
-    maxdepth: usize
+    maxdepth: usize,
 }
 
 impl Firewall {
-    fn new () -> Firewall {
+    fn new() -> Firewall {
         Firewall {
             scanners: Vec::new(),
             depths: Vec::new(),
             directions: Vec::new(),
-            maxdepth: 0
+            maxdepth: 0,
         }
     }
 
     fn add_scanner(&mut self, line: &str) {
-        let bits: Vec<usize> =
-            line.split(":").map(|s| s.trim().parse().unwrap()).collect();
+        let bits: Vec<usize> = line.split(":").map(|s| s.trim().parse().unwrap()).collect();
         assert!(bits.len() == 2);
         let layer = bits[0];
         let depth = bits[1];
@@ -75,7 +73,7 @@ impl Firewall {
             self.move_scanner(i);
         }
     }
-    
+
     fn severity(&mut self, caught: bool) -> usize {
         let mut total = 0;
         let mut layer = 0;
@@ -102,12 +100,20 @@ impl Firewall {
         for depth in 0..self.maxdepth {
             for layer in 0..self.scanners.len() {
                 if self.depths[layer] > depth {
-                    let (open,close) = if (pos == layer) && (depth == 0) { ('(',')') } else { ('[',']') };
+                    let (open, close) = if (pos == layer) && (depth == 0) {
+                        ('(', ')')
+                    } else {
+                        ('[', ']')
+                    };
                     let scanner = if self.scanners[layer] == depth {
                         if (pos == layer) && (depth == 0) {
                             '*'
-                        } else { 'S' }
-                    } else { '.' };
+                        } else {
+                            'S'
+                        }
+                    } else {
+                        '.'
+                    };
                     print!("{}{}{} ", open, scanner, close);
                 } else {
                     if depth == 0 {
@@ -127,7 +133,7 @@ impl Firewall {
     }
 }
 
-fn load_instructions () -> Firewall {
+fn load_instructions() -> Firewall {
     let infile = File::open("input").unwrap();
     let freader = BufReader::new(&infile);
     let mut ret = Firewall::new();
@@ -138,7 +144,7 @@ fn load_instructions () -> Firewall {
     ret
 }
 
-fn load_example () -> Firewall {
+fn load_example() -> Firewall {
     let mut ret = Firewall::new();
     ret.add_scanner_(0, 3);
     ret.add_scanner_(1, 2);
@@ -147,12 +153,12 @@ fn load_example () -> Firewall {
     ret
 }
 
-fn problem2 (input: &Firewall) -> usize {
+fn problem2(input: &Firewall) -> usize {
     let mut runner = input.clone();
     for delay in 0.. {
         let caught = runner.clone().severity(true);
         if caught == 0 {
-            return delay
+            return delay;
         }
         if (delay % 100000) == 0 {
             println!("Delay {}", delay);
