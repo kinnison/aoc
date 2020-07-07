@@ -91,7 +91,7 @@ fn problem2() -> usize {
     // Add in the final disc
     state.sizes[DISC_N!()] = 11;
     state.offsets[DISC_N!()] = (0 + DISC_N!() + 1 + 11 + 0) % 11;
-    let (mut n, step) = prob_opt(&state);
+    let (mut n, _step) = prob_opt(&state);
     while !aligned(&state, n) {
         n += 1;
     }

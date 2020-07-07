@@ -144,7 +144,7 @@ impl RTGFacility {
     fn possible_moves(&self) -> Vec<Move> {
         // Based on where we are, we generate all possible one or two carry
         // moves up and down, and return the facility for them
-        let mut carries: Vec<Carry> = self.floors[self.liftat].all_carries();
+        let carries: Vec<Carry> = self.floors[self.liftat].all_carries();
         let mut moves: Vec<Move> = Vec::new();
         let dir = self.liftat == 0;
         // No carries, no moves...
@@ -312,7 +312,7 @@ impl Solver {
         let mut threads = Vec::new();
         let mut worktxs = Vec::new();
 
-        for i in 0..WORKER_COUNT {
+        for _i in 0..WORKER_COUNT {
             let (worktx, workrx) = mpsc::channel::<Option<RTGFacility>>();
             worktxs.push(worktx);
             let restx: mpsc::Sender<Option<RTGFacility>> = restx.clone();

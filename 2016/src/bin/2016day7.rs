@@ -98,8 +98,8 @@ impl Address {
 
 fn load_addresses() -> Vec<Address> {
     let mut ret: Vec<Address> = Vec::new();
-    let mut f = File::open("day7.input").unwrap();
-    let mut reader = BufReader::new(f);
+    let f = File::open("day7.input").unwrap();
+    let reader = BufReader::new(f);
     for line_ in reader.lines() {
         let line = line_.unwrap();
         ret.push(Address::new(line));

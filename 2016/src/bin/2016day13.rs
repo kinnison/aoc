@@ -66,7 +66,7 @@ fn path_len(goalx: usize, goaly: usize) -> usize {
 fn count_locs(maxn: usize) -> usize {
     let mut visited: HashSet<(usize, usize)> = HashSet::new();
     let mut branches: Vec<(usize, usize)> = Vec::new();
-    let mut depth: usize = 0;
+    let _depth: usize = 0;
     visited.insert((1, 1));
     push_nexts(1, 1, &mut branches, &visited);
     for _ in 0..maxn {

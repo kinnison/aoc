@@ -107,7 +107,7 @@ impl VM {
             sent: 0,
         };
         for i in 0..26 {
-            vm.regs.insert(((('a' as u8) + i) as char), 0);
+            vm.regs.insert((('a' as u8) + i) as char, 0);
         }
         vm
     }

@@ -2,7 +2,7 @@
 extern crate lazy_static;
 extern crate regex;
 
-use std::collections::HashMap;
+
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
@@ -71,7 +71,7 @@ impl Screen {
 
     fn count(&self) -> usize {
         self.pixels
-            .into_iter()
+            .iter()
             .fold(0, |aa, &p| if p { aa + 1 } else { aa })
     }
 
@@ -93,7 +93,7 @@ impl Screen {
                 }
             }
             Instr::RotRow(y, n) => {
-                for i in 0..n {
+                for _i in 0..n {
                     let lastpix = self.get_pix(49, y);
                     for j in 1..50 {
                         let p1 = self.get_pix(49 - j, y);
@@ -103,7 +103,7 @@ impl Screen {
                 }
             }
             Instr::RotCol(x, n) => {
-                for i in 0..n {
+                for _i in 0..n {
                     let lastpix = self.get_pix(x, 5);
                     for j in 1..6 {
                         let p1 = self.get_pix(x, 5 - j);

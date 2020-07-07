@@ -2,7 +2,7 @@
 extern crate lazy_static;
 extern crate regex;
 
-use std::collections::HashMap;
+
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
@@ -93,7 +93,7 @@ impl Instr {
                 let ref val_ = cap.get(2);
                 let val: i32 = val_.unwrap().as_str().parse().unwrap();
                 let tst: i32 = tst_.unwrap().as_str().parse().unwrap();
-                if (tst != 0) {
+                if tst != 0 {
                     return Instr::Jmp(val);
                 } else {
                     return Instr::Nop;
@@ -204,14 +204,14 @@ fn load_program() -> Vec<Instr> {
 }
 
 fn problem1() -> i32 {
-    let mut prog = load_program();
+    let prog = load_program();
     let mut vm = VM::new();
     vm.run_program(prog);
     vm.a
 }
 
 fn problem2() -> i32 {
-    let mut prog = load_program();
+    let prog = load_program();
     let mut vm = VM::new();
     vm.c = 1;
     vm.run_program(prog);

@@ -96,22 +96,22 @@ impl RoomState {
             /* chosen bot is holding 2 items, can we do something? */
             match lowgoal {
                 Goal::Output(bin) => {
-                    let prev: usize = *self.bins.get(&bin).unwrap();
+                    let _prev: usize = *self.bins.get(&bin).unwrap();
                     self.bins.insert(bin, holding1);
                 }
                 Goal::Bot(target) => {
-                    let mut targbot = self.bots.get_mut(&target).unwrap();
+                    let targbot = self.bots.get_mut(&target).unwrap();
                     targbot.give(holding1);
                 }
                 _ => unreachable!(),
             }
             match highgoal {
                 Goal::Output(bin) => {
-                    let prev: usize = *self.bins.get(&bin).unwrap();
+                    let _prev: usize = *self.bins.get(&bin).unwrap();
                     self.bins.insert(bin, holding2);
                 }
                 Goal::Bot(target) => {
-                    let mut targbot = self.bots.get_mut(&target).unwrap();
+                    let targbot = self.bots.get_mut(&target).unwrap();
                     targbot.give(holding2);
                 }
                 _ => unreachable!(),
@@ -176,8 +176,8 @@ impl Instruction {
 }
 
 fn load_state() -> RoomState {
-    let mut f = File::open("day10.input").unwrap();
-    let mut reader = BufReader::new(f);
+    let f = File::open("day10.input").unwrap();
+    let reader = BufReader::new(f);
     let mut bots: HashMap<usize, Bot> = HashMap::new();
     let mut bins: HashMap<usize, usize> = HashMap::new();
     let ensure_bot = |bots: &mut HashMap<usize, Bot>, n: usize| {
@@ -196,7 +196,7 @@ fn load_state() -> RoomState {
         match instr {
             Instruction::Give(val, bot) => {
                 ensure_bot(&mut bots, bot);
-                let mut bot = bots.get_mut(&bot).unwrap();
+                let bot = bots.get_mut(&bot).unwrap();
                 bot.give(val);
             }
             Instruction::Prog(bot, lowgoal, highgoal) => {
@@ -211,7 +211,7 @@ fn load_state() -> RoomState {
                     Goal::Bot(bot2) => ensure_bot(&mut bots, bot2),
                     Goal::Output(bin) => ensure_bin(&mut bins, bin),
                 }
-                let mut bot = bots.get_mut(&bot).unwrap();
+                let bot = bots.get_mut(&bot).unwrap();
                 bot.set_goals(lowgoal, highgoal);
             }
         }

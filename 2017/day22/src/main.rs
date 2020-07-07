@@ -156,7 +156,7 @@ fn problem1(g: &Grid, n: usize) -> usize {
 fn problem2(g: &Grid, n: usize) -> usize {
     let mut grid = g.clone();
     let mut count = 0;
-    for i in 0..n {
+    for _i in 0..n {
         if grid.burst2() {
             count += 1;
         }

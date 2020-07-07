@@ -66,7 +66,7 @@ fn problem1(label: &str) -> usize {
     let mut hash = Md5::new();
     let mut keys = 0;
     let mut idx: u64 = 0;
-    let chs = [
+    let _chs = [
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
     ];
     'outer: loop {
@@ -135,7 +135,7 @@ fn problem2(label: &str) -> usize {
     let mut keys = 0;
     let mut idx: u64 = 0;
     let mut cache: HashMap<usize, [u8; 16]> = HashMap::new();
-    let chs = [
+    let _chs = [
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
     ];
     'outer: loop {

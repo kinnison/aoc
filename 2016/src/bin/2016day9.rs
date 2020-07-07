@@ -1,8 +1,8 @@
-use std::collections::HashSet;
+
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::vec::Vec;
+
 
 fn load_compressed() -> String {
     let infile = File::open("day9.input").unwrap();
@@ -41,14 +41,14 @@ fn len_compressed(compr_: &String, recurse: bool) -> usize {
         let numof: usize = numof_.parse().unwrap();
         let times: usize = times_.parse().unwrap();
         let mut chunk = String::new();
-        for i in 0..numof {
+        for _i in 0..numof {
             chunk.push(compr.remove(0));
         }
         if recurse {
             let comprlen = len_compressed(&chunk, recurse);
-            ret += (comprlen * times);
+            ret += comprlen * times;
         } else {
-            for i in 0..times {
+            for _i in 0..times {
                 ret += chunk.len();
             }
         }
