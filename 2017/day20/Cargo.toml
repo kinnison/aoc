@@ -1,5 +1,5 @@
 [package]
-name = "day20"
+name = "aoc2017day20"
 version = "0.1.0"
 authors = ["Daniel Silverstone <daniel.silverstone@codethink.co.uk>"]
 

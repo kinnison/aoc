@@ -1,5 +1,5 @@
 [package]
-name = "day12"
+name = "aoc2017day12"
 version = "0.1.0"
 authors = ["Daniel Silverstone <dsilvers@digital-scurf.org>"]
 

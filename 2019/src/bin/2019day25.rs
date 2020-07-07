@@ -1,5 +1,6 @@
 use aoc2019::*;
 
+#[allow(dead_code)]
 fn gather_output(vm: &mut intcode::VM) -> Result<Vec<String>> {
     let mut out = String::new();
     while let intcode::VMState::GaveOutput(c) = vm.interpreter_step(None)? {
@@ -8,6 +9,7 @@ fn gather_output(vm: &mut intcode::VM) -> Result<Vec<String>> {
     Ok(out.lines().map(String::from).collect())
 }
 
+#[allow(dead_code)]
 fn parse_room(vm: &mut intcode::VM) -> Result<(String, Vec<Direction>, Vec<String>)> {
     // We run this VM until it prompts for input, and then analyse its output
     let mut output = gather_output(vm)?;

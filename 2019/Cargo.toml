@@ -8,10 +8,6 @@ edition = "2018"
 debug_intcode = []
 interactive = []
 
-[profile.release]
-lto = false
-debug = true
-
 [dependencies]
 md5="0.6.0"
 regex="1"

@@ -1,6 +1,0 @@
-[package]
-name="day17"
-version="0.0.1"
-authors = [ "me <me@me>" ]
-[dependencies]
-rust-crypto = "0.2.36"

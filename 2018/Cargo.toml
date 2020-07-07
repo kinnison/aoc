@@ -4,9 +4,6 @@ version = "0.1.0"
 authors = ["Daniel Silverstone <daniel.silverstone@codethink.co.uk>"]
 edition = "2018"
 
-[profile.release]
-lto = true
-
 [dependencies]
 md5="0.6.0"
 regex="1"

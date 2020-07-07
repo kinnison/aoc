@@ -1,8 +1,0 @@
-[package]
-name = "day10"
-version = "0.1.0"
-authors = ["Daniel Silverstone <dsilvers@digital-scurf.org>"]
-
-[dependencies]
-regex = "~0"
-lazy_static = "~0"
