@@ -31,7 +31,7 @@ dependencies = [
  "either",
  "itertools",
  "lazy_static",
- "md5",
+ "md5 0.6.1",
  "permutohedron",
  "regex",
  "serde_json",
@@ -194,7 +194,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "lazy_static",
- "md5",
+ "md5 0.6.1",
  "parsebyregex",
  "parsebyregex-derive",
  "permutohedron",
@@ -208,10 +208,29 @@ name = "aoc2019"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "color-backtrace",
+ "color-backtrace 0.3.0",
  "itertools",
  "lazy_static",
- "md5",
+ "md5 0.6.1",
+ "modinverse",
+ "num-traits",
+ "parsebyregex",
+ "parsebyregex-derive",
+ "permutohedron",
+ "regex",
+ "serde_json",
+ "twoway",
+]
+
+[[package]]
+name = "aoc2020"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "color-backtrace 0.4.2",
+ "itertools",
+ "lazy_static",
+ "md5 0.7.0",
  "modinverse",
  "num-traits",
  "parsebyregex",
@@ -284,6 +303,17 @@ name = "color-backtrace"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "65d13f1078cc63c791d0deba0dd43db37c9ec02b311f10bed10b577016f3a957"
+dependencies = [
+ "atty",
+ "backtrace",
+ "termcolor",
+]
+
+[[package]]
+name = "color-backtrace"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5356ae4e07c994a2763226a8a991e5829ded78ac23f8ac88b3f3e69970db5163"
 dependencies = [
  "atty",
  "backtrace",
@@ -385,6 +415,12 @@ name = "md5"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e6bcd6433cff03a4bfc3d9834d504467db1f1cf6d0ea765d37d330249ed629d"
+
+[[package]]
+name = "md5"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "490cc448043f947bae3cbee9c203358d62dbee0db12107a74be5c30ccfd09771"
 
 [[package]]
 name = "memchr"
