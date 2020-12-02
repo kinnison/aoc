@@ -1,27 +1,33 @@
 use aoc2020::*;
 
 fn part1(input: &[u64]) -> u64 {
-    for a in 0..input.len() - 1 {
-        for b in a + 1..input.len() {
-            if input[a] + input[b] == 2020 {
-                return input[a] * input[b];
+    input
+        .iter()
+        .copied()
+        .tuple_combinations::<(_, _)>()
+        .find_map(|i| {
+            if i.0 + i.1 == 2020 {
+                Some(i.0 * i.1)
+            } else {
+                None
             }
-        }
-    }
-    unreachable!();
+        })
+        .unwrap()
 }
 
 fn part2(input: &[u64]) -> u64 {
-    for a in 0..input.len() - 2 {
-        for b in a + 1..input.len() - 1 {
-            for c in b + 1..input.len() {
-                if input[a] + input[b] + input[c] == 2020 {
-                    return input[a] * input[b] * input[c];
-                }
+    input
+        .iter()
+        .copied()
+        .combinations(3)
+        .find_map(|n| {
+            if n.iter().copied().sum::<u64>() == 2020 {
+                Some(n.iter().product())
+            } else {
+                None
             }
-        }
-    }
-    unreachable!();
+        })
+        .unwrap()
 }
 
 #[cfg(test)]
