@@ -66,7 +66,7 @@ fn find_longest_route(passcode: &str) -> usize {
     let mut routes: Vec<(String, usize, usize)> = Vec::new();
     let mut found: Vec<String> = Vec::new();
     routes.push(("".to_string(), 1, 1));
-    while routes.len() > 0 {
+    while !routes.is_empty() {
         let mut newroutes: Vec<(String, usize, usize)> = Vec::new();
         for (oldroute, posx, posy) in routes.drain(..) {
             if (posx == 4) && (posy == 4) {

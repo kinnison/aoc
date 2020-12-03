@@ -1,6 +1,6 @@
 use md5::{Digest, Md5};
 
-fn problem1(label: &String) -> String {
+fn problem1(label: &str) -> String {
     let mut hash = Md5::new();
     let mut ret = String::new();
     let mut idx: u64 = 0;
@@ -23,10 +23,10 @@ fn problem1(label: &String) -> String {
             }
         }
     }
-    return ret;
+    ret
 }
 
-fn problem2(label: &String) -> String {
+fn problem2(label: &str) -> String {
     let mut hash = Md5::new();
     let mut ret = ['_', '_', '_', '_', '_', '_', '_', '_'];
     let mut done = 0;

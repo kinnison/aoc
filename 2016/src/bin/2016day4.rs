@@ -70,7 +70,7 @@ impl Room {
         chv.truncate(5);
         let checkv: Vec<char> = self.check.chars().collect();
         let resv: Vec<char> = chv.iter().map(|&(a, _)| a).collect();
-        return checkv == resv;
+        checkv == resv
     }
 
     fn decrypt(&self) -> String {
@@ -80,10 +80,10 @@ impl Room {
                 ret.push(' ');
             } else {
                 let mut chn = ch as u32;
-                chn = chn - ('a' as u32);
-                chn = chn + self.sectornum;
-                chn = chn % 26;
-                chn = chn + ('a' as u32);
+                chn -= b'a' as u32;
+                chn += self.sectornum;
+                chn %= 26;
+                chn += b'a' as u32;
                 ret.push((chn as u8) as char);
             }
         }
@@ -100,7 +100,7 @@ fn load_rooms() -> Vec<Room> {
         let line = line_.unwrap();
         ret.push(Room::new(line));
     }
-    return ret;
+    ret
 }
 
 fn problem1() -> u32 {
@@ -117,7 +117,7 @@ fn problem2() -> u32 {
             return room.sectornum;
         }
     }
-    return 0;
+    0
 }
 
 fn main() {

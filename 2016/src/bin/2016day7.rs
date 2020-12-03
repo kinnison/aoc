@@ -8,7 +8,7 @@ struct Address {
     hypernet: Vec<String>,
 }
 
-fn has_abba(seg: &String) -> bool {
+fn has_abba(seg: &str) -> bool {
     let mut vseg: Vec<char> = seg.chars().collect();
     while vseg.len() > 3 {
         let ch4 = vseg.pop().unwrap();
@@ -22,7 +22,7 @@ fn has_abba(seg: &String) -> bool {
     false
 }
 
-fn bab_for(ch1: char, ch2: char, hyps: &Vec<String>) -> bool {
+fn bab_for(ch1: char, ch2: char, hyps: &[String]) -> bool {
     for hyp in hyps.iter() {
         let mut vhyp: Vec<char> = hyp.chars().collect();
         while vhyp.len() > 2 {
@@ -37,16 +37,14 @@ fn bab_for(ch1: char, ch2: char, hyps: &Vec<String>) -> bool {
     false
 }
 
-fn aba_bab(seg: &String, hyps: &Vec<String>) -> bool {
+fn aba_bab(seg: &str, hyps: &[String]) -> bool {
     let mut vseg: Vec<char> = seg.chars().collect();
     while vseg.len() > 2 {
         let ch3 = vseg.pop().unwrap();
         let ch2 = vseg[vseg.len() - 1];
         let ch1 = vseg[vseg.len() - 2];
-        if (ch1 == ch3) && (ch1 != ch2) {
-            if bab_for(ch1, ch2, hyps) {
-                return true;
-            }
+        if (ch1 == ch3) && (ch1 != ch2) && bab_for(ch1, ch2, hyps) {
+            return true;
         }
     }
     false
@@ -104,19 +102,19 @@ fn load_addresses() -> Vec<Address> {
         let line = line_.unwrap();
         ret.push(Address::new(line));
     }
-    return ret;
+    ret
 }
 
 fn problem1() -> usize {
     let mut addrs = load_addresses();
     addrs.retain(|a| a.does_tls());
-    return addrs.len();
+    addrs.len()
 }
 
 fn problem2() -> usize {
     let mut addrs = load_addresses();
     addrs.retain(|a| a.does_ssl());
-    return addrs.len();
+    addrs.len()
 }
 
 fn main() {

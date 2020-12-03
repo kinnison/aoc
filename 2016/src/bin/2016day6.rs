@@ -12,7 +12,7 @@ fn load_words() -> Vec<String> {
         let line = line_.unwrap();
         ret.push(line);
     }
-    return ret;
+    ret
 }
 
 fn problem1() -> String {
@@ -32,7 +32,7 @@ fn problem1() -> String {
         cs.sort_by_key(|&(_, n)| *n);
         ret.push(*(cs.pop().unwrap().0));
     }
-    return ret;
+    ret
 }
 
 fn problem2() -> String {
@@ -52,7 +52,7 @@ fn problem2() -> String {
         cs.sort_by_key(|&(_, n)| words.len() - (*n as usize));
         ret.push(*(cs.pop().unwrap().0));
     }
-    return ret;
+    ret
 }
 
 fn main() {

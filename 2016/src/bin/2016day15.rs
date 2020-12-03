@@ -34,8 +34,7 @@ fn initial_state() -> PuzzleState {
         offsets: [0; DISC_N!() + 1],
     };
 
-    for i in 0..DISC_N!() {
-        let (discn, size, at, ofs) = PUZZLE_INPUT[i];
+    for (discn, size, at, ofs) in PUZZLE_INPUT.iter().copied() {
         // Since we're hoping to make it so that at time N the value
         // we store in the puzzle state is such that (N+offset)%size == 0
         // if the disc would be in the right place when we release at N
@@ -90,7 +89,7 @@ fn problem2() -> usize {
     let mut state = initial_state();
     // Add in the final disc
     state.sizes[DISC_N!()] = 11;
-    state.offsets[DISC_N!()] = (0 + DISC_N!() + 1 + 11 + 0) % 11;
+    state.offsets[DISC_N!()] = (DISC_N!() + 1 + 11) % 11;
     let (mut n, _step) = prob_opt(&state);
     while !aligned(&state, n) {
         n += 1;

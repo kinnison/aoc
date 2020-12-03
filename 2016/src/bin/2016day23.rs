@@ -57,27 +57,27 @@ impl Instr {
         }
 
         if let Some(cap) = CPY_RE.captures(&t_) {
-            let ref src_ = cap.get(1);
-            let ref tgt_ = cap.get(2);
+            let src_ = cap.get(1);
+            let tgt_ = cap.get(2);
             let src = arg_from(src_.unwrap().as_str());
             let tgt = arg_from(tgt_.unwrap().as_str());
             Instr::Cpy(src, tgt)
         } else if let Some(cap) = JNZ_RE.captures(&t_) {
-            let ref tst_ = cap.get(1);
-            let ref ofs_ = cap.get(2);
+            let tst_ = cap.get(1);
+            let ofs_ = cap.get(2);
             let tst = arg_from(tst_.unwrap().as_str());
             let ofs = arg_from(ofs_.unwrap().as_str());
             Instr::Jnz(tst, ofs)
         } else if let Some(cap) = INC_RE.captures(&t_) {
-            let ref tgt_ = cap.get(1);
+            let tgt_ = cap.get(1);
             let tgt = arg_from(tgt_.unwrap().as_str());
             Instr::Inc(tgt)
         } else if let Some(cap) = DEC_RE.captures(&t_) {
-            let ref tgt_ = cap.get(1);
+            let tgt_ = cap.get(1);
             let tgt = arg_from(tgt_.unwrap().as_str());
             Instr::Dec(tgt)
         } else if let Some(cap) = TGL_RE.captures(&t_) {
-            let ref tgt_ = cap.get(1);
+            let tgt_ = cap.get(1);
             let tgt = arg_from(tgt_.unwrap().as_str());
             Instr::Tgl(tgt)
         } else {
@@ -99,7 +99,7 @@ struct VM {
 impl VM {
     fn new(instr: Vec<Instr>) -> VM {
         VM {
-            instr: instr,
+            instr,
             a: 0,
             b: 0,
             c: 0,
@@ -109,14 +109,13 @@ impl VM {
     }
 
     fn get_arg(&self, arg: Arg) -> i32 {
-        let ret = match arg {
+        match arg {
             Arg::AReg(Reg::A) => self.a,
             Arg::AReg(Reg::B) => self.b,
             Arg::AReg(Reg::C) => self.c,
             Arg::AReg(Reg::D) => self.d,
             Arg::AVal(v) => v,
-        };
-        ret
+        }
     }
 
     fn set_arg(&mut self, arg: Arg, val: i32) {
@@ -201,7 +200,7 @@ fn load_program() -> Vec<Instr> {
         ret.push(Instr::new(line));
     }
     ret.push(Instr::Hlt);
-    return ret;
+    ret
 }
 
 fn problem1() -> i32 {

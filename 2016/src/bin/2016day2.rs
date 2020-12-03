@@ -13,39 +13,39 @@ enum Instruction {
 impl Instruction {
     pub fn new(c: char) -> Instruction {
         if c == 'U' {
-            return Instruction::Up;
+            Instruction::Up
         } else if c == 'D' {
-            return Instruction::Down;
+            Instruction::Down
         } else if c == 'L' {
-            return Instruction::Left;
+            Instruction::Left
         } else {
-            return Instruction::Right;
+            Instruction::Right
         }
     }
     fn go(&self, pos: i32) -> i32 {
         match self {
-            &Instruction::Up => {
+            Instruction::Up => {
                 if pos < 4 {
                     pos
                 } else {
                     pos - 3
                 }
             }
-            &Instruction::Down => {
+            Instruction::Down => {
                 if pos > 6 {
                     pos
                 } else {
                     pos + 3
                 }
             }
-            &Instruction::Left => {
+            Instruction::Left => {
                 if (pos % 3) == 1 {
                     pos
                 } else {
                     pos - 1
                 }
             }
-            &Instruction::Right => {
+            Instruction::Right => {
                 if (pos % 3) == 0 {
                     pos
                 } else {
@@ -58,27 +58,27 @@ impl Instruction {
     fn go2(&self, pos: i32) -> i32 {
         if pos == 1 {
             match self {
-                &Instruction::Down => 3,
+                Instruction::Down => 3,
                 _ => 1,
             }
         } else if pos < 5 {
             match self {
-                &Instruction::Up => {
+                Instruction::Up => {
                     if pos == 3 {
                         1
                     } else {
                         pos
                     }
                 }
-                &Instruction::Down => pos + 4,
-                &Instruction::Left => {
+                Instruction::Down => pos + 4,
+                Instruction::Left => {
                     if pos == 2 {
                         pos
                     } else {
                         pos - 1
                     }
                 }
-                &Instruction::Right => {
+                Instruction::Right => {
                     if pos == 4 {
                         pos
                     } else {
@@ -88,28 +88,28 @@ impl Instruction {
             }
         } else if pos < 10 {
             match self {
-                &Instruction::Up => {
+                Instruction::Up => {
                     if (pos == 5) || (pos == 9) {
                         pos
                     } else {
                         pos - 4
                     }
                 }
-                &Instruction::Down => {
+                Instruction::Down => {
                     if (pos == 5) || (pos == 9) {
                         pos
                     } else {
                         pos + 4
                     }
                 }
-                &Instruction::Left => {
+                Instruction::Left => {
                     if pos == 5 {
                         pos
                     } else {
                         pos - 1
                     }
                 }
-                &Instruction::Right => {
+                Instruction::Right => {
                     if pos == 9 {
                         pos
                     } else {
@@ -119,22 +119,22 @@ impl Instruction {
             }
         } else if pos < 13 {
             match self {
-                &Instruction::Up => pos - 4,
-                &Instruction::Down => {
+                Instruction::Up => pos - 4,
+                Instruction::Down => {
                     if pos == 11 {
                         13
                     } else {
                         pos
                     }
                 }
-                &Instruction::Left => {
+                Instruction::Left => {
                     if pos == 10 {
                         10
                     } else {
                         pos - 1
                     }
                 }
-                &Instruction::Right => {
+                Instruction::Right => {
                     if pos == 12 {
                         12
                     } else {
@@ -144,7 +144,7 @@ impl Instruction {
             }
         } else {
             match self {
-                &Instruction::Up => 11,
+                Instruction::Up => 11,
                 _ => 13,
             }
         }
@@ -163,7 +163,7 @@ fn load_instructions() -> Vec<Vec<Instruction>> {
         }
         ret.push(lvec);
     }
-    return ret;
+    ret
 }
 
 fn problem1() {
@@ -176,7 +176,7 @@ fn problem1() {
         }
         print!("{}", pos);
     }
-    println!("");
+    println!();
 }
 
 fn problem2() {
@@ -191,7 +191,7 @@ fn problem2() {
         let ch = buttons.chars().nth(pos as usize).unwrap();
         print!("{}", ch);
     }
-    println!("");
+    println!();
 }
 
 fn main() {

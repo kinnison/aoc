@@ -15,28 +15,28 @@ enum Facing {
 impl Facing {
     fn turn(&self, left: bool) -> Facing {
         match self {
-            &Facing::North => {
+            Facing::North => {
                 if left {
                     Facing::West
                 } else {
                     Facing::East
                 }
             }
-            &Facing::South => {
+            Facing::South => {
                 if left {
                     Facing::East
                 } else {
                     Facing::West
                 }
             }
-            &Facing::East => {
+            Facing::East => {
                 if left {
                     Facing::North
                 } else {
                     Facing::South
                 }
             }
-            &Facing::West => {
+            Facing::West => {
                 if left {
                     Facing::South
                 } else {
@@ -59,7 +59,7 @@ impl Instruction {
             left = true;
         }
         return Instruction {
-            left: left,
+            left,
             dist: instr.split_at(1).1.parse::<i32>().unwrap(),
         };
     }
@@ -86,7 +86,7 @@ impl Instruction {
         for i in 1..self.dist {
             ret.push((xpos + (i * step.0), ypos + (i * step.1)));
         }
-        return ret;
+        ret
     }
 }
 
@@ -101,7 +101,7 @@ fn load_instructions() -> Vec<Instruction> {
             ret.push(Instruction::new(instr));
         }
     }
-    return ret;
+    ret
 }
 
 fn abs(n: i32) -> i32 {
@@ -123,7 +123,7 @@ fn problem1() -> i32 {
         xpos = xpos_;
         ypos = ypos_;
     }
-    return abs(xpos) + abs(ypos);
+    abs(xpos) + abs(ypos)
 }
 
 fn problem2() -> i32 {
@@ -145,7 +145,7 @@ fn problem2() -> i32 {
             visited.insert((pos.0, pos.1));
         }
     }
-    return 0;
+    0
 }
 
 fn main() {

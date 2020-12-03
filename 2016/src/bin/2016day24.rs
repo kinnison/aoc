@@ -29,7 +29,7 @@ impl Maze {
             } else {
                 newcells.push(true);
                 if ch != '.' {
-                    let val: usize = ((ch as u8) - ('0' as u8)) as usize;
+                    let val: usize = ((ch as u8) - b'0') as usize;
                     while self.digits.len() <= val {
                         self.digits.push((0, 0));
                     }

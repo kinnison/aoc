@@ -8,10 +8,10 @@ fn load_compressed() -> String {
     freader.lines().next().unwrap().unwrap()
 }
 
-fn len_compressed(compr_: &String, recurse: bool) -> usize {
+fn len_compressed(compr_: &str, recurse: bool) -> usize {
     let mut ret: usize = 0;
-    let mut compr = compr_.clone();
-    let mut oparen = compr.find("(");
+    let mut compr = compr_.to_string();
+    let mut oparen = compr.find('(');
     while oparen.is_some() {
         let mut pfx = String::new();
         let mut ch = compr.remove(0);
@@ -46,21 +46,20 @@ fn len_compressed(compr_: &String, recurse: bool) -> usize {
                 ret += chunk.len();
             }
         }
-        oparen = compr.find("(");
+        oparen = compr.find('(');
     }
     ret += compr.len();
-    return ret;
+    ret
 }
 
 fn problem1() -> usize {
     let compr = load_compressed();
-    return len_compressed(&compr, false);
+    len_compressed(&compr, false)
 }
 
 fn problem2() -> usize {
     let compr = load_compressed();
-
-    return len_compressed(&compr, true);
+    len_compressed(&compr, true)
 }
 
 fn main() {

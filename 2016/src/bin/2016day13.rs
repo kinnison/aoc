@@ -10,7 +10,7 @@ fn is_open(x: usize, y: usize) -> bool {
         locn = locn & (locn - 1);
         count += 1;
     }
-    return (count & 1) == 0;
+    (count & 1) == 0
 }
 
 fn maybe_next(
@@ -48,7 +48,7 @@ fn path_len(goalx: usize, goaly: usize) -> usize {
     visited.insert((1, 1));
     push_nexts(1, 1, &mut branches, &visited);
     'outer: loop {
-        assert!(branches.len() > 0);
+        assert!(!branches.is_empty());
         depth += 1;
         let mut newbranches: Vec<(usize, usize)> = Vec::new();
         for (newx, newy) in branches.drain(..) {
@@ -70,7 +70,7 @@ fn count_locs(maxn: usize) -> usize {
     visited.insert((1, 1));
     push_nexts(1, 1, &mut branches, &visited);
     for _ in 0..maxn {
-        assert!(branches.len() > 0);
+        assert!(!branches.is_empty());
         let mut newbranches: Vec<(usize, usize)> = Vec::new();
         for (newx, newy) in branches.drain(..) {
             visited.insert((newx, newy));

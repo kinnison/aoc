@@ -44,13 +44,13 @@ impl Floor {
     }
 
     fn empty(&self) -> bool {
-        (self.gens.len() == 0) && (self.chips.len() == 0)
+        (self.gens.is_empty()) && (self.chips.is_empty())
     }
 
     fn safe(&self) -> bool {
         // Safe if all chips have corresponding generator
         // or if there are no generators
-        if self.gens.len() == 0 {
+        if self.gens.is_empty() {
             return true;
         }
         for chip in &self.chips {
@@ -58,7 +58,7 @@ impl Floor {
                 return false;
             }
         }
-        return true;
+        true
     }
 
     fn leave_(&mut self, carry: Carry) {
@@ -146,7 +146,7 @@ impl RTGFacility {
         let mut moves: Vec<Move> = Vec::new();
         let dir = self.liftat == 0;
         // No carries, no moves...
-        if carries.len() == 0 {
+        if carries.is_empty() {
             return moves;
         }
         // First up you can carry Nothing, and one of the possible carries
@@ -239,7 +239,7 @@ impl PartialEq for RTGFacility {
                 .iter()
                 .zip(other.floors.iter())
                 .map(|(a, b)| *a == *b)
-                .fold(true, |a, x| a && x)
+                .all(|x| x)
     }
 }
 
@@ -302,10 +302,7 @@ impl Solver {
 
     fn finished(&self) -> bool {
         // We're finished if any of self.branches is finished
-        self.branches
-            .iter()
-            .map(RTGFacility::finished)
-            .fold(false, |a, b| a || b)
+        self.branches.iter().map(RTGFacility::finished).any(|b| b)
     }
 
     fn solve(&mut self) -> usize {
@@ -316,7 +313,7 @@ impl Solver {
             if self.finished() {
                 break;
             }
-            assert!(self.branches.len() > 0);
+            assert!(!self.branches.is_empty());
             self.step_branches(depth);
             depth += 1;
         }

@@ -28,24 +28,24 @@ impl Instr {
         let mut ret: Instr = Instr::Rect(0, 0);
         if RECT_RE.is_match(&t_) {
             for cap in RECT_RE.captures_iter(&t_) {
-                let ref width_ = cap.get(1);
-                let ref height_ = cap.get(2);
+                let width_ = cap.get(1);
+                let height_ = cap.get(2);
                 let width: usize = width_.unwrap().as_str().parse().unwrap();
                 let height: usize = height_.unwrap().as_str().parse().unwrap();
                 ret = Instr::Rect(width, height);
             }
         } else if ROT_ROW_RE.is_match(&t_) {
             for cap in ROT_ROW_RE.captures_iter(&t_) {
-                let ref y_ = cap.get(1);
-                let ref by_ = cap.get(2);
+                let y_ = cap.get(1);
+                let by_ = cap.get(2);
                 let y: usize = y_.unwrap().as_str().parse().unwrap();
                 let by: usize = by_.unwrap().as_str().parse().unwrap();
                 ret = Instr::RotRow(y, by);
             }
         } else if ROT_COL_RE.is_match(&t_) {
             for cap in ROT_COL_RE.captures_iter(&t_) {
-                let ref x_ = cap.get(1);
-                let ref by_ = cap.get(2);
+                let x_ = cap.get(1);
+                let by_ = cap.get(2);
                 let x: usize = x_.unwrap().as_str().parse().unwrap();
                 let by: usize = by_.unwrap().as_str().parse().unwrap();
                 ret = Instr::RotCol(x, by);
@@ -125,7 +125,7 @@ impl Screen {
                 }
                 print!(" ");
             }
-            print!("\n");
+            println!();
         }
     }
 }
@@ -138,7 +138,7 @@ fn load_instructions() -> Vec<Instr> {
         let line = line_.unwrap();
         ret.push(Instr::new(line));
     }
-    return ret;
+    ret
 }
 
 fn problem1() -> usize {
@@ -147,7 +147,7 @@ fn problem1() -> usize {
     for instr in &instrs {
         screen.run_instr(instr);
     }
-    return screen.count();
+    screen.count()
 }
 
 fn problem2() {

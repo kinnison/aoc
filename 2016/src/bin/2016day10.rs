@@ -26,6 +26,12 @@ struct Bot {
     lastcomp2: usize,
 }
 
+impl Default for Bot {
+    fn default() -> Self {
+        Bot::new()
+    }
+}
+
 impl Bot {
     fn new() -> Bot {
         Bot {
@@ -177,14 +183,10 @@ fn load_state() -> RoomState {
     let mut bots: HashMap<usize, Bot> = HashMap::new();
     let mut bins: HashMap<usize, usize> = HashMap::new();
     let ensure_bot = |bots: &mut HashMap<usize, Bot>, n: usize| {
-        if !bots.contains_key(&n) {
-            bots.insert(n, Bot::new());
-        }
+        bots.entry(n).or_default();
     };
     let ensure_bin = |bins: &mut HashMap<usize, usize>, n: usize| {
-        if !bins.contains_key(&n) {
-            bins.insert(n, 0);
-        }
+        bins.entry(n).or_insert(0);
     };
     for line_ in reader.lines() {
         let line = line_.unwrap();
@@ -213,10 +215,7 @@ fn load_state() -> RoomState {
         }
     }
 
-    RoomState {
-        bots: bots,
-        bins: bins,
-    }
+    RoomState { bots, bins }
 }
 
 fn problem1() -> usize {

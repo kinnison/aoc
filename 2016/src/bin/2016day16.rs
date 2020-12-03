@@ -5,7 +5,7 @@ fn curve_step(i: &str) -> String {
     for ch in i.chars().rev() {
         s.push(if ch == '0' { '1' } else { '0' });
     }
-    return s;
+    s
 }
 
 fn fill_disc(i: &str, tlen: usize) -> String {
@@ -22,7 +22,7 @@ fn checksum(i: &str) -> String {
     if (i.len() & 1) != 0 {
         return i.to_string();
     }
-    let ref mut chs = i.chars();
+    let mut chs = i.chars();
     'lo: loop {
         if let Some(c1) = chs.next() {
             if let Some(c2) = chs.next() {
@@ -34,7 +34,7 @@ fn checksum(i: &str) -> String {
             break 'lo;
         }
     }
-    if s.len() == 0 {
+    if s.is_empty() {
         panic!("No loop?");
     }
     if (s.len() & 1) == 0 {

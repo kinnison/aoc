@@ -14,7 +14,7 @@ impl Triangle {
     pub fn new(t_: String) -> Triangle {
         let t = t_.trim();
         let ns: Vec<i32> = t
-            .split(" ")
+            .split(' ')
             .filter(|x| (x.trim() != ""))
             .map(&str::parse::<i32>)
             .map(&std::result::Result::unwrap)
@@ -22,14 +22,14 @@ impl Triangle {
         let a = ns[0];
         let b = ns[1];
         let c = ns[2];
-        return Triangle { a: a, b: b, c: c };
+        Triangle { a, b, c }
     }
 
     fn is_valid(&self) -> bool {
         let a = self.a;
         let b = self.b;
         let c = self.c;
-        return ((a + b) > c) && ((a + c) > b) && ((b + c) > a);
+        ((a + b) > c) && ((a + c) > b) && ((b + c) > a)
     }
 }
 
@@ -41,13 +41,13 @@ fn load_triangles() -> Vec<Triangle> {
         let line = line_.unwrap();
         ret.push(Triangle::new(line));
     }
-    return ret;
+    ret
 }
 
 fn problem1() -> usize {
     let mut triangles = load_triangles();
     triangles.retain(|t| t.is_valid());
-    return triangles.len();
+    triangles.len()
 }
 
 fn load_triangles2() -> Vec<Triangle> {
@@ -55,7 +55,7 @@ fn load_triangles2() -> Vec<Triangle> {
     let freader = BufReader::new(&infile);
     let mut ret: Vec<Triangle> = Vec::new();
     let mut lines: Vec<String> = freader.lines().map(&std::result::Result::unwrap).collect();
-    while lines.len() > 0 {
+    while !lines.is_empty() {
         let l1 = lines.pop().unwrap();
         let l2 = lines.pop().unwrap();
         let l3 = lines.pop().unwrap();
@@ -65,21 +65,21 @@ fn load_triangles2() -> Vec<Triangle> {
          */
         let ns1: Vec<i32> = l1
             .trim()
-            .split(" ")
+            .split(' ')
             .filter(|x| (x.trim() != ""))
             .map(&str::parse::<i32>)
             .map(&std::result::Result::unwrap)
             .collect();
         let ns2: Vec<i32> = l2
             .trim()
-            .split(" ")
+            .split(' ')
             .filter(|x| (x.trim() != ""))
             .map(&str::parse::<i32>)
             .map(&std::result::Result::unwrap)
             .collect();
         let ns3: Vec<i32> = l3
             .trim()
-            .split(" ")
+            .split(' ')
             .filter(|x| (x.trim() != ""))
             .map(&str::parse::<i32>)
             .map(&std::result::Result::unwrap)
@@ -91,13 +91,13 @@ fn load_triangles2() -> Vec<Triangle> {
         ret.push(Triangle::new(t2));
         ret.push(Triangle::new(t3));
     }
-    return ret;
+    ret
 }
 
 fn problem2() -> usize {
     let mut triangles = load_triangles2();
     triangles.retain(|t| t.is_valid());
-    return triangles.len();
+    triangles.len()
 }
 
 fn main() {

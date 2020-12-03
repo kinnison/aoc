@@ -8,13 +8,13 @@ fn load_ranges() -> Vec<(u32, u32)> {
     let mut ret: Vec<(u32, u32)> = Vec::new();
     for line_ in freader.lines() {
         let line = line_.unwrap();
-        let mut elems = line.split("-");
+        let mut elems = line.split('-');
         let low: u32 = elems.next().unwrap().parse().unwrap();
         let high: u32 = elems.next().unwrap().parse().unwrap();
         ret.push((low, high));
     }
     ret.sort_by_key(|&t| t.0);
-    return ret;
+    ret
 }
 
 fn collapse_ranges_a_bit(inr: Vec<(u32, u32)>) -> Vec<(u32, u32)> {
@@ -23,6 +23,7 @@ fn collapse_ranges_a_bit(inr: Vec<(u32, u32)>) -> Vec<(u32, u32)> {
         // Try and find a range already in the output containing low
         let mut found: bool = false;
         let mut ofs: usize = 0;
+        #[allow(clippy::needless_range_loop)]
         for i in 0..ret.len() {
             if (ret[i].0 <= low) && (ret[i].1 >= (low - 1)) {
                 found = true;
@@ -39,11 +40,11 @@ fn collapse_ranges_a_bit(inr: Vec<(u32, u32)>) -> Vec<(u32, u32)> {
         }
     }
     ret.sort_by_key(|&t| t.0);
-    return ret;
+    ret
 }
 
 fn collapse_ranges(inr: Vec<(u32, u32)>) -> Vec<(u32, u32)> {
-    let mut cur = inr.clone();
+    let mut cur = inr;
     loop {
         let oldlen = cur.len();
         cur = collapse_ranges_a_bit(cur);
@@ -64,6 +65,7 @@ fn problem2() -> u32 {
     let ranges = collapse_ranges(load_ranges());
     let mut tot: u32 = 0; // Nothing below range 0...
     let mut pos: u32 = ranges[0].1;
+    #[allow(clippy::needless_range_loop)]
     for i in 1..ranges.len() {
         tot += ranges[i].0 - pos - 1;
         pos = ranges[i].1;

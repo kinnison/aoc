@@ -26,7 +26,7 @@ impl<'a> Iterator for Nibbles<'a> {
 
 impl<'a> Nibbles<'a> {
     fn new(h: &[u8]) -> Nibbles {
-        Nibbles { h: h, l: 0 }
+        Nibbles { h, l: 0 }
     }
 }
 
@@ -110,9 +110,7 @@ fn stretched_result(
     match cache.get(&n) {
         None => {}
         Some(arr) => {
-            for i in 0..16 {
-                output[i] = arr[i];
-            }
+            output.clone_from_slice(arr);
             return;
         }
     }

@@ -36,44 +36,44 @@ impl Instr {
                 Regex::new("move position ([0-9]+) to position ([0-9]+)").unwrap();
         }
         if let Some(cap) = SWAP_POS_RE.captures(&t_) {
-            let ref x_ = cap.get(1);
-            let ref y_ = cap.get(2);
+            let x_ = cap.get(1);
+            let y_ = cap.get(2);
             let x: usize = x_.unwrap().as_str().parse().unwrap();
             let y: usize = y_.unwrap().as_str().parse().unwrap();
             return Instr::Swap(x, y);
         }
         if let Some(cap) = SWAP_LET_RE.captures(&t_) {
-            let ref x_ = cap.get(1);
-            let ref y_ = cap.get(2);
-            let x: char = x_.unwrap().as_str().chars().nth(0).unwrap();
-            let y: char = y_.unwrap().as_str().chars().nth(0).unwrap();
+            let x_ = cap.get(1);
+            let y_ = cap.get(2);
+            let x: char = x_.unwrap().as_str().chars().next().unwrap();
+            let y: char = y_.unwrap().as_str().chars().next().unwrap();
             return Instr::SwapLetter(x as u8, y as u8);
         }
         if let Some(cap) = ROT_LEFT_RE.captures(&t_) {
-            let ref s_ = cap.get(1);
+            let s_ = cap.get(1);
             let steps: usize = s_.unwrap().as_str().parse().unwrap();
             return Instr::RotateLeft(steps);
         }
         if let Some(cap) = ROT_RIGHT_RE.captures(&t_) {
-            let ref s_ = cap.get(1);
+            let s_ = cap.get(1);
             let steps: usize = s_.unwrap().as_str().parse().unwrap();
             return Instr::RotateRight(steps);
         }
         if let Some(cap) = ROT_LETTR_RE.captures(&t_) {
-            let ref l_ = cap.get(1);
-            let letter: char = l_.unwrap().as_str().chars().nth(0).unwrap();
+            let l_ = cap.get(1);
+            let letter: char = l_.unwrap().as_str().chars().next().unwrap();
             return Instr::RotatePos(letter as u8);
         }
         if let Some(cap) = REVERSE_RE.captures(&t_) {
-            let ref x_ = cap.get(1);
-            let ref y_ = cap.get(2);
+            let x_ = cap.get(1);
+            let y_ = cap.get(2);
             let x: usize = x_.unwrap().as_str().parse().unwrap();
             let y: usize = y_.unwrap().as_str().parse().unwrap();
             return Instr::Reverse(x, y);
         }
         if let Some(cap) = MOVE_RE.captures(&t_) {
-            let ref x_ = cap.get(1);
-            let ref y_ = cap.get(2);
+            let x_ = cap.get(1);
+            let y_ = cap.get(2);
             let x: usize = x_.unwrap().as_str().parse().unwrap();
             let y: usize = y_.unwrap().as_str().parse().unwrap();
             return Instr::Move(x, y);
@@ -207,7 +207,7 @@ fn load_instructions() -> Vec<Instr> {
         let line = line_.unwrap();
         ret.push(Instr::new(line));
     }
-    return ret;
+    ret
 }
 
 fn problem1(inp: &str) -> String {

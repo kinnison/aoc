@@ -25,22 +25,17 @@ impl Node {
                     .unwrap();
         }
         if let Some(cap) = NODE_RE.captures(&t_) {
-            let ref x_ = cap.get(1);
-            let ref y_ = cap.get(2);
-            let ref size_ = cap.get(3);
-            let ref used_ = cap.get(4);
-            let ref avail_ = cap.get(5);
+            let x_ = cap.get(1);
+            let y_ = cap.get(2);
+            let size_ = cap.get(3);
+            let used_ = cap.get(4);
+            let avail_ = cap.get(5);
             let x: usize = x_.unwrap().as_str().parse().unwrap();
             let y: usize = y_.unwrap().as_str().parse().unwrap();
             let size: usize = size_.unwrap().as_str().parse().unwrap();
             let used: usize = used_.unwrap().as_str().parse().unwrap();
             let avail: usize = avail_.unwrap().as_str().parse().unwrap();
-            let ret = Node {
-                x: x,
-                y: y,
-                size: size,
-                used: used,
-            };
+            let ret = Node { x, y, size, used };
             assert_eq!(ret.avail(), avail);
             Some(ret)
         } else {
@@ -137,7 +132,7 @@ impl Grid {
         for x in 0..(max_x + 1) {
             let mut col: Vec<NS> = Vec::new();
             for y in 0..(max_y + 1) {
-                let ref node = self.node(x, y);
+                let node = self.node(x, y);
                 // In the example, it's only worth considering nodes
                 // as empty, used, (used as goal), or blocking
                 if node.used == 0 {
@@ -187,7 +182,7 @@ impl Grid {
                 print!(" ");
             }
         }
-        println!("");
+        println!();
         for y in 0..(self.max_y + 1) {
             print!("{:3} ", y);
             for x in 0..(self.max_x + 1) {
@@ -206,7 +201,7 @@ impl Grid {
                     }
                 }
             }
-            println!("");
+            println!();
         }
     }
 

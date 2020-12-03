@@ -168,7 +168,7 @@ impl VM {
 
     fn run_program(&mut self, prog: Vec<Instr>) {
         loop {
-            let ref i = prog[self.pc];
+            let i = &prog[self.pc];
             if self.exec_instr(i) {
                 break;
             }
@@ -188,7 +188,7 @@ fn load_program() -> Vec<Instr> {
         ret.push(Instr::new(line));
     }
     ret.push(Instr::Hlt);
-    return ret;
+    ret
 }
 
 fn problem1() -> i32 {
