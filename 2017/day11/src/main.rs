@@ -33,7 +33,7 @@ fn load_instructions() -> Vec<Move> {
     let mut ret = Vec::new();
     for line_ in freader.lines() {
         let line = line_.unwrap();
-        for move_ in line.split(",") {
+        for move_ in line.split(',') {
             ret.push(Move::from_str(move_));
         }
     }
@@ -54,7 +54,7 @@ struct HexPos {
 
 impl HexPos {
     fn new(x: i32, y: i32, z: i32) -> HexPos {
-        HexPos { x: x, y: y, z: z }
+        HexPos { x, y, z }
     }
 
     fn domove(&mut self, move_: &Move) {
@@ -86,7 +86,7 @@ impl HexPos {
         }
     }
 
-    fn doseq(&mut self, seq: &Vec<Move>) {
+    fn doseq(&mut self, seq: &[Move]) {
         //println!("Starting move sequence at {:?}", self);
         for move_ in seq {
             self.domove(move_);
@@ -94,7 +94,7 @@ impl HexPos {
         }
     }
 
-    fn doseq_farthest(&mut self, seq: &Vec<Move>) -> usize {
+    fn doseq_farthest(&mut self, seq: &[Move]) -> usize {
         //println!("Starting move sequence at {:?}", self);
         let mut dist = self.dist_to_origin();
         for move_ in seq {
@@ -170,13 +170,13 @@ fn runtest1(seq: Vec<Move>, expdist: usize) {
     assert!(dist == expdist);
 }
 
-fn problem1(input: &Vec<Move>) -> usize {
+fn problem1(input: &[Move]) -> usize {
     let mut pos = HexPos::new(0, 0, 0);
     pos.doseq(input);
     pos.dist_to_origin()
 }
 
-fn problem2(input: &Vec<Move>) -> usize {
+fn problem2(input: &[Move]) -> usize {
     let mut pos = HexPos::new(0, 0, 0);
     pos.doseq_farthest(input)
 }

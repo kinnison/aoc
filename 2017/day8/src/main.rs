@@ -75,12 +75,12 @@ impl Instruction {
             let test_cond = Condition::new(cap.get(5).unwrap().as_str());
             let test_amt: i32 = cap.get(6).unwrap().as_str().parse().unwrap();
             return Instruction {
-                reg: reg,
-                cmd: cmd,
-                amt: amt,
-                test_reg: test_reg,
-                test_cond: test_cond,
-                test_amt: test_amt,
+                reg,
+                cmd,
+                amt,
+                test_reg,
+                test_cond,
+                test_amt,
             };
         }
         panic!("Unable to parse instruction: {:?}", input);
@@ -112,7 +112,7 @@ impl VM {
     }
 
     fn run_instruction(&mut self, instr: &Instruction) {
-        let testval = self.regs.get(&instr.test_reg).map(|v| *v).unwrap_or(0);
+        let testval = self.regs.get(&instr.test_reg).copied().unwrap_or(0);
         if match instr.test_cond {
             Condition::LE => testval <= instr.test_amt,
             Condition::LT => testval < instr.test_amt,
@@ -122,7 +122,7 @@ impl VM {
             Condition::GE => testval >= instr.test_amt,
         } {
             // Test passed, execute change...
-            let curval = self.regs.get(&instr.reg).map(|v| *v).unwrap_or(0);
+            let curval = self.regs.get(&instr.reg).copied().unwrap_or(0);
             let newval = match instr.cmd {
                 Command::Increment => curval + instr.amt,
                 Command::Decrement => curval - instr.amt,
@@ -134,18 +134,18 @@ impl VM {
         }
     }
 
-    fn run_program(&mut self, prog: &Vec<Instruction>) {
+    fn run_program(&mut self, prog: &[Instruction]) {
         for instr in prog {
             self.run_instruction(instr);
         }
     }
 }
 
-fn problem1(prog: &Vec<Instruction>) -> i32 {
+fn problem1(prog: &[Instruction]) -> i32 {
     let mut vm = VM::new();
     vm.run_program(prog);
     let mut biggest = 0;
-    for (_, &value) in &vm.regs {
+    for &value in vm.regs.values() {
         if value > biggest {
             biggest = value;
         }
@@ -153,7 +153,7 @@ fn problem1(prog: &Vec<Instruction>) -> i32 {
     biggest
 }
 
-fn problem2(prog: &Vec<Instruction>) -> i32 {
+fn problem2(prog: &[Instruction]) -> i32 {
     let mut vm = VM::new();
     vm.run_program(prog);
     vm.biggest

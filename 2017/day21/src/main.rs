@@ -53,14 +53,14 @@ impl Pattern {
             bits: self
                 .bits
                 .iter()
-                .map(|row| row.iter().rev().map(|v| v.clone()).collect())
+                .map(|row| row.iter().rev().copied().collect())
                 .collect(),
         }
     }
 
     fn flip_vert(&self) -> Pattern {
         Pattern {
-            bits: self.bits.iter().rev().map(|row| row.clone()).collect(),
+            bits: self.bits.iter().rev().cloned().collect(),
         }
     }
 
@@ -184,7 +184,7 @@ impl Grid {
 
     fn from_patt(patt: &Pattern) -> Grid {
         Grid {
-            cells: patt.bits.iter().map(|r| r.clone()).collect(),
+            cells: patt.bits.to_vec(),
         }
     }
 

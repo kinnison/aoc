@@ -63,15 +63,13 @@ impl Grid {
                         // We're at a + and we can't go left or right
                         return None;
                     }
+                } else if dir == Dir::Up && row > 0 {
+                    nextrow = row - 1;
+                } else if dir == Dir::Down && row < (self.rowcount - 1) {
+                    nextrow = row + 1;
                 } else {
-                    if dir == Dir::Up && row > 0 {
-                        nextrow = row - 1;
-                    } else if dir == Dir::Down && row < (self.rowcount - 1) {
-                        nextrow = row + 1;
-                    } else {
-                        // Can't go up/down, done.
-                        return None;
-                    }
+                    // Can't go up/down, done.
+                    return None;
                 }
             }
             Dir::Left | Dir::Right => {
@@ -87,15 +85,13 @@ impl Grid {
                         // We're at a + and we can't go up or down
                         return None;
                     }
+                } else if dir == Dir::Left && col > 0 {
+                    nextcol = col - 1;
+                } else if dir == Dir::Right && col < (self.colcount - 1) {
+                    nextcol = col + 1;
                 } else {
-                    if dir == Dir::Left && col > 0 {
-                        nextcol = col - 1;
-                    } else if dir == Dir::Right && col < (self.colcount - 1) {
-                        nextcol = col + 1;
-                    } else {
-                        // Can't go left/right, done.
-                        return None;
-                    }
+                    // Can't go left/right, done.
+                    return None;
                 }
             }
         }
@@ -132,7 +128,7 @@ impl Grid {
                     nextrow, nextcol, nextdir, self.content[nextrow][nextcol]
                 );
             }
-            if (curch as u8) >= ('A' as u8) && (curch as u8) <= ('Z' as u8) {
+            if (curch as u8) >= b'A' && (curch as u8) <= b'Z' {
                 ret.push(curch);
             }
             currow = nextrow;
@@ -141,7 +137,7 @@ impl Grid {
             steps += 1;
         }
         let curch = self.content[currow][curcol];
-        if (curch as u8) >= ('A' as u8) && (curch as u8) <= ('Z' as u8) {
+        if (curch as u8) >= b'A' && (curch as u8) <= b'Z' {
             ret.push(curch);
         }
         if tell {

@@ -18,6 +18,7 @@ fn load_instructions() -> Vec<usize> {
     ret
 }
 
+#[allow(clippy::ptr_arg, clippy::needless_range_loop)]
 fn problem1(input_: &Vec<usize>) -> usize {
     let mut seen: HashSet<Vec<usize>> = HashSet::new();
     let mut cur = input_.clone();
@@ -36,7 +37,7 @@ fn problem1(input_: &Vec<usize>) -> usize {
         cur[biggest_idx] = 0;
         while redist > 0 {
             biggest_idx = (biggest_idx + 1) % cur.len();
-            cur[biggest_idx] = cur[biggest_idx] + 1;
+            cur[biggest_idx] += 1;
             redist -= 1;
         }
         // New state created
@@ -49,6 +50,7 @@ fn problem1(input_: &Vec<usize>) -> usize {
     redists
 }
 
+#[allow(clippy::ptr_arg, clippy::needless_range_loop)]
 fn problem2(input_: &Vec<usize>) -> usize {
     let mut seen: HashMap<Vec<usize>, usize> = HashMap::new();
     let mut cur = input_.clone();
@@ -67,7 +69,7 @@ fn problem2(input_: &Vec<usize>) -> usize {
         cur[biggest_idx] = 0;
         while redist > 0 {
             biggest_idx = (biggest_idx + 1) % cur.len();
-            cur[biggest_idx] = cur[biggest_idx] + 1;
+            cur[biggest_idx] += 1;
             redist -= 1;
         }
         // New state created

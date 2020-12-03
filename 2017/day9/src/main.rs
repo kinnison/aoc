@@ -55,7 +55,7 @@ impl Parser {
                 break;
             }
             self.next();
-            count = count + 1;
+            count += 1;
         }
         self.next();
         count
@@ -102,10 +102,7 @@ impl Group {
         }
         parser.next();
         elems.push(Left(accum));
-        Group {
-            elems: elems,
-            garbage: garbage,
-        }
+        Group { elems, garbage }
     }
 
     fn parse(input: &str) -> Group {

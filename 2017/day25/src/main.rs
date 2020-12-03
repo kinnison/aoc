@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::vec::Vec;
 
 #[derive(Clone)]
 struct ActionPrint {
@@ -47,9 +46,9 @@ struct BluePrint {
 }
 
 impl BluePrint {
-    fn new(start: char, after: usize, states: &Vec<(char, StatePrint)>) -> BluePrint {
+    fn new(start: char, after: usize, states: &[(char, StatePrint)]) -> BluePrint {
         let mut ret = BluePrint {
-            start: start,
+            start,
             sumafter: after,
             states: HashMap::new(),
         };

@@ -31,7 +31,7 @@ impl Particle {
         }
         if let Some(cap) = PART_RE.captures(s) {
             Particle {
-                n: n,
+                n,
                 px: cap.get(1).unwrap().as_str().parse().unwrap(),
                 py: cap.get(2).unwrap().as_str().parse().unwrap(),
                 pz: cap.get(3).unwrap().as_str().parse().unwrap(),
@@ -79,9 +79,9 @@ struct GPU {
 }
 
 impl GPU {
-    fn new(input: &Vec<Particle>) -> GPU {
+    fn new(input: &[Particle]) -> GPU {
         GPU {
-            particles: input.clone(),
+            particles: input.to_vec(),
         }
     }
 
@@ -105,7 +105,7 @@ impl GPU {
             }
         }
 
-        if collided.len() > 0 {
+        if !collided.is_empty() {
             self.particles = oldparts
                 .drain(..)
                 .filter(|p| !collided.contains(&(p.px, p.py, p.pz)))
@@ -114,13 +114,13 @@ impl GPU {
     }
 }
 
-fn problem1(input: &Vec<Particle>) -> usize {
-    let mut parts = input.clone();
-    parts.sort_by(|a, b| a.absacc().cmp(&b.absacc()));
+fn problem1(input: &[Particle]) -> usize {
+    let mut parts = input.to_vec();
+    parts.sort_by_key(|&a| a.absacc());
     parts[0].n
 }
 
-fn problem2(input: &Vec<Particle>) -> usize {
+fn problem2(input: &[Particle]) -> usize {
     let mut gpu = GPU::new(input);
     let mut count = 1;
     let mut lastlen = gpu.particles.len();

@@ -11,9 +11,9 @@ impl Hurricane {
     fn new(cap: usize, step: usize) -> Hurricane {
         let mut ret = Hurricane {
             entries: Vec::with_capacity(cap),
-            cap: cap,
+            cap,
             pos: 0,
-            step: step,
+            step,
         };
         ret.entries.push(0);
         ret

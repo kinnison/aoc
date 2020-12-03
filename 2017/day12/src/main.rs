@@ -26,7 +26,7 @@ impl Prog {
             let id_ = cap.get(1).unwrap().as_str().parse().unwrap();
             let rest_ = cap.get(2).unwrap().as_str();
             let mut pipes_: Vec<usize> = Vec::new();
-            for num_ in rest_.split(",") {
+            for num_ in rest_.split(',') {
                 pipes_.push(num_.trim().parse().unwrap());
             }
             return Prog {
@@ -40,7 +40,7 @@ impl Prog {
     fn connected_progs(start: usize, all: &HashMap<usize, Prog>) -> HashSet<usize> {
         let mut ret = HashSet::new();
         let mut to_check = vec![start];
-        while to_check.len() > 0 {
+        while !to_check.is_empty() {
             let id = to_check.pop().unwrap();
             let dis = all.get(&id).unwrap();
             if !ret.contains(&id) {
@@ -57,8 +57,8 @@ impl Prog {
 
     fn group_count(all: &HashMap<usize, Prog>) -> usize {
         let mut groups = 0;
-        let mut progsleft: HashSet<usize> = all.keys().map(|c| *c).collect();
-        while progsleft.len() > 0 {
+        let mut progsleft: HashSet<usize> = all.keys().copied().collect();
+        while !progsleft.is_empty() {
             let someid = *(progsleft.iter().last().unwrap());
             let connset = Prog::connected_progs(someid, all);
             groups += 1;

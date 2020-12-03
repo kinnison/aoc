@@ -10,7 +10,7 @@ fn load_instructions() -> Vec<usize> {
     let mut ret = Vec::new();
     for line_ in freader.lines() {
         let line = line_.unwrap();
-        for num_ in line.split(",") {
+        for num_ in line.split(',') {
             ret.push(usize::from_str(num_).unwrap());
         }
     }
@@ -48,7 +48,7 @@ struct KnotHash {
 impl KnotHash {
     fn new(size: usize) -> KnotHash {
         let mut ret = KnotHash {
-            size: size,
+            size,
             entries: Vec::new(),
             curpos: 0,
             skip: 0,
@@ -76,6 +76,7 @@ impl KnotHash {
             .map(|v| (self.curpos + v) % self.size)
             .map(|p| self.entries[p])
             .collect();
+        #[allow(clippy::needless_range_loop)]
         for p in 0..len {
             self.entries[(self.curpos + p) % self.size] = revvec[p];
         }
@@ -83,7 +84,7 @@ impl KnotHash {
         self.skip += 1;
     }
 
-    fn run_prog(&mut self, prog: &Vec<usize>, printing: bool) {
+    fn run_prog(&mut self, prog: &[usize], printing: bool) {
         for elem in prog {
             self.run_instruction(*elem);
             if printing {
@@ -96,7 +97,7 @@ impl KnotHash {
         self.entries[0] * self.entries[1]
     }
 
-    fn run_rounds(&mut self, prog: &Vec<usize>) {
+    fn run_rounds(&mut self, prog: &[usize]) {
         for _i in 0..64 {
             self.run_prog(prog, false);
         }
@@ -115,13 +116,13 @@ impl KnotHash {
     }
 }
 
-fn problem1(prog: &Vec<usize>) -> usize {
+fn problem1(prog: &[usize]) -> usize {
     let mut knot = KnotHash::new(256);
     knot.run_prog(prog, false);
     knot.check_value()
 }
 
-fn problem2(prog: &Vec<usize>) -> String {
+fn problem2(prog: &[usize]) -> String {
     let mut knot = KnotHash::new(256);
     knot.run_rounds(prog);
 

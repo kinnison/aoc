@@ -58,14 +58,14 @@ fn load_instructions() -> Vec<Passphrase> {
         let line = line_.unwrap();
         ret.push(Passphrase::from_line(line));
     }
-    return ret;
+    ret
 }
 
-fn problem1(input: &Vec<Passphrase>) -> usize {
+fn problem1(input: &[Passphrase]) -> usize {
     input.iter().filter(|c| c.is_valid1()).count()
 }
 
-fn problem2(input: &Vec<Passphrase>) -> usize {
+fn problem2(input: &[Passphrase]) -> usize {
     input.iter().filter(|c| c.is_valid2()).count()
 }
 

@@ -20,7 +20,7 @@ fn load_instructions() -> Sheet {
         }
         ret.cells.push(row);
     }
-    return ret;
+    ret
 }
 
 fn problem1(sheet: &Sheet) -> usize {
@@ -55,11 +55,9 @@ fn problem2(sheet: &Sheet) -> usize {
                             sum += a / b;
                             continue 'rows;
                         }
-                    } else {
-                        if (b % a) == 0 {
-                            sum += b / a;
-                            continue 'rows;
-                        }
+                    } else if (b % a) == 0 {
+                        sum += b / a;
+                        continue 'rows;
                     }
                 }
             }

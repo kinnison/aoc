@@ -28,7 +28,7 @@ struct KnotHash {
 impl KnotHash {
     fn new(size: usize) -> KnotHash {
         let mut ret = KnotHash {
-            size: size,
+            size,
             entries: Vec::new(),
             curpos: 0,
             skip: 0,
@@ -56,6 +56,7 @@ impl KnotHash {
             .map(|v| (self.curpos + v) % self.size)
             .map(|p| self.entries[p])
             .collect();
+        #[allow(clippy::needless_range_loop)]
         for p in 0..len {
             self.entries[(self.curpos + p) % self.size] = revvec[p];
         }
@@ -63,7 +64,7 @@ impl KnotHash {
         self.skip += 1;
     }
 
-    fn run_prog(&mut self, prog: &Vec<usize>, printing: bool) {
+    fn run_prog(&mut self, prog: &[usize], printing: bool) {
         for elem in prog {
             self.run_instruction(*elem);
             if printing {
@@ -77,7 +78,7 @@ impl KnotHash {
         self.entries[0] * self.entries[1]
     }
 
-    fn run_rounds(&mut self, prog: &Vec<usize>) {
+    fn run_rounds(&mut self, prog: &[usize]) {
         for _i in 0..64 {
             self.run_prog(prog, false);
         }
@@ -155,30 +156,28 @@ impl Disk {
     fn count_groups(&self) -> usize {
         let mut coords: HashSet<(usize, usize)> = iproduct!(0..128, 0..128).collect();
         let mut groups = 0;
-        while coords.len() > 0 {
+        while !coords.is_empty() {
             let mut consider: HashSet<(usize, usize)> = HashSet::new();
-            let coord: (usize, usize) = coords.iter().next().unwrap().clone();
+            let coord: (usize, usize) = *coords.iter().next().unwrap();
             coords.remove(&coord);
             if !self.bit_at(coord.0, coord.1) {
                 continue;
             }
             groups += 1;
             consider.insert(coord);
-            while consider.len() > 0 {
-                let ponder: (usize, usize) = consider.iter().next().unwrap().clone();
+            while !consider.is_empty() {
+                let ponder: (usize, usize) = *consider.iter().next().unwrap();
                 consider.remove(&ponder);
-                for (rowofs, colofs) in vec![(-1, 0), (1, 0), (0, -1), (0, 1)] {
-                    if (ponder.0 as i32) >= -rowofs {
-                        if (ponder.1 as i32) >= -colofs {
-                            let newc: (usize, usize) = (
-                                ((ponder.0 as i32) + rowofs) as usize,
-                                ((ponder.1 as i32) + colofs) as usize,
-                            );
-                            if coords.contains(&newc) {
-                                coords.remove(&newc);
-                                if self.bit_at(newc.0, newc.1) {
-                                    consider.insert(newc);
-                                }
+                for (rowofs, colofs) in &[(-1, 0), (1, 0), (0, -1), (0, 1)] {
+                    if (ponder.0 as i32) >= -rowofs && (ponder.1 as i32) >= -colofs {
+                        let newc: (usize, usize) = (
+                            ((ponder.0 as i32) + rowofs) as usize,
+                            ((ponder.1 as i32) + colofs) as usize,
+                        );
+                        if coords.contains(&newc) {
+                            coords.remove(&newc);
+                            if self.bit_at(newc.0, newc.1) {
+                                consider.insert(newc);
                             }
                         }
                     }

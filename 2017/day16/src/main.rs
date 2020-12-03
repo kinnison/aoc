@@ -46,7 +46,7 @@ fn load_instructions() -> Vec<Inst> {
     let mut ret = Vec::new();
     for line_ in freader.lines() {
         let line = line_.unwrap();
-        for chunk in line.split(",") {
+        for chunk in line.split(',') {
             ret.push(Inst::new(chunk));
         }
     }
@@ -67,10 +67,10 @@ impl Lineup {
     }
 
     fn do_instr(&mut self, inst: &Inst) {
-        match inst {
-            &Inst::Spin(count) => self.do_spin(count),
-            &Inst::Exch(a, b) => self.do_exch(a, b),
-            &Inst::Part(a, b) => self.do_part(a, b),
+        match *inst {
+            Inst::Spin(count) => self.do_spin(count),
+            Inst::Exch(a, b) => self.do_exch(a, b),
+            Inst::Part(a, b) => self.do_part(a, b),
         }
     }
 
@@ -82,9 +82,7 @@ impl Lineup {
     }
 
     fn do_exch(&mut self, a: usize, b: usize) {
-        let temp = self.progs[a];
-        self.progs[a] = self.progs[b];
-        self.progs[b] = temp;
+        self.progs.swap(a, b);
     }
 
     fn do_part(&mut self, a: char, b: char) {
@@ -97,25 +95,26 @@ impl Lineup {
         }
     }
 
-    fn run_instr_vec(&mut self, v: &Vec<Inst>) {
+    fn run_instr_vec(&mut self, v: &[Inst]) {
         for inst in v {
             self.do_instr(inst);
         }
     }
 }
 
-fn problem1(input: &Vec<Inst>) -> String {
+fn problem1(input: &[Inst]) -> String {
     let mut lineup = Lineup::new();
     lineup.run_instr_vec(input);
     lineup.progs.iter().collect()
 }
 
-fn cycle_size(input: &Vec<Inst>) -> usize {
+fn cycle_size(input: &[Inst]) -> usize {
     let mut lineup = Lineup::new();
     let mut maps: HashMap<String, usize> = HashMap::new();
     let mut i = 0;
     while i < 1_000_000_000 {
         let s = lineup.progs.iter().collect();
+        #[allow(clippy::map_entry)]
         if maps.contains_key(&s) {
             // Cycle length is i - maps[s]
             return i - maps[&s];
@@ -131,7 +130,7 @@ fn cycle_size(input: &Vec<Inst>) -> usize {
     i
 }
 
-fn problem2(input: &Vec<Inst>) -> String {
+fn problem2(input: &[Inst]) -> String {
     let cyc = cycle_size(input);
     let mut lineup = Lineup::new();
     for _ in 0..(1_000_000_000 % cyc) {

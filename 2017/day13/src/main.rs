@@ -22,7 +22,7 @@ impl Firewall {
     }
 
     fn add_scanner(&mut self, line: &str) {
-        let bits: Vec<usize> = line.split(":").map(|s| s.trim().parse().unwrap()).collect();
+        let bits: Vec<usize> = line.split(':').map(|s| s.trim().parse().unwrap()).collect();
         assert!(bits.len() == 2);
         let layer = bits[0];
         let depth = bits[1];
@@ -116,21 +116,19 @@ impl Firewall {
                         '.'
                     };
                     print!("{}{}{} ", open, scanner, close);
-                } else {
-                    if depth == 0 {
-                        if layer == pos {
-                            print!("(.) ");
-                        } else {
-                            print!("... ");
-                        }
+                } else if depth == 0 {
+                    if layer == pos {
+                        print!("(.) ");
                     } else {
-                        print!("    ");
+                        print!("... ");
                     }
+                } else {
+                    print!("    ");
                 }
             }
-            println!("");
+            println!();
         }
-        println!("");
+        println!();
     }
 }
 

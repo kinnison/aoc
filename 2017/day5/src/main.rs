@@ -14,8 +14,8 @@ fn load_instructions() -> Vec<i32> {
     ret
 }
 
-fn problem1(istr_: &Vec<i32>) -> usize {
-    let mut prog: Vec<i32> = istr_.clone();
+fn problem1(istr_: &[i32]) -> usize {
+    let mut prog: Vec<i32> = istr_.to_vec();
     let mut ip = 0;
     let mut ret = 0;
     loop {
@@ -30,8 +30,8 @@ fn problem1(istr_: &Vec<i32>) -> usize {
     }
 }
 
-fn problem2(istr_: &Vec<i32>) -> usize {
-    let mut prog: Vec<i32> = istr_.clone();
+fn problem2(istr_: &[i32]) -> usize {
+    let mut prog: Vec<i32> = istr_.to_vec();
     let mut ip = 0;
     let mut ret = 0;
     loop {

@@ -11,7 +11,7 @@ struct Part {
 
 impl Part {
     fn new(s: &str) -> Part {
-        let parts: Vec<usize> = s.split("/").map(|s| s.trim().parse().unwrap()).collect();
+        let parts: Vec<usize> = s.split('/').map(|s| s.trim().parse().unwrap()).collect();
         assert!(parts.len() == 2);
         Part {
             a: parts[0],
@@ -69,15 +69,15 @@ impl Bridge {
         ret
     }
 
-    fn build_all(&self, remaining: &Vec<Part>, bridges: &mut Vec<Bridge>) {
+    fn build_all(&self, remaining: &[Part], bridges: &mut Vec<Bridge>) {
         for nextpart in remaining.iter().filter(|p| p.has(self.desired)) {
             // Construct a bridge out of self, nextpart
             let nextbridge = self.add_part(nextpart);
             bridges.push(nextbridge.clone());
-            let nextset = remaining
+            let nextset: Vec<_> = remaining
                 .iter()
                 .filter(|p| *p != nextpart)
-                .map(|p| p.clone())
+                .cloned()
                 .collect();
             nextbridge.build_all(&nextset, bridges);
         }
@@ -88,7 +88,7 @@ impl Bridge {
         self.seq.iter().map(|p| p.strength()).sum()
     }
 
-    fn strongest(bridges: &Vec<Bridge>) -> usize {
+    fn strongest(bridges: &[Bridge]) -> usize {
         bridges.iter().map(|b| b.strength()).max().unwrap()
     }
 
@@ -97,13 +97,13 @@ impl Bridge {
     }
 }
 
-fn problem(input: &Vec<Part>) -> (usize, usize) {
+fn problem(input: &[Part]) -> (usize, usize) {
     let mut all_valid = Vec::new();
     let base = Bridge::new();
     base.build_all(&input, &mut all_valid);
     let strongest = Bridge::strongest(&all_valid);
     let maxlen = all_valid.iter().map(|b| b.len()).max().unwrap();
-    let longs = all_valid.drain(..).filter(|b| b.len() == maxlen).collect();
+    let longs: Vec<_> = all_valid.drain(..).filter(|b| b.len() == maxlen).collect();
     let longest = Bridge::strongest(&longs);
     (strongest, longest)
 }

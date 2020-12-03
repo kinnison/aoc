@@ -76,13 +76,13 @@ impl Tower {
         while let Some(ref next) = self.progs.get(&cur).unwrap().parent {
             cur = next.clone();
         }
-        return cur.clone();
+        cur
     }
 
     fn weigh_everyone(&mut self) {
         let mut to_weigh: Vec<String> = Vec::new();
         to_weigh.push(self.root());
-        while to_weigh.len() > 0 {
+        while !to_weigh.is_empty() {
             let weighing = to_weigh[to_weigh.len() - 1].clone();
             let mut possible = true;
             let mut totalkids = 0;
@@ -107,9 +107,9 @@ impl Tower {
         self.list_unbalanced_(&self.root());
     }
 
-    fn list_unbalanced_(&self, cur: &String) {
+    fn list_unbalanced_(&self, cur: &str) {
         let prog = self.progs.get(cur).unwrap();
-        if prog.kids.len() > 0 {
+        if !prog.kids.is_empty() {
             let base = self.masses.get(&prog.kids[0]).unwrap();
             let mut unbalanced = false;
             for k in &prog.kids {
@@ -124,7 +124,7 @@ impl Tower {
         }
     }
 
-    fn print_disc(&self, disc: &String) {
+    fn print_disc(&self, disc: &str) {
         let prog = self.progs.get(disc).unwrap();
         println!(
             "Disc {} has weight {} totalling {}",

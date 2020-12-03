@@ -86,23 +86,23 @@ struct VM {
 }
 
 impl VM {
-    fn new(input: &Vec<Inst>) -> VM {
+    fn new(input: &[Inst]) -> VM {
         let mut vm = VM {
-            prog: input.clone(),
+            prog: input.to_vec(),
             regs: HashMap::new(),
             pc: 0,
             mulc: 0,
         };
         for i in 0..26 {
-            vm.regs.insert((('a' as u8) + i) as char, 0);
+            vm.regs.insert((b'a' + i) as char, 0);
         }
         vm
     }
 
     fn eval_val(&self, val: &Val) -> i64 {
-        match val {
-            &Val::Reg(c) => self.regs.get(&c).unwrap().clone(),
-            &Val::Num(i) => i,
+        match *val {
+            Val::Reg(c) => *self.regs.get(&c).unwrap(),
+            Val::Num(i) => i,
         }
     }
 
@@ -110,23 +110,23 @@ impl VM {
         while self.pc < self.prog.len() {
             let curinst = &self.prog[self.pc];
             let mut nextpc = self.pc + 1;
-            match curinst {
-                &Inst::Set(r, ref v_) => {
+            match *curinst {
+                Inst::Set(r, ref v_) => {
                     let v = self.eval_val(v_);
                     self.regs.insert(r, v);
                 }
-                &Inst::Sub(r, ref v_) => {
+                Inst::Sub(r, ref v_) => {
                     let v = self.eval_val(v_);
-                    let rv = self.regs.get(&r).unwrap().clone();
+                    let rv = *self.regs.get(&r).unwrap();
                     self.regs.insert(r, rv - v);
                 }
-                &Inst::Mul(r, ref v_) => {
+                Inst::Mul(r, ref v_) => {
                     let v = self.eval_val(v_);
-                    let rv = self.regs.get(&r).unwrap().clone();
+                    let rv = *self.regs.get(&r).unwrap();
                     self.regs.insert(r, rv * v);
                     self.mulc += 1;
                 }
-                &Inst::Jnz(ref cv_, ref ov_) => {
+                Inst::Jnz(ref cv_, ref ov_) => {
                     let cv = self.eval_val(cv_);
                     let ov = self.eval_val(ov_);
                     if cv != 0 {
@@ -139,13 +139,13 @@ impl VM {
     }
 }
 
-fn problem1(input: &Vec<Inst>) -> usize {
+fn problem1(input: &[Inst]) -> usize {
     let mut vm = VM::new(input);
     vm.run();
     vm.mulc
 }
 
-fn problem2(input: &Vec<Inst>) -> usize {
+fn problem2(input: &[Inst]) -> usize {
     // we're shortcircuiting...
     let b = match input[0] {
         Inst::Set(_, Val::Num(i)) => i,

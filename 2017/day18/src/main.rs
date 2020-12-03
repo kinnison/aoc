@@ -97,25 +97,25 @@ struct VM {
 }
 
 impl VM {
-    fn new(input: &Vec<Inst>) -> VM {
+    fn new(input: &[Inst]) -> VM {
         let mut vm = VM {
             regs: HashMap::new(),
-            inst: input.clone(),
+            inst: input.to_vec(),
             pc: 0,
             lastsnd: 0,
             lastrcv: 0,
             sent: 0,
         };
         for i in 0..26 {
-            vm.regs.insert((('a' as u8) + i) as char, 0);
+            vm.regs.insert((b'a' + i) as char, 0);
         }
         vm
     }
 
     fn eval_val(&self, val: &Val) -> i64 {
         match val {
-            &Val::Reg(c) => self.regs.get(&c).unwrap().clone(),
-            &Val::Num(i) => i,
+            Val::Reg(c) => *self.regs.get(c).unwrap(),
+            Val::Num(i) => *i,
         }
     }
 
@@ -124,30 +124,30 @@ impl VM {
             let inst: &Inst = &self.inst[self.pc];
             let mut nextpc = self.pc + 1;
             match inst {
-                &Inst::Snd(ref v_) => {
+                Inst::Snd(ref v_) => {
                     let v = self.eval_val(v_);
                     self.lastsnd = v;
                 }
-                &Inst::Set(r, ref v_) => {
+                Inst::Set(r, ref v_) => {
                     let v = self.eval_val(v_);
-                    self.regs.insert(r, v);
+                    self.regs.insert(*r, v);
                 }
-                &Inst::Add(r, ref v_) => {
+                Inst::Add(r, ref v_) => {
                     let v = self.eval_val(v_);
-                    let rv = self.regs.get(&r).unwrap().clone();
-                    self.regs.insert(r, rv + v);
+                    let rv = *self.regs.get(&r).unwrap();
+                    self.regs.insert(*r, rv + v);
                 }
-                &Inst::Mul(r, ref v_) => {
+                Inst::Mul(r, ref v_) => {
                     let v = self.eval_val(v_);
-                    let rv = self.regs.get(&r).unwrap().clone();
-                    self.regs.insert(r, rv * v);
+                    let rv = *self.regs.get(&r).unwrap();
+                    self.regs.insert(*r, rv * v);
                 }
-                &Inst::Mod(r, ref v_) => {
+                Inst::Mod(r, ref v_) => {
                     let v = self.eval_val(v_);
-                    let rv = self.regs.get(&r).unwrap().clone();
-                    self.regs.insert(r, rv % v);
+                    let rv = *self.regs.get(&r).unwrap();
+                    self.regs.insert(*r, rv % v);
                 }
-                &Inst::Rcv(ref v_) => {
+                Inst::Rcv(ref v_) => {
                     let v = self.eval_val(v_);
                     if v != 0 {
                         self.lastrcv = self.lastsnd;
@@ -156,7 +156,7 @@ impl VM {
                         }
                     }
                 }
-                &Inst::Jgz(ref cv_, ref ov_) => {
+                Inst::Jgz(ref cv_, ref ov_) => {
                     let cv = self.eval_val(cv_);
                     let ov = self.eval_val(ov_);
                     if cv > 0 {
@@ -172,43 +172,43 @@ impl VM {
         while self.pc < self.inst.len() {
             let inst: &Inst = &self.inst[self.pc];
             let mut nextpc = self.pc + 1;
-            match inst {
-                &Inst::Snd(ref v_) => {
+            match *inst {
+                Inst::Snd(ref v_) => {
                     let v = self.eval_val(v_);
                     out.push(v);
                     self.sent += 1;
                 }
-                &Inst::Set(r, ref v_) => {
+                Inst::Set(r, ref v_) => {
                     let v = self.eval_val(v_);
                     self.regs.insert(r, v);
                 }
-                &Inst::Add(r, ref v_) => {
+                Inst::Add(r, ref v_) => {
                     let v = self.eval_val(v_);
-                    let rv = self.regs.get(&r).unwrap().clone();
+                    let rv = *self.regs.get(&r).unwrap();
                     self.regs.insert(r, rv + v);
                 }
-                &Inst::Mul(r, ref v_) => {
+                Inst::Mul(r, ref v_) => {
                     let v = self.eval_val(v_);
-                    let rv = self.regs.get(&r).unwrap().clone();
+                    let rv = *self.regs.get(&r).unwrap();
                     self.regs.insert(r, rv * v);
                 }
-                &Inst::Mod(r, ref v_) => {
+                Inst::Mod(r, ref v_) => {
                     let v = self.eval_val(v_);
-                    let rv = self.regs.get(&r).unwrap().clone();
+                    let rv = *self.regs.get(&r).unwrap();
                     self.regs.insert(r, rv % v);
                 }
-                &Inst::Rcv(ref v_) => {
-                    let r = match v_ {
-                        &Val::Reg(rn) => rn,
+                Inst::Rcv(ref v_) => {
+                    let r = match *v_ {
+                        Val::Reg(rn) => rn,
                         _ => panic!("Attempted to rcv to non-reg"),
                     };
-                    if inc.len() == 0 {
+                    if inc.is_empty() {
                         return false;
                     }
                     let v = inc.remove(0);
                     self.regs.insert(r, v);
                 }
-                &Inst::Jgz(ref cv_, ref ov_) => {
+                Inst::Jgz(ref cv_, ref ov_) => {
                     let cv = self.eval_val(cv_);
                     let ov = self.eval_val(ov_);
                     if cv > 0 {
@@ -218,17 +218,17 @@ impl VM {
             }
             self.pc = nextpc;
         }
-        return true;
+        true
     }
 }
 
-fn problem1(input: &Vec<Inst>) -> i64 {
+fn problem1(input: &[Inst]) -> i64 {
     let mut vm = VM::new(input);
     vm.run(true);
     vm.lastrcv
 }
 
-fn problem2(input: &Vec<Inst>) -> usize {
+fn problem2(input: &[Inst]) -> usize {
     let mut vm0 = VM::new(input);
     let mut vm1 = VM::new(input);
     vm1.regs.insert('p', 1);
@@ -238,21 +238,19 @@ fn problem2(input: &Vec<Inst>) -> usize {
     let mut from1to0 = Vec::new();
     while !(finished0 || finished1) {
         if !finished0 {
+            #[allow(clippy::if_same_then_else)]
             if vm0.run2(&mut from0to1, &mut from1to0) {
                 finished0 = true;
-            } else {
-                if from0to1.len() == 0 && from1to0.len() == 0 {
-                    finished0 = true;
-                }
+            } else if from0to1.is_empty() && from1to0.is_empty() {
+                finished0 = true;
             }
         }
         if !finished1 {
+            #[allow(clippy::if_same_then_else)]
             if vm1.run2(&mut from1to0, &mut from0to1) {
                 finished1 = true;
-            } else {
-                if from0to1.len() == 0 && from1to0.len() == 0 {
-                    finished1 = true;
-                }
+            } else if from0to1.is_empty() && from1to0.is_empty() {
+                finished1 = true;
             }
         }
     }

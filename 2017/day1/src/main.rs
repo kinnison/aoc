@@ -13,10 +13,10 @@ fn load_instructions() -> Vec<u32> {
             ret.push(digit.to_digit(10).unwrap());
         }
     }
-    return ret;
+    ret
 }
 
-fn problem1(input: &Vec<u32>) -> u32 {
+fn problem1(input: &[u32]) -> u32 {
     let mut sum: u32 = 0;
     for i in 0..input.len() - 1 {
         if input[i] == input[i + 1] {
@@ -29,7 +29,7 @@ fn problem1(input: &Vec<u32>) -> u32 {
     sum
 }
 
-fn problem2(input: &Vec<u32>) -> u32 {
+fn problem2(input: &[u32]) -> u32 {
     let mut sum: u32 = 0;
     let skip = input.len() >> 1;
     let l = input.len();
