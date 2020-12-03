@@ -147,11 +147,8 @@ impl Group {
 fn load_instructions() -> Group {
     let infile = File::open("input").unwrap();
     let freader = BufReader::new(&infile);
-    for line_ in freader.lines() {
-        let line = line_.unwrap();
-        return Group::parse(&line);
-    }
-    unreachable!()
+    let line = freader.lines().next().unwrap().unwrap();
+    Group::parse(&line)
 }
 
 fn run_test(input: &str, grps: usize, score: usize) {

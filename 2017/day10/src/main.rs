@@ -34,11 +34,8 @@ fn load_instr2_from(s: &str) -> Vec<usize> {
 fn load_instructions_2() -> Vec<usize> {
     let infile = File::open("input").unwrap();
     let freader = BufReader::new(&infile);
-    for line_ in freader.lines() {
-        let line = line_.unwrap();
-        return load_instr2_from(&line);
-    }
-    unreachable!()
+    let line = freader.lines().next().unwrap().unwrap();
+    load_instr2_from(&line)
 }
 
 struct KnotHash {

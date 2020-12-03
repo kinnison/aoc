@@ -5,11 +5,7 @@ use std::io::BufReader;
 fn load_compressed() -> String {
     let infile = File::open("day9.input").unwrap();
     let freader = BufReader::new(&infile);
-    for line_ in freader.lines() {
-        let line = line_.unwrap();
-        return line.to_string();
-    }
-    unreachable!();
+    freader.lines().next().unwrap().unwrap()
 }
 
 fn len_compressed(compr_: &String, recurse: bool) -> usize {

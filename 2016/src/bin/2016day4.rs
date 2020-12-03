@@ -27,20 +27,21 @@ impl Room {
         if !RE.is_match(&t_) {
             panic!(t_);
         }
-        for cap in RE.captures_iter(&t_) {
-            let ref name = cap.get(1);
-            let ref sector = cap.get(2);
-            let ref check = cap.get(3);
+        if let Some(cap) = RE.captures_iter(&t_).next() {
+            let name = cap.get(1);
+            let sector = cap.get(2);
+            let check = cap.get(3);
             let sectornum: u32 = sector.unwrap().as_str().parse().unwrap();
-            return Room {
+            Room {
                 label: t_.clone(),
                 name: name.unwrap().as_str().to_string(),
                 sector: sector.unwrap().as_str().to_string(),
                 check: check.unwrap().as_str().to_string(),
-                sectornum: sectornum,
-            };
+                sectornum,
+            }
+        } else {
+            panic!("Unable to construct room!")
         }
-        panic!("Unable to construct room!")
     }
 
     fn is_valid(&self) -> bool {

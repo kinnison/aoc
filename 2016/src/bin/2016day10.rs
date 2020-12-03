@@ -140,38 +140,34 @@ impl Instruction {
             )
             .unwrap();
         }
-        if GIVE_RE.is_match(l) {
-            for cap in GIVE_RE.captures_iter(l) {
-                let val_ = cap.get(1).unwrap();
-                let bot_ = cap.get(2).unwrap();
-                let val: usize = val_.as_str().parse().unwrap();
-                let bot: usize = bot_.as_str().parse().unwrap();
-                return Instruction::Give(val, bot);
-            }
+        if let Some(cap) = GIVE_RE.captures_iter(l).next() {
+            let val_ = cap.get(1).unwrap();
+            let bot_ = cap.get(2).unwrap();
+            let val: usize = val_.as_str().parse().unwrap();
+            let bot: usize = bot_.as_str().parse().unwrap();
+            Instruction::Give(val, bot)
         } else {
-            for cap in PROG_RE.captures_iter(l) {
-                let bot_ = cap.get(1).unwrap();
-                let what1 = cap.get(2).unwrap();
-                let n1_ = cap.get(3).unwrap();
-                let what2 = cap.get(4).unwrap();
-                let n2_ = cap.get(5).unwrap();
-                let bot: usize = bot_.as_str().parse().unwrap();
-                let n1: usize = n1_.as_str().parse().unwrap();
-                let n2: usize = n2_.as_str().parse().unwrap();
-                let goal1 = if what1.as_str().len() == 3 {
-                    Goal::Bot(n1)
-                } else {
-                    Goal::Output(n1)
-                };
-                let goal2 = if what2.as_str().len() == 3 {
-                    Goal::Bot(n2)
-                } else {
-                    Goal::Output(n2)
-                };
-                return Instruction::Prog(bot, goal1, goal2);
-            }
+            let cap = PROG_RE.captures_iter(l).next().unwrap();
+            let bot_ = cap.get(1).unwrap();
+            let what1 = cap.get(2).unwrap();
+            let n1_ = cap.get(3).unwrap();
+            let what2 = cap.get(4).unwrap();
+            let n2_ = cap.get(5).unwrap();
+            let bot: usize = bot_.as_str().parse().unwrap();
+            let n1: usize = n1_.as_str().parse().unwrap();
+            let n2: usize = n2_.as_str().parse().unwrap();
+            let goal1 = if what1.as_str().len() == 3 {
+                Goal::Bot(n1)
+            } else {
+                Goal::Output(n1)
+            };
+            let goal2 = if what2.as_str().len() == 3 {
+                Goal::Bot(n2)
+            } else {
+                Goal::Output(n2)
+            };
+            Instruction::Prog(bot, goal1, goal2)
         }
-        unreachable!();
     }
 }
 

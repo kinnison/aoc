@@ -30,6 +30,7 @@ struct Floor {
     chips: HashSet<Isotope>,
 }
 
+#[allow(clippy::derive_hash_xor_eq)]
 impl Hash for Floor {
     fn hash<H: Hasher>(&self, state: &mut H) {
         let mut carries = self.all_carries();
@@ -117,6 +118,7 @@ struct Move {
     carry2: Carry,
 }
 
+#[allow(clippy::derive_hash_xor_eq)]
 #[derive(Debug, Clone, Eq, Hash)]
 struct RTGFacility {
     liftat: usize,

@@ -50,56 +50,45 @@ impl Instr {
             }
         }
 
-        if CPY_I_RE.is_match(&t_) {
-            for cap in CPY_I_RE.captures_iter(&t_) {
-                let ref val_ = cap.get(1);
-                let ref reg_ = cap.get(2);
-                let reg = reg_from(reg_.unwrap().as_str());
-                let val: i32 = val_.unwrap().as_str().parse().unwrap();
-                return Instr::CpyI(val, reg);
+        if let Some(cap) = CPY_I_RE.captures_iter(&t_).next() {
+            let val_ = cap.get(1);
+            let reg_ = cap.get(2);
+            let reg = reg_from(reg_.unwrap().as_str());
+            let val: i32 = val_.unwrap().as_str().parse().unwrap();
+            Instr::CpyI(val, reg)
+        } else if let Some(cap) = CPY_R_RE.captures_iter(&t_).next() {
+            let regi_ = cap.get(1);
+            let rego_ = cap.get(2);
+            let regi = reg_from(regi_.unwrap().as_str());
+            let rego = reg_from(rego_.unwrap().as_str());
+            Instr::CpyR(regi, rego)
+        } else if let Some(cap) = INC_RE.captures_iter(&t_).next() {
+            let reg_ = cap.get(1);
+            let reg = reg_from(reg_.unwrap().as_str());
+            Instr::Inc(reg)
+        } else if let Some(cap) = DEC_RE.captures_iter(&t_).next() {
+            let reg_ = cap.get(1);
+            let reg = reg_from(reg_.unwrap().as_str());
+            Instr::Dec(reg)
+        } else if let Some(cap) = JNZ_R_RE.captures_iter(&t_).next() {
+            let reg_ = cap.get(1);
+            let val_ = cap.get(2);
+            let reg = reg_from(reg_.unwrap().as_str());
+            let val: i32 = val_.unwrap().as_str().parse().unwrap();
+            Instr::Jnz(reg, val)
+        } else if let Some(cap) = JNZ_I_RE.captures_iter(&t_).next() {
+            let tst_ = cap.get(1);
+            let val_ = cap.get(2);
+            let val: i32 = val_.unwrap().as_str().parse().unwrap();
+            let tst: i32 = tst_.unwrap().as_str().parse().unwrap();
+            if tst != 0 {
+                Instr::Jmp(val)
+            } else {
+                Instr::Nop
             }
-        } else if CPY_R_RE.is_match(&t_) {
-            for cap in CPY_R_RE.captures_iter(&t_) {
-                let ref regi_ = cap.get(1);
-                let ref rego_ = cap.get(2);
-                let regi = reg_from(regi_.unwrap().as_str());
-                let rego = reg_from(rego_.unwrap().as_str());
-                return Instr::CpyR(regi, rego);
-            }
-        } else if INC_RE.is_match(&t_) {
-            for cap in INC_RE.captures_iter(&t_) {
-                let ref reg_ = cap.get(1);
-                let reg = reg_from(reg_.unwrap().as_str());
-                return Instr::Inc(reg);
-            }
-        } else if DEC_RE.is_match(&t_) {
-            for cap in DEC_RE.captures_iter(&t_) {
-                let ref reg_ = cap.get(1);
-                let reg = reg_from(reg_.unwrap().as_str());
-                return Instr::Dec(reg);
-            }
-        } else if JNZ_R_RE.is_match(&t_) {
-            for cap in JNZ_R_RE.captures_iter(&t_) {
-                let ref reg_ = cap.get(1);
-                let ref val_ = cap.get(2);
-                let reg = reg_from(reg_.unwrap().as_str());
-                let val: i32 = val_.unwrap().as_str().parse().unwrap();
-                return Instr::Jnz(reg, val);
-            }
-        } else if JNZ_I_RE.is_match(&t_) {
-            for cap in JNZ_I_RE.captures_iter(&t_) {
-                let ref tst_ = cap.get(1);
-                let ref val_ = cap.get(2);
-                let val: i32 = val_.unwrap().as_str().parse().unwrap();
-                let tst: i32 = tst_.unwrap().as_str().parse().unwrap();
-                if tst != 0 {
-                    return Instr::Jmp(val);
-                } else {
-                    return Instr::Nop;
-                }
-            }
+        } else {
+            panic!(t_);
         }
-        panic!(t_);
     }
 }
 

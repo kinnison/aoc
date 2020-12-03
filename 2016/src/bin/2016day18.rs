@@ -3,14 +3,8 @@ fn gen_row(prev: &Vec<bool>) -> Vec<bool> {
     let l = prev.len();
     for n in 0..l {
         let left = if n == 0 { false } else { prev[n - 1] };
-        let center = prev[n];
         let right = if n == (l - 1) { false } else { prev[n + 1] };
-        ret.push(
-            (left && center && !right)
-                || (center && right && !left)
-                || (left && !center && !right)
-                || (right && !center && !left),
-        );
+        ret.push((!left && right) || (left && !right));
     }
     ret
 }
