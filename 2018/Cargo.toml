@@ -5,7 +5,7 @@ authors = ["Daniel Silverstone <daniel.silverstone@codethink.co.uk>"]
 edition = "2018"
 
 [dependencies]
-md5="0.6.0"
+md5="0.7.0"
 regex="1"
 lazy_static="1.2"
 permutohedron="0.2.4"

@@ -6,4 +6,4 @@ authors = ["Daniel Silverstone <dsilvers@digital-scurf.org>"]
 [dependencies]
 regex = "1"
 lazy_static = "~1"
-primal = "0.2"
+primal = "0.3"
