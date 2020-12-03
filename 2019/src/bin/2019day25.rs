@@ -34,8 +34,8 @@ fn parse_room(vm: &mut intcode::VM) -> Result<(String, Vec<Direction>, Vec<Strin
     let mut doors = Vec::new();
     while !output.is_empty() {
         let line = output.remove(0);
-        if line.starts_with("- ") {
-            let dir = Direction::from_str(&line[2..])?;
+        if let Some(end) = line.strip_prefix("- ") {
+            let dir = Direction::from_str(end)?;
             doors.push(dir);
         } else {
             break; // Finished doors
@@ -51,8 +51,8 @@ fn parse_room(vm: &mut intcode::VM) -> Result<(String, Vec<Direction>, Vec<Strin
         if line == "Items here:" {
             while !output.is_empty() {
                 let line = output.remove(0);
-                if line.starts_with("- ") {
-                    items.push(line[2..].to_string());
+                if let Some(end) = line.strip_prefix("- ") {
+                    items.push(end.to_string());
                 } else {
                     break;
                 }

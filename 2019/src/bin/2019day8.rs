@@ -15,7 +15,7 @@ fn part1(input: &str) -> Result<usize> {
         })
         .collect();
     assert!(!layers.is_empty());
-    layers.sort();
+    layers.sort_unstable();
     Ok(layers[0].1)
 }
 

@@ -27,10 +27,7 @@ impl CellKind {
     }
 
     fn is_open(self) -> bool {
-        match self {
-            Passable => true,
-            _ => false,
-        }
+        matches!(self, Passable)
     }
 }
 
