@@ -19,38 +19,23 @@ impl Cell {
     }
 
     fn is_alive(&self) -> bool {
-        match self {
-            Blocked | Passable => false,
-            _ => true,
-        }
+        !matches!(self, Blocked | Passable)
     }
 
     fn is_elf(&self) -> bool {
-        match self {
-            Elf { .. } => true,
-            _ => false,
-        }
+        matches!(self, Elf { .. })
     }
 
     fn is_goblin(&self) -> bool {
-        match self {
-            Goblin { .. } => true,
-            _ => false,
-        }
+        matches!(self, Goblin { .. })
     }
 
     fn is_passable(&self) -> bool {
-        match self {
-            Passable => true,
-            _ => false,
-        }
+        matches!(self, Passable)
     }
 
     fn is_cave(&self) -> bool {
-        match self {
-            Blocked => true,
-            _ => false,
-        }
+        matches!(self, Blocked)
     }
 
     fn is_hostile(&self, is_elf: bool) -> bool {
@@ -254,7 +239,7 @@ impl Cave {
             .iter()
             .map(|&p| (self.cells[p].hp(), p))
             .collect();
-        enemies.sort();
+        enemies.sort_unstable();
         if enemies.is_empty() {
             return;
         }

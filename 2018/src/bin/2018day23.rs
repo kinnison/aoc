@@ -80,7 +80,7 @@ fn part2(inputs: &[Nanobot]) -> i32 {
     }
     // Find the most common range start by sorting the map by pos
     let mut poss: Vec<(i32, i32)> = occurrence.drain().collect();
-    poss.sort();
+    poss.sort_unstable();
     // And then scanning, maintaining a running total
     let mut total = 0;
     let mut best = 0;
@@ -93,12 +93,7 @@ fn part2(inputs: &[Nanobot]) -> i32 {
         }
     }
     // Finally we find the position immediately after that best start
-    let best_end = poss
-        .iter()
-        .skip_while(|e| e.0 <= best_start)
-        .next()
-        .expect("Oddness!")
-        .0;
+    let best_end = poss.iter().find(|e| e.0 > best_start).expect("Oddness!").0;
     // The result is one back from the best_end to put it back in the
     // range of the nanobot
     best_end - 1

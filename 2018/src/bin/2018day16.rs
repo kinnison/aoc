@@ -140,22 +140,13 @@ enum InputLine {
 
 impl InputLine {
     fn is_before(&self) -> bool {
-        match self {
-            InputLine::Before(_, _, _, _) => true,
-            _ => false,
-        }
+        matches!(self, InputLine::Before(_, _, _, _))
     }
     fn is_instr(&self) -> bool {
-        match self {
-            InputLine::Instr(_, _, _, _) => true,
-            _ => false,
-        }
+        matches!(self, InputLine::Instr(_, _, _, _))
     }
     fn is_after(&self) -> bool {
-        match self {
-            InputLine::After(_, _, _, _) => true,
-            _ => false,
-        }
+        matches!(self, InputLine::After(_, _, _, _))
     }
 
     fn get_args(&self) -> (i32, i32, i32) {
@@ -265,7 +256,7 @@ fn part2(input: &[InputLine]) -> Result<i32> {
         for i in 0..16 {
             let opset = opmap.get_mut(&i).expect("Oddness!");
             if opset.len() == 1 {
-                dropops.push(opset.iter().next().expect("Oddness!").clone());
+                dropops.push(*opset.iter().next().expect("Oddness!"));
             }
         }
         let mut reduced = 0;

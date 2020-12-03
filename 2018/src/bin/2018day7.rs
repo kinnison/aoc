@@ -26,7 +26,7 @@ fn part1(input: &[Dependency]) -> Result<String> {
         steps_left.insert(dep.after);
     }
     let mut steps_todo: Vec<char> = steps_left.iter().cloned().collect();
-    steps_todo.sort();
+    steps_todo.sort_unstable();
 
     while !steps_todo.is_empty() {
         // In each iteration, try and find a step which we can do,
@@ -66,7 +66,7 @@ fn part2(input: &[Dependency], worker_count: usize, overhead: usize) -> Result<(
         steps_left.insert(dep.after);
     }
     let mut steps_todo: Vec<char> = steps_left.iter().cloned().collect();
-    steps_todo.sort();
+    steps_todo.sort_unstable();
     let mut workers: Vec<(char, usize)> = Vec::new();
     workers.resize(worker_count, ('A', 0));
     let mut working: usize = 0;

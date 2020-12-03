@@ -91,6 +91,7 @@ impl Grid {
         let mut nearest_dist = std::usize::MAX;
         for (n, p) in self.points.iter().enumerate() {
             let dist = manhattan_distance(x, y, p.x, p.y);
+            #[allow(clippy::comparison_chain)]
             if dist == nearest_dist {
                 nearest = None;
             } else if dist < nearest_dist {

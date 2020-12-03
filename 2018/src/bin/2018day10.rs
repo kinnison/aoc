@@ -114,6 +114,7 @@ fn find_best(input: &[MessagePoint]) {
         grid.tick();
         seconds += 1;
         let grsize = grid.size();
+        #[allow(clippy::comparison_chain)]
         if grsize < bestsize {
             bestsize = grsize;
         } else if grsize > bestsize {
