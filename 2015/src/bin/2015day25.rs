@@ -21,7 +21,7 @@ impl Iterator for PosGen {
     fn next(&mut self) -> Option<Self::Item> {
         if self.row == 1 {
             // Reset to col1 on the next row down
-            self.last = self.last + 1;
+            self.last += 1;
             self.row = self.last;
             self.col = 1;
         } else {

@@ -14,7 +14,7 @@ fn part2(red: &Value, input: &Value) -> f64 {
         Value::Number(n) => n.as_f64().unwrap(),
         Value::Array(ref v) => v.iter().map(|v| part2(red, v)).sum(),
         Value::Object(ref m) => {
-            if m.values().find(|&v| v == red).is_some() {
+            if m.values().any(|v| v == red) {
                 0.0
             } else {
                 m.values().map(|v| part2(red, v)).sum()

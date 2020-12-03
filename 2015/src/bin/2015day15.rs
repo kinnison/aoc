@@ -53,12 +53,13 @@ impl Pantry {
         }
     }
 
-    fn score_cookie(&self, recipe: &Vec<i32>) -> i32 {
+    fn score_cookie(&self, recipe: &[i32]) -> i32 {
         assert!(recipe.len() == self.ingredients.len());
         let mut capacity = 0;
         let mut durability = 0;
         let mut flavor = 0;
         let mut texture = 0;
+        #[allow(clippy::clippy::needless_range_loop)]
         for i in 0..recipe.len() {
             capacity += recipe[i] * self.ingredients[i].capacity;
             durability += recipe[i] * self.ingredients[i].durability;
@@ -80,13 +81,14 @@ impl Pantry {
         capacity * durability * flavor * texture
     }
 
-    fn calories(&self, recipe: &Vec<i32>) -> i32 {
+    fn calories(&self, recipe: &[i32]) -> i32 {
         assert!(recipe.len() == self.ingredients.len());
-        let mut calories = 0;
-        for i in 0..recipe.len() {
-            calories += recipe[i] * self.ingredients[i].calories;
-        }
-        calories
+        recipe
+            .iter()
+            .copied()
+            .zip(self.ingredients.iter().map(|i| i.calories))
+            .map(|(r, c)| r * c)
+            .sum()
     }
 
     fn dump(&self) {

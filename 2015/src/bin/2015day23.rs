@@ -86,16 +86,16 @@ impl VM {
     fn run_instruction(&mut self, instr: &Instr) {
         match instr {
             Instr::Hlf { ref reg } => match reg {
-                Reg::A => self.reg_a = self.reg_a >> 1,
-                Reg::B => self.reg_b = self.reg_b >> 1,
+                Reg::A => self.reg_a >>= 1,
+                Reg::B => self.reg_b >>= 1,
             },
             Instr::Tpl { ref reg } => match reg {
-                Reg::A => self.reg_a = self.reg_a * 3,
-                Reg::B => self.reg_b = self.reg_b * 3,
+                Reg::A => self.reg_a *= 3,
+                Reg::B => self.reg_b *= 3,
             },
             Instr::Inc { ref reg } => match reg {
-                Reg::A => self.reg_a = self.reg_a + 1,
-                Reg::B => self.reg_b = self.reg_b + 1,
+                Reg::A => self.reg_a += 1,
+                Reg::B => self.reg_b += 1,
             },
             Instr::Jmp { ofs } => self.pc += ofs - 1,
             Instr::Jie { ref reg, ofs } => {
@@ -121,20 +121,20 @@ impl VM {
         self.pc += 1;
     }
 
-    fn run_program(&mut self, prog: &Vec<Instr>) {
+    fn run_program(&mut self, prog: &[Instr]) {
         while self.pc >= 0 && self.pc < (prog.len() as i32) {
             self.run_instruction(&prog[self.pc as usize]);
         }
     }
 }
 
-fn part1(input: &Vec<Instr>) -> usize {
+fn part1(input: &[Instr]) -> usize {
     let mut vm = VM::new();
     vm.run_program(input);
     vm.reg_b
 }
 
-fn part2(input: &Vec<Instr>) -> usize {
+fn part2(input: &[Instr]) -> usize {
     let mut vm = VM::new();
     vm.reg_a = 1;
     vm.run_program(input);

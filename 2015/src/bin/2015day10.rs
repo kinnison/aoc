@@ -8,7 +8,7 @@ struct LookAndSay {
 impl LookAndSay {
     fn from_str(value: &str) -> LookAndSay {
         LookAndSay {
-            value: value.trim().bytes().map(|ch| ch - ('0' as u8)).collect(),
+            value: value.trim().bytes().map(|ch| ch - b'0').collect(),
         }
     }
 

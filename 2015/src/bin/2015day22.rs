@@ -123,9 +123,9 @@ impl GameState {
             if self.recharge > 0 {
                 print!(" recharge={}", self.recharge);
             }
-            println!("");
+            println!();
         }
-        println!("");
+        println!();
     }
 
     fn run_timers(&mut self) {
@@ -209,7 +209,7 @@ impl GameState {
             ret.push(Spell::Recharge.cast(&basegame));
         }
 
-        if ret.len() > 0 {
+        if !ret.is_empty() {
             Left(ret)
         } else {
             Right(None) // Player dies, can't cast any spells
@@ -261,7 +261,7 @@ fn play_game(base: &GameState) -> Vec<Option<i32>> {
     let mut results = HashSet::new();
     let mut turns = full_turn(&base);
     //let mut goes = 0;
-    while turns.len() > 0 {
+    while !turns.is_empty() {
         //println!("************************************************************************");
         //println!("Gathered {} turns", turns.len());
         let curs: Vec<Either<GameState, Option<i32>>> = turns.drain(..).collect();

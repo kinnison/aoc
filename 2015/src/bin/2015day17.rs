@@ -1,9 +1,10 @@
 use aoc2015::*;
 
-fn part1(input: &Vec<usize>, target: usize) -> usize {
+fn part1(input: &[usize], target: usize) -> usize {
     let mut totmet = 0;
     for v in 0..(1 << input.len()) {
         let mut combo = 0;
+        #[allow(clippy::clippy::needless_range_loop)]
         for ent in 0..input.len() {
             if (v & (1 << ent)) != 0 {
                 combo += input[ent];
@@ -16,7 +17,8 @@ fn part1(input: &Vec<usize>, target: usize) -> usize {
     totmet
 }
 
-fn part2(input: &Vec<usize>, target: usize) -> usize {
+#[allow(clippy::clippy::needless_range_loop)]
+fn part2(input: &[usize], target: usize) -> usize {
     let mut ctrcount = input.len() + 1;
     let mut totmet = 0;
     for v in 0..(1 << input.len()) {
@@ -28,6 +30,7 @@ fn part2(input: &Vec<usize>, target: usize) -> usize {
                 combo += input[ent];
             }
         }
+        #[allow(clippy::comparison_chain)]
         if combo == target {
             if ctrs < ctrcount {
                 ctrcount = ctrs;

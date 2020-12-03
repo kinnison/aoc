@@ -153,7 +153,7 @@ fn part1(input: &Vec<usize>) -> u128 {
 
 */
 
-fn part1(input: &Vec<usize>) -> u128 {
+fn part1(input: &[usize]) -> u128 {
     // First up, find the minimum length grouping which adds to our goal
     let gift_sum: usize = input.iter().sum();
     let goal_weight: usize = gift_sum / 3;
@@ -162,7 +162,7 @@ fn part1(input: &Vec<usize>) -> u128 {
         println!("Considering footgroups of size {}", group_len);
         let mut bestqe = std::u128::MAX;
         for combo in input.iter().combinations(group_len) {
-            let combo_sum: usize = combo.iter().map(|&v| v).sum();
+            let combo_sum: usize = combo.iter().copied().sum();
             if combo_sum == goal_weight {
                 let qe: u128 = combo.into_iter().map(|&v| v as u128).product();
                 if qe < bestqe {
@@ -177,7 +177,7 @@ fn part1(input: &Vec<usize>) -> u128 {
     unreachable!()
 }
 
-fn part2(input: &Vec<usize>) -> u128 {
+fn part2(input: &[usize]) -> u128 {
     // First up, find the minimum length grouping which adds to our goal
     let gift_sum: usize = input.iter().sum();
     let goal_weight: usize = gift_sum / 4;
@@ -186,7 +186,7 @@ fn part2(input: &Vec<usize>) -> u128 {
         println!("Considering footgroups of size {}", group_len);
         let mut bestqe = std::u128::MAX;
         for combo in input.iter().combinations(group_len) {
-            let combo_sum: usize = combo.iter().map(|&v| v).sum();
+            let combo_sum: usize = combo.iter().copied().sum();
             if combo_sum == goal_weight {
                 let qe: u128 = combo.into_iter().map(|&v| v as u128).product();
                 if qe < bestqe {

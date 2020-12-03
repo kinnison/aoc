@@ -67,6 +67,7 @@ impl Instruction {
         }
     }
 
+    #[allow(clippy::needless_range_loop)]
     fn apply1(&self, lights: &mut [[bool; 1000]; 1000]) {
         for x in self.x1..=self.x2 {
             for y in self.y1..=self.y2 {
@@ -79,20 +80,21 @@ impl Instruction {
         }
     }
 
+    #[allow(clippy::needless_range_loop)]
     fn apply2(&self, lights: &mut [[usize; 1000]; 1000]) {
         for x in self.x1..=self.x2 {
             for y in self.y1..=self.y2 {
                 match self.op {
-                    Op::TurnOn => lights[y][x] = lights[y][x] + 1,
+                    Op::TurnOn => lights[y][x] += 1,
                     Op::TurnOff => lights[y][x] = lights[y][x].saturating_sub(1),
-                    Op::Toggle => lights[y][x] = lights[y][x] + 2,
+                    Op::Toggle => lights[y][x] += 2,
                 }
             }
         }
     }
 }
 
-fn part1(input: &Vec<Instruction>) -> usize {
+fn part1(input: &[Instruction]) -> usize {
     let mut lights = [[false; 1000]; 1000];
     for instr in input {
         instr.apply1(&mut lights);
@@ -108,7 +110,7 @@ fn part1(input: &Vec<Instruction>) -> usize {
     tot
 }
 
-fn part2(input: &Vec<Instruction>) -> usize {
+fn part2(input: &[Instruction]) -> usize {
     let mut lights = [[0usize; 1000]; 1000];
     for instr in input {
         instr.apply2(&mut lights);

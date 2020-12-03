@@ -66,7 +66,7 @@ impl Grid {
                     print!(".")
                 }
             }
-            println!("");
+            println!();
         }
     }
 

@@ -54,10 +54,8 @@ impl Sue {
                     if value >= amount {
                         okay = false
                     }
-                } else {
-                    if value != amount {
-                        okay = false
-                    }
+                } else if value != amount {
+                    okay = false
                 }
             }
         }
@@ -80,7 +78,7 @@ fn reading() -> HashMap<String, usize> {
     known
 }
 
-fn part1(input: &Vec<Sue>) -> usize {
+fn part1(input: &[Sue]) -> usize {
     let known = reading();
     for sue in input.iter() {
         if sue.matches(&known) {
@@ -90,7 +88,7 @@ fn part1(input: &Vec<Sue>) -> usize {
     unreachable!()
 }
 
-fn part2(input: &Vec<Sue>) -> usize {
+fn part2(input: &[Sue]) -> usize {
     let known = reading();
     for sue in input.iter() {
         if sue.matches2(&known) {

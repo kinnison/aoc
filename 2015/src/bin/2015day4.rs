@@ -1,5 +1,4 @@
 use aoc2015::*;
-use md5;
 use std::io::Result;
 
 fn run(input: &str, mstr: &str) -> usize {

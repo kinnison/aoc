@@ -1,7 +1,7 @@
 use aoc2015::*;
 use std::io::Result;
 
-fn part1(input: &Vec<String>) -> usize {
+fn part1(input: &[String]) -> usize {
     fn is_nice(input: &str) -> bool {
         // It contains at least three vowels (aeiou only), like aei, xazegov, or aeiouaeiouaeiou.
         if input
@@ -29,13 +29,13 @@ fn part1(input: &Vec<String>) -> usize {
             }
         }
 
-        return found_pair;
+        found_pair
     }
 
     input.iter().filter(|s| is_nice(s)).count()
 }
 
-fn part2(input: &Vec<String>) -> usize {
+fn part2(input: &[String]) -> usize {
     fn is_nice(input: &str) -> bool {
         // It contains a pair of any two letters that appears at least twice in the string without overlapping, like xyxy (xy) or aabcdefgaa (aa), but not like aaa (aa, but it overlaps).
         let mut got_pair = false;

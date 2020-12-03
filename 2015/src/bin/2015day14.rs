@@ -39,7 +39,7 @@ impl Reindeer {
     }
 }
 
-fn part1(input: &Vec<Reindeer>, time: usize) -> usize {
+fn part1(input: &[Reindeer], time: usize) -> usize {
     let mut maxdist = std::usize::MIN;
     for deer in input {
         let pos = deer.position_at_time(time);
@@ -50,7 +50,7 @@ fn part1(input: &Vec<Reindeer>, time: usize) -> usize {
     maxdist
 }
 
-fn part2(input: &Vec<Reindeer>, racelen: usize) -> usize {
+fn part2(input: &[Reindeer], racelen: usize) -> usize {
     let mut scores: Vec<usize> = Vec::new();
     scores.resize(input.len(), 0);
     for second in 1..=racelen {

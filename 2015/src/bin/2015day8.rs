@@ -52,7 +52,7 @@ impl Sticks {
     }
 }
 
-fn part1(input: &Vec<Sticks>) -> usize {
+fn part1(input: &[Sticks]) -> usize {
     let mut totcode = 0;
     let mut totlen = 0;
     for stick in input {
@@ -62,7 +62,7 @@ fn part1(input: &Vec<Sticks>) -> usize {
     totcode - totlen
 }
 
-fn part2(input: &Vec<Sticks>) -> usize {
+fn part2(input: &[Sticks]) -> usize {
     let mut enclen = 0;
     let mut codelen = 0;
     for stick in input {

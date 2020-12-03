@@ -1,6 +1,6 @@
 use aoc2015::*;
 
-const WEAPONS: [(&'static str, i32, i32, i32); 5] = [
+const WEAPONS: [(&str, i32, i32, i32); 5] = [
     ("Dagger", 8, 4, 0),
     ("Shortsword", 10, 5, 0),
     ("Warhammer", 25, 6, 0),
@@ -8,7 +8,7 @@ const WEAPONS: [(&'static str, i32, i32, i32); 5] = [
     ("Greataxe", 74, 8, 0),
 ];
 
-const ARMORS: [(&'static str, i32, i32, i32); 5] = [
+const ARMORS: [(&str, i32, i32, i32); 5] = [
     ("Leather", 13, 0, 1),
     ("Chainmail", 31, 0, 2),
     ("Splintmail", 53, 0, 3),
@@ -16,7 +16,7 @@ const ARMORS: [(&'static str, i32, i32, i32); 5] = [
     ("Platemail", 102, 0, 5),
 ];
 
-const RINGS: [(&'static str, i32, i32, i32); 6] = [
+const RINGS: [(&str, i32, i32, i32); 6] = [
     ("Damage +1", 25, 1, 0),
     ("Damage +2", 50, 2, 0),
     ("Damage +3", 100, 3, 0),
@@ -238,25 +238,21 @@ fn test_fight() {
     );
 }
 
-fn part1(boss: &Boss, players: &Vec<Player>) -> i32 {
+fn part1(boss: &Boss, players: &[Player]) -> i32 {
     let mut leastcost = std::i32::MAX;
     for player in players {
-        if player_wins(player, boss, 100) {
-            if player.cost < leastcost {
-                leastcost = player.cost;
-            }
+        if player_wins(player, boss, 100) && player.cost < leastcost {
+            leastcost = player.cost;
         }
     }
     leastcost
 }
 
-fn part2(boss: &Boss, players: &Vec<Player>) -> i32 {
+fn part2(boss: &Boss, players: &[Player]) -> i32 {
     let mut mostcost = std::i32::MIN;
     for player in players {
-        if !player_wins(player, boss, 100) {
-            if player.cost > mostcost {
-                mostcost = player.cost;
-            }
+        if !player_wins(player, boss, 100) && player.cost > mostcost {
+            mostcost = player.cost;
         }
     }
     mostcost

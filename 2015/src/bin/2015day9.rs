@@ -31,12 +31,9 @@ impl Map {
     fn insert(&mut self, first: String, second: String, dist: usize) {
         self.routes
             .entry(first.clone())
-            .or_insert(HashMap::new())
+            .or_default()
             .insert(second.clone(), dist);
-        self.routes
-            .entry(second)
-            .or_insert(HashMap::new())
-            .insert(first, dist);
+        self.routes.entry(second).or_default().insert(first, dist);
     }
 
     fn all_locations(&self) -> Vec<&str> {
@@ -48,10 +45,7 @@ impl Map {
     }
 
     fn dist(&self, first: &str, second: &str) -> Option<usize> {
-        self.routes
-            .get(first)
-            .and_then(|m| m.get(second))
-            .and_then(|r| Some(*r))
+        self.routes.get(first).and_then(|m| m.get(second)).copied()
     }
 }
 

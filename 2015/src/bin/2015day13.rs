@@ -18,10 +18,10 @@ impl HappyTracker {
                 let who = cap.get(1).unwrap().as_str().to_owned();
                 let by = cap.get(4).unwrap().as_str().to_owned();
                 let mut amt: i32 = cap.get(3).unwrap().as_str().parse().unwrap();
-                if cap.get(2).unwrap().as_str().chars().next().unwrap() == 'l' {
+                if cap.get(2).unwrap().as_str().starts_with('l') {
                     amt = -amt;
                 }
-                (*ret.changes.entry(who).or_insert(HashMap::new())).insert(by, amt);
+                ret.changes.entry(who).or_default().insert(by, amt);
             } else {
                 panic!("Unable to parse: {}", line);
             }
@@ -33,7 +33,7 @@ impl HappyTracker {
         self.changes.keys().collect()
     }
 
-    fn happiness_of(&self, layout: &Vec<&String>) -> i32 {
+    fn happiness_of(&self, layout: &[&String]) -> i32 {
         layout
             .iter()
             .cycle()
@@ -47,7 +47,7 @@ impl HappyTracker {
     }
 
     fn add_myself(&mut self) {
-        let others: Vec<String> = self.changes.keys().map(|s| s.clone()).collect();
+        let others: Vec<String> = self.changes.keys().cloned().collect();
         self.changes.insert("@".to_owned(), HashMap::new());
         for other in others.into_iter() {
             self.changes

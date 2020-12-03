@@ -160,7 +160,7 @@ impl Gate {
     }
 }
 
-fn part1(input: &Vec<Gate>) -> u16 {
+fn part1(input: &[Gate]) -> u16 {
     let mut wires = HashMap::new();
     loop {
         let mut applied = true;
@@ -175,9 +175,9 @@ fn part1(input: &Vec<Gate>) -> u16 {
     wires["a"]
 }
 
-fn part2(input: &Vec<Gate>) -> u16 {
+fn part2(input: &[Gate]) -> u16 {
     let val_a = part1(&input);
-    let newinput = input
+    let newinput: Vec<_> = input
         .iter()
         .map(|gate| match gate {
             Gate::Assign { val: _, wire } => {

@@ -8,7 +8,7 @@ struct Password {
 impl Password {
     fn from_str(input: &str) -> Password {
         Password {
-            inner: input.trim().bytes().map(|ch| ch - ('a' as u8)).collect(),
+            inner: input.trim().bytes().map(|ch| ch - b'a').collect(),
         }
     }
 
@@ -64,10 +64,7 @@ impl Password {
     }
 
     fn as_string(&self) -> String {
-        self.inner
-            .iter()
-            .map(|ch| (ch + ('a' as u8)) as char)
-            .collect()
+        self.inner.iter().map(|ch| (ch + b'a') as char).collect()
     }
 }
 

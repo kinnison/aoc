@@ -26,7 +26,7 @@ impl Input {
                 }
             }
         }
-        assert!(ret.molecule.is_some() && ret.repls.len() > 0);
+        assert!(ret.molecule.is_some() && !ret.repls.is_empty());
         ret
     }
 

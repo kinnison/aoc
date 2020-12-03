@@ -16,13 +16,13 @@ impl Gift {
 
     fn smallest_side(&self) -> usize {
         let mut sized = [self.length, self.width, self.height];
-        sized.sort();
+        sized.sort_unstable();
         sized[0] * sized[1]
     }
 
     fn ribbon(&self) -> usize {
         let mut sized = [self.length, self.width, self.height];
-        sized.sort();
+        sized.sort_unstable();
         ((sized[0] + sized[1]) * 2) + (sized[0] * sized[1] * sized[2])
     }
 }
@@ -40,14 +40,14 @@ fn parse_input(input: &str) -> Vec<Gift> {
     ret
 }
 
-fn part1(input: &Vec<Gift>) -> usize {
+fn part1(input: &[Gift]) -> usize {
     input
         .iter()
         .map(|g| g.surface_area() + g.smallest_side())
         .sum()
 }
 
-fn part2(input: &Vec<Gift>) -> usize {
+fn part2(input: &[Gift]) -> usize {
     input.iter().map(|g| g.ribbon()).sum()
 }
 
