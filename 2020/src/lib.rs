@@ -12,6 +12,7 @@ pub use std::collections::HashSet;
 pub use std::convert::{TryFrom, TryInto};
 pub use std::fmt;
 pub use std::iter::successors;
+pub use std::str::FromStr;
 
 pub use permutohedron::Heap;
 
@@ -92,6 +93,21 @@ pub fn input_as_lists<T: ParseByRegex, S: AsRef<str>>(input: S) -> Result<Vec<Ve
 pub fn read_input_as_lists<T: ParseByRegex>(day: usize) -> Result<Vec<Vec<T>>> {
     let plain = read_input(day)?;
     Ok(input_as_lists(plain)?)
+}
+
+pub fn input_by_split_pat<T: ParseByRegex, S: AsRef<str>>(input: S, pat: &str) -> Result<Vec<T>> {
+    let mapped: Result<Vec<T>> = input
+        .as_ref()
+        .trim()
+        .split(pat)
+        .map(ParseByRegex::parse_by_regex)
+        .collect();
+    Ok(mapped?)
+}
+
+pub fn read_input_as_vec_split<T: ParseByRegex>(day: usize, pat: &str) -> Result<Vec<T>> {
+    let plain = read_input(day)?;
+    input_by_split_pat(plain, pat)
 }
 
 // 2020 specific stuff

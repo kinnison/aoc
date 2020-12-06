@@ -1,8 +1,18 @@
+use std::convert::Infallible;
+
 use aoc2020::*;
 
 struct CustomsForm {
     answers: HashMap<char, usize>,
     people: usize,
+}
+
+impl FromStr for CustomsForm {
+    type Err = Infallible;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        Ok(CustomsForm::load(s))
+    }
 }
 
 impl CustomsForm {
@@ -63,26 +73,19 @@ b"#;
 
     #[test]
     fn testcase1() {
-        let input: Vec<_> = TEST_INPUT
-            .split("\n\n")
-            .map(|s| CustomsForm::load(s))
-            .collect();
+        let input: Vec<_> = input_by_split_pat(TEST_INPUT, "\n\n").unwrap();
         assert_eq!(part1(&input), 11);
     }
 
     #[test]
     fn testcase2() {
-        let input: Vec<_> = TEST_INPUT
-            .split("\n\n")
-            .map(|s| CustomsForm::load(s))
-            .collect();
+        let input: Vec<_> = input_by_split_pat(TEST_INPUT, "\n\n").unwrap();
         assert_eq!(part2(&input), 6);
     }
 }
 
 fn main() -> Result<()> {
-    let input: String = read_input(6)?;
-    let input: Vec<_> = input.split("\n\n").map(|s| CustomsForm::load(s)).collect();
+    let input = read_input_as_vec_split(6, "\n\n")?;
     println!("Part 1: {}", part1(&input));
     println!("Part 2: {}", part2(&input));
     Ok(())
