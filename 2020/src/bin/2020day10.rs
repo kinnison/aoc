@@ -49,81 +49,21 @@ fn part2(input: &[u32]) -> u64 {
         .filter_map(|(v, l)| if v == 1 && l > 1 { Some(l) } else { None })
         .collect();
     println!("{:?}", runs);
-    // If we have a run of 1 then we can remove nothing, so there's 1 combination
-    // If we have a run of 2 then we can remove at most 1 and so there are 2
-    // possibilties.
-    // a b
-    //   b
-    // A run of 3 we could remove either of the first 2, or both
-    // so there are 4 possibilities.
-    // a b c
-    // two ways to remove 1
-    //   b c
-    // a   c
-    // one way to remove 2
-    //     c
-    // A run of 4 is more complex since we can remove any number of runs
-    // such that there are no gaps of more than 2 (leading to a 3 in the output)
-    // remove nothing
-    // a b c d
-    // three ways to remove 1
-    //   b c d
-    // a   c d
-    // a b   d
-    // two ways to remove 2
-    //     c d
-    // a     d
-    // This is 6 possibilities
-    // Nominally this gives us a sequence of 1,2,4,6
-    // which naively looks like multiples of 2, so let's try run of 5
-    // there's one where we do nothing
-    // a b c d e
-    // four possible removals of 1 entry
-    //   b c d e
-    // a   c d e
-    // a b   d e
-    // a b c   e
-    // some six ways to remove 2 entries
-    //     c d e
-    //   b   d e
-    //   b c   e
-    // a     d e
-    // a   c   e
-    // a b     e
-    // And two ways to remove 3 entries
-    //     c   e
-    //   b     e
-    // And no way to remove 3 or more
-    // For a total of 12
-    // Now we have 1,2,4,6,12 which no longer looks like multiples of 2
-    // for a sequence of n, we always have 1 for unchanged, n-1 for one elision.
-    // Removal of 2 entries sequence is 0,0,1,2,3
-    // Let's longhand out sequences of 6 1s
-    // one unchanged
-    // a b c d e f
-    // five ways to remove 1, let's not write them out
-    // ten ways to remove 2
-    //     c d e f
-    //   b   d e f
-    //   b c   e f
-    //   b c d   f
-    // a     d e f
-    // a   c   e f
-    // a   c d   f
-    // a b     e f
-    // a b   d   f
-    // a b c     f
-    // three ways to remove 3
-    //     c   e f
-    //     c d   f
-    // a     d   f
-    // one way to remove 4
-    //     c     f
-    // For a total of 20
-    // 1,2,4,6,12,20
 
-    // naively we multiple 2^(n-1) for all runs
-    runs.into_iter().map(|n| 2u64.pow(n - 1)).product()
+    // for runs of 1, there's only 1 way to do it (keep)
+    // for runs of 2, there's 2 ways (keep or remove first)
+    // for runs of 3, there's 4 ways (keep or remove each of first 2)
+    // for runs of 4, there's 7 ways (keep or remove first, or keep first one, keep or remove subsequent 2)
+    // by inspection, we don't have runs > 4 in our input, so try multiplying by that
+    runs.into_iter()
+        .map(|n| match n {
+            1 => 1,
+            2 => 2,
+            3 => 4,
+            4 => 7,
+            _ => unimplemented!(),
+        })
+        .product()
 }
 
 #[cfg(test)]
