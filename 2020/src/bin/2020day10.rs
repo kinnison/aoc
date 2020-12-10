@@ -48,22 +48,24 @@ fn part2(input: &[u32]) -> u64 {
         // but we only care about the runs of 1s of 2 or more
         .filter_map(|(v, l)| if v == 1 && l > 1 { Some(l) } else { None })
         .collect();
-    println!("{:?}", runs);
 
+    // for runs of 0, there's nothing to do, so keep it (1)
     // for runs of 1, there's only 1 way to do it (keep)
     // for runs of 2, there's 2 ways (keep or remove first)
     // for runs of 3, there's 4 ways (keep or remove each of first 2)
-    // for runs of 4, there's 7 ways (keep or remove first, or keep first one, keep or remove subsequent 2)
-    // by inspection, we don't have runs > 4 in our input, so try multiplying by that
-    runs.into_iter()
-        .map(|n| match n {
-            1 => 1,
+    // for runs of 4, there's 7 ways (keep or remove first, or keep first one, keep or remove subsequent 2, or remove first and third)
+    // 1,1,2,4,7 looks like the tribonnacci sequence, let's test that by
+    // thinking about runs of 5 there can indeed only be 13 ways, so let's assume
+    // tribonnacci and make this generic rather than a horrid match
+    fn trib(n: u32) -> u64 {
+        match n {
+            0 | 1 => 1,
             2 => 2,
-            3 => 4,
-            4 => 7,
-            _ => unimplemented!(),
-        })
-        .product()
+            n => trib(n - 1) + trib(n - 2) + trib(n - 3),
+        }
+    }
+
+    runs.into_iter().map(trib).product()
 }
 
 #[cfg(test)]
