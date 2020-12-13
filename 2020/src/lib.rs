@@ -3,6 +3,7 @@ use std::fs::read_to_string;
 pub type StdResult<T, E> = std::result::Result<T, E>;
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
+pub use gcd::Gcd;
 pub use lazy_static::lazy_static;
 pub use regex::Regex;
 pub use std::cmp::{max, min, Ordering};
@@ -108,6 +109,27 @@ pub fn input_by_split_pat<T: ParseByRegex, S: AsRef<str>>(input: S, pat: &str) -
 pub fn read_input_as_vec_split<T: ParseByRegex>(day: usize, pat: &str) -> Result<Vec<T>> {
     let plain = read_input(day)?;
     input_by_split_pat(plain, pat)
+}
+
+pub fn input_as_first_and_vec_by_pat<T: ParseByRegex, S: AsRef<str>>(
+    input: S,
+    pat: &str,
+) -> Result<(String, Vec<T>)> {
+    let input = input.as_ref().trim();
+    let mut bits = input.splitn(2, '\n');
+    let first = bits.next().ok_or("No lines")?;
+    let rest = bits.next().ok_or("Only one line?")?;
+    let first = first.to_string();
+    let rest = input_by_split_pat(rest, pat)?;
+    Ok((first, rest))
+}
+
+pub fn read_input_as_first_and_vec_by_pat<T: ParseByRegex>(
+    day: usize,
+    pat: &str,
+) -> Result<(String, Vec<T>)> {
+    let plain = read_input(day)?;
+    input_as_first_and_vec_by_pat(plain, pat)
 }
 
 // 2020 specific stuff
