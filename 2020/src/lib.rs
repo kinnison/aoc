@@ -1,4 +1,7 @@
-use std::fs::read_to_string;
+use std::{
+    fs::read_to_string,
+    ops::{Div, Mul},
+};
 
 pub type StdResult<T, E> = std::result::Result<T, E>;
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -242,6 +245,23 @@ impl XYPosition {
             })
             .rotate_right(deg - 90)
         }
+    }
+}
+
+pub trait Lcm {
+    type Output;
+    fn lcm(self, other: Self) -> Self::Output;
+}
+
+impl<T> Lcm for T
+where
+    T: Copy + Gcd + Mul<T>,
+    <T as Mul<T>>::Output: Div<T>,
+{
+    type Output = <<T as Mul>::Output as Div<T>>::Output;
+
+    fn lcm(self, other: Self) -> Self::Output {
+        (self * other) / self.gcd(other)
     }
 }
 
