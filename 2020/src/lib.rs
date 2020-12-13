@@ -111,3 +111,126 @@ pub fn read_input_as_vec_split<T: ParseByRegex>(day: usize, pat: &str) -> Result
 }
 
 // 2020 specific stuff
+
+#[derive(ParseByRegex, Copy, Clone, PartialEq, Eq, Debug)]
+pub enum Facing {
+    #[regex = "[Nn]"]
+    North,
+    #[regex = "[Ee]"]
+    East,
+    #[regex = "[Ss]"]
+    South,
+    #[regex = "[Ww]"]
+    West,
+}
+
+impl Facing {
+    fn turn_left(self) -> Self {
+        match self {
+            Self::North => Self::West,
+            Self::East => Self::North,
+            Self::South => Self::East,
+            Self::West => Self::South,
+        }
+    }
+
+    fn turn_right(self) -> Self {
+        match self {
+            Self::North => Self::East,
+            Self::East => Self::South,
+            Self::South => Self::West,
+            Self::West => Self::North,
+        }
+    }
+
+    pub fn turn_left_deg(mut self, mut deg: i32) -> Self {
+        if deg < 0 {
+            self.turn_right_deg(-deg)
+        } else {
+            while deg > 0 {
+                self = self.turn_left();
+                deg -= 90;
+            }
+            self
+        }
+    }
+
+    pub fn turn_right_deg(mut self, mut deg: i32) -> Self {
+        if deg < 0 {
+            self.turn_left_deg(-deg)
+        } else {
+            while deg > 0 {
+                self = self.turn_right();
+                deg -= 90;
+            }
+            self
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Default)]
+pub struct XYPosition {
+    pub x: i32,
+    pub y: i32,
+}
+
+impl XYPosition {
+    pub fn moved(self, dir: Facing, amount: i32) -> Self {
+        let delts = match dir {
+            Facing::North => (0, 1),
+            Facing::East => (1, 0),
+            Facing::South => (0, -1),
+            Facing::West => (-1, 0),
+        };
+        Self {
+            x: self.x + (delts.0 * amount),
+            y: self.y + (delts.1 * amount),
+        }
+    }
+
+    pub fn origin_manhattan(&self) -> i32 {
+        self.x.abs() + self.y.abs()
+    }
+
+    #[allow(clippy::clippy::comparison_chain)]
+    pub fn rotate_left(self, deg: i32) -> Self {
+        if deg == 0 {
+            self
+        } else if deg < 0 {
+            self.rotate_right(-deg)
+        } else {
+            (XYPosition {
+                x: -self.y,
+                y: self.x,
+            })
+            .rotate_left(deg - 90)
+        }
+    }
+
+    #[allow(clippy::clippy::comparison_chain)]
+    pub fn rotate_right(self, deg: i32) -> Self {
+        if deg == 0 {
+            self
+        } else if deg < 0 {
+            self.rotate_left(-deg)
+        } else {
+            (XYPosition {
+                x: self.y,
+                y: -self.x,
+            })
+            .rotate_right(deg - 90)
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn posrot() {
+        let pos = XYPosition { x: 10, y: 1 };
+        assert_eq!(pos, pos.rotate_left(360));
+        assert_eq!(pos.rotate_left(180), pos.rotate_right(180));
+    }
+}
