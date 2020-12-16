@@ -82,9 +82,9 @@ fn part2(input: &Puzzle) -> usize {
         .collect();
     println!("Possible tickets are: {:?}", possibles);
     // For each ticket, we need to determine what rules might apply.
-    let all_sets: Vec<Vec<HashSet<usize>>> = input
-        .nearby_tickets
-        .iter()
+    let all_sets: Vec<Vec<HashSet<usize>>> = possibles
+        .into_iter()
+        .map(|n| &input.nearby_tickets[n])
         .map(|t| {
             // for the ticket t, return the set of rules which match each value
             t.iter()
