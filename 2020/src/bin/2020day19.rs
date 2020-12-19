@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+
 use aoc2020::*;
 
 #[derive(Debug)]
@@ -10,6 +12,7 @@ enum Rule {
 
 struct Ruleset {
     rules: HashMap<usize, Rule>,
+    min_lens: RefCell<HashMap<usize, usize>>,
 }
 
 impl FromStr for Ruleset {
@@ -39,20 +42,51 @@ impl FromStr for Ruleset {
             };
             rules.insert(rulenum, rule);
         }
-        Ok(Self { rules })
+        let ret = Self {
+            rules,
+            min_lens: RefCell::new(HashMap::new()),
+        };
+
+        ret.compute_min_len(0);
+
+        Ok(ret)
     }
 }
 
 impl Ruleset {
-    fn regex_string(&self) -> String {
+    fn regex_string(&self, maxlen: usize) -> String {
         let mut ret = String::new();
         ret.push('^');
-        self._regex_string(&mut ret, 0);
+        self._regex_string(&mut ret, 0, maxlen);
         ret.push('$');
         ret
     }
 
-    fn _regex_string(&self, acc: &mut String, rule: usize) {
+    fn compute_min_len(&self, rule: usize) -> usize {
+        if self.min_lens.borrow().contains_key(&rule) {
+            return *self.min_lens.borrow().get(&rule).unwrap();
+        }
+        let len = match self.rules.get(&rule).unwrap() {
+            Rule::Terminal(_) => 1,
+            Rule::Recurse(alts) => alts
+                .iter()
+                .map(|alt| alt.iter().map(|r| self.compute_min_len(*r)).sum())
+                .max()
+                .unwrap(),
+            Rule::Repeat(sub) => self.compute_min_len(*sub),
+            Rule::Matched(first, second) => {
+                self.compute_min_len(*first) + self.compute_min_len(*second)
+            }
+        };
+        self.min_lens.borrow_mut().insert(rule, len);
+        len
+    }
+
+    fn min_len_of(&self, rule: usize) -> usize {
+        *self.min_lens.borrow().get(&rule).unwrap()
+    }
+
+    fn _regex_string(&self, acc: &mut String, rule: usize, maxlen: usize) {
         match self.rules.get(&rule).unwrap() {
             Rule::Terminal(c) => acc.push(*c),
             Rule::Recurse(alts) => {
@@ -60,7 +94,7 @@ impl Ruleset {
                     let mut alt = String::new();
                     subs.iter()
                         .copied()
-                        .for_each(|n| self._regex_string(&mut alt, n));
+                        .for_each(|n| self._regex_string(&mut alt, n, maxlen));
                     alt
                 });
                 acc.push_str("(?:");
@@ -71,106 +105,30 @@ impl Ruleset {
                 acc.pop(); // remove last |
                 acc.push(')');
             }
-            _ => unimplemented!(),
-        }
-    }
-
-    fn is_match(&self, s: &str) -> bool {
-        // We are implementing a backtracking solver...
-        println!("!!! Trying to match {}", s);
-        self.try_match(s, 0, 0) == Some("")
-    }
-
-    // Try to match the rule to the start of s, if successful
-    // return the rest of s, otherwise None
-    fn try_match<'a>(&self, s: &'a str, rule: usize, pfx: usize) -> Option<&'a str> {
-        print!("{:width$}", "", width = pfx);
-        println!("Trying to match {}: {:?}", rule, self.rules[&rule]);
-        match &self.rules[&rule] {
-            Rule::Terminal(c) => {
-                if s.starts_with(*c) {
-                    print!("{:width$}", "", width = pfx);
-                    println!("Matched");
-                    Some(&s[1..])
-                } else {
-                    print!("{:width$}", "", width = pfx);
-                    println!("Nope");
-                    None
-                }
-            }
-            Rule::Recurse(alt) => {
-                let mut alt_n = 0;
-                loop {
-                    if alt_n == alt.len() {
-                        print!("{:width$}", "", width = pfx);
-                        println!("Ran out of alts");
-                        break None;
-                    }
-                    let alt = &alt[alt_n];
-                    let mut rs = s;
-                    let mut ok = true;
-                    print!("{:width$}", "", width = pfx);
-                    println!("Considering alt: {:?}", alt);
-                    for rule in alt.iter().copied() {
-                        if let Some(rest) = self.try_match(rs, rule, pfx + 1) {
-                            rs = rest;
-                        } else {
-                            print!("{:width$}", "", width = pfx);
-                            println!("Failed at rule {}", rule);
-                            ok = false;
-                            break;
-                        }
-                    }
-                    if ok {
-                        print!("{:width$}", "", width = pfx);
-                        println!("Matched alt {}!", alt_n);
-                        break Some(rs);
-                    }
-                    alt_n += 1;
-                }
-            }
             Rule::Repeat(n) => {
-                let mut rs = s;
-                let mut count = 0;
-                while let Some(rest) = self.try_match(s, *n, pfx + 1) {
-                    rs = rest;
-                    count += 1;
-                }
-                if rs == s {
-                    print!("{:width$}", "", width = pfx);
-                    println!("Found none");
-                    None
-                } else {
-                    print!("{:width$}", "", width = pfx);
-                    println!("Found {}", count);
-                    Some(rs)
-                }
+                acc.push_str("(?:");
+                self._regex_string(acc, *n, maxlen);
+                acc.push_str(")+");
             }
             Rule::Matched(first, second) => {
-                let mut rs = s;
-                let mut count = 0;
-                while let Some(rest) = self.try_match(s, *first, pfx + 1) {
-                    rs = rest;
-                    count += 1;
-                }
-                print!("{:width$}", "", width = pfx);
-                println!("Found {} of opening", count);
-                if count == 0 {
-                    None
-                } else {
-                    let mut count2 = 0;
-                    while let Some(rest) = self.try_match(s, *second, pfx + 1) {
-                        rs = rest;
-                        count2 += 1;
+                let mut first_str = String::new();
+                self._regex_string(&mut first_str, *first, maxlen);
+                let mut second_str = String::new();
+                self._regex_string(&mut second_str, *second, maxlen);
+                acc.push_str("(?:");
+                let totlen = self.min_len_of(*first) + self.min_len_of(*second);
+                let maxrep = (maxlen + totlen - 1) / totlen;
+                for n in 1..=maxrep {
+                    for _ in 1..=n {
+                        acc.push_str(&first_str)
                     }
-                    print!("{:width$}", "", width = pfx);
-                    println!("Found {} of closing", count2);
-                    if count == count2 {
-                        Some(rs)
-                    } else {
-                        None
+                    for _ in 1..=n {
+                        acc.push_str(&second_str)
                     }
+                    acc.push('|');
                 }
+                acc.pop(); //last |
+                acc.push(')');
             }
         }
     }
@@ -196,8 +154,12 @@ impl FromStr for Puzzle {
 
 fn part1(input: &Puzzle) -> usize {
     // Build a regexp representing the puzzle and then test all the goals
-    let rex = input.rules.regex_string();
-    let rex = Regex::new(&rex).unwrap();
+    let maxlen = input.goals.iter().map(|s| s.len()).max().unwrap();
+    let rex = input.rules.regex_string(maxlen);
+    let rex = RegexBuilder::new(&rex)
+        .size_limit(104857600)
+        .build()
+        .unwrap();
     input.goals.iter().filter(|s| rex.is_match(s)).count()
 }
 
@@ -212,19 +174,11 @@ fn part2(mut input: Puzzle) -> usize {
     // 11: 42 31 | 42 11 31
     // The 8 rule becomes 8+ which is pretty simple to encode in a regex
     // but the 11 rule becomes a counting pattern which is more of a parsing
-    // operation, so we basically end up replacing those with custom matching
-    // rules
+    // operation, so we basically end up replacing those with custom expressions
+    // which cannot exceed the length of a given input
     input.rules.rules.insert(8, Rule::Repeat(42));
     input.rules.rules.insert(11, Rule::Matched(42, 31));
-    input
-        .goals
-        .iter()
-        .filter(|s| {
-            let b = input.rules.is_match(s);
-            unreachable!();
-            b
-        })
-        .count()
+    part1(&input)
 }
 
 #[cfg(test)]

@@ -9,7 +9,7 @@ pub type Result<T> = std::result::Result<T, GenError>;
 
 pub use gcd::Gcd;
 pub use lazy_static::lazy_static;
-pub use regex::Regex;
+pub use regex::{Regex, RegexBuilder};
 pub use std::cmp::{max, min, Ordering};
 pub use std::collections::hash_map::Entry;
 pub use std::collections::HashMap;
