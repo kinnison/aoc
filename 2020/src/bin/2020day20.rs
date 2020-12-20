@@ -1,4 +1,4 @@
-use std::convert::{identity, Infallible};
+use std::convert::Infallible;
 
 use aoc2020::*;
 
@@ -161,12 +161,10 @@ impl Grid {
     }
 
     fn place_tile(&mut self, row: usize, col: usize, tile: &RawTile) {
-        println!("Place tile at {} {}", row, col);
         for trow in 1..9 {
             for tcol in 1..9 {
                 let gridrow = row + trow - 1;
                 let gridcol = col + tcol - 1;
-                println!("Pixel from {} {} into {} {}", trow, tcol, gridrow, gridcol);
                 self.data[gridrow * self.width + gridcol] = tile.pixel(trow, tcol);
             }
         }
@@ -351,7 +349,6 @@ fn part2(input: &[RawTile]) -> usize {
             // We need to fit adjid next to thisid, to do that we need to determine
             // which edge matches
             let grid = grids.get_mut(&adjid).unwrap();
-            println!("Try to fit {} next to {}", adjid, thisid);
             for i in 0..8 {
                 let found = if thistop == grid.bottom() {
                     // We've found grid above thistile
@@ -369,15 +366,12 @@ fn part2(input: &[RawTile]) -> usize {
                     None
                 };
                 if let Some(pos) = found {
-                    println!("Fitted it at {:?}", pos);
                     grid_to_pos.insert(adjid, pos);
                     pos_to_grid.insert(pos, adjid);
                     break;
                 }
-                println!("Rotate");
                 grid.rotate();
                 if i == 3 {
-                    println!("Flip");
                     grid.flip();
                 }
             }
@@ -389,34 +383,29 @@ fn part2(input: &[RawTile]) -> usize {
     let minrow = pos_to_grid
         .keys()
         .copied()
-        .map(|(row, col)| row)
+        .map(|(row, _)| row)
         .min()
         .unwrap();
     let maxrow = pos_to_grid
         .keys()
         .copied()
-        .map(|(row, col)| row)
+        .map(|(row, _)| row)
         .max()
         .unwrap();
     let mincol = pos_to_grid
         .keys()
         .copied()
-        .map(|(row, col)| col)
+        .map(|(_, col)| col)
         .min()
         .unwrap();
     let maxcol = pos_to_grid
         .keys()
         .copied()
-        .map(|(row, col)| col)
+        .map(|(_, col)| col)
         .max()
         .unwrap();
-    println!(
-        "Grid runs from ({},{}) to ({},{})",
-        minrow, mincol, maxrow, maxcol
-    );
     let gridcols = (maxcol - mincol + 1) * 8;
     let gridrows = (maxrow - minrow + 1) * 8;
-    println!("That makes the grid {}x{} pixels", gridrows, gridcols);
     let mut grid = Grid::new(gridcols as usize, gridrows as usize);
     for (pos, gridid) in pos_to_grid {
         let tile = &grids[&gridid];
@@ -424,19 +413,12 @@ fn part2(input: &[RawTile]) -> usize {
         let tilecol = pos.1 - mincol;
         let gridrow = tilerow * 8;
         let gridcol = tilecol * 8;
-        println!(
-            "Attempt to place {} from {:?} at {},{}",
-            gridid, pos, gridrow, gridcol
-        );
         grid.place_tile(gridrow as usize, gridcol as usize, tile);
     }
     grid.rotate();
-    println!("{}", grid);
     let monster = Grid::monster();
-    println!("{}", monster);
     for i in 0..8 {
         let monsters = grid.count_of(&monster);
-        println!("Found {} monsters in this orientation", monsters);
         if monsters > 0 {
             return grid.count_set() - (monster.count_set() * monsters);
         }
