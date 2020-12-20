@@ -112,7 +112,7 @@ pub fn input_by_split_pat<T: ParseByRegex, S: AsRef<str>>(input: S, pat: &str) -
 
 pub fn read_input_as_vec_split<T: ParseByRegex>(day: usize, pat: &str) -> Result<Vec<T>> {
     let plain = read_input(day)?;
-    input_by_split_pat(plain, pat)
+    Ok(input_by_split_pat(plain, pat)?)
 }
 
 pub fn input_as_first_and_vec_by_pat<T: ParseByRegex, S: AsRef<str>>(
