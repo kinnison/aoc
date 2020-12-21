@@ -14,9 +14,10 @@ pub use std::cmp::{max, min, Ordering};
 pub use std::collections::hash_map::Entry;
 pub use std::collections::HashMap;
 pub use std::collections::HashSet;
-pub use std::convert::{TryFrom, TryInto};
+pub use std::convert::{Infallible, TryFrom, TryInto};
 pub use std::fmt;
 pub use std::iter::successors;
+pub use std::ops::{Deref, DerefMut};
 pub use std::str::FromStr;
 
 pub use permutohedron::Heap;
@@ -134,6 +135,58 @@ pub fn read_input_as_first_and_vec_by_pat<T: ParseByRegex>(
 ) -> Result<(String, Vec<T>)> {
     let plain = read_input(day)?;
     input_as_first_and_vec_by_pat(plain, pat)
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct SpacedString(Vec<String>);
+
+impl FromStr for SpacedString {
+    type Err = Infallible;
+
+    fn from_str(value: &str) -> StdResult<Self, Self::Err> {
+        let v = input_by_split_pat(value, " ").unwrap();
+        Ok(Self(v))
+    }
+}
+
+impl Deref for SpacedString {
+    type Target = Vec<String>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for SpacedString {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct CommaSpacedString(Vec<String>);
+
+impl FromStr for CommaSpacedString {
+    type Err = Infallible;
+
+    fn from_str(value: &str) -> StdResult<Self, Self::Err> {
+        let v = input_by_split_pat(value, ", ").unwrap();
+        Ok(Self(v))
+    }
+}
+
+impl Deref for CommaSpacedString {
+    type Target = Vec<String>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for CommaSpacedString {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
 }
 
 // 2020 specific stuff
