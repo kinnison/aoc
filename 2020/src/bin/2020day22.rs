@@ -1,9 +1,21 @@
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
+
 use aoc2020::*;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 struct Decks {
     p1: VecDeque<u8>,
     p2: VecDeque<u8>,
+}
+
+impl Decks {
+    fn fpr(&self) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        self.p1.hash(&mut hasher);
+        self.p2.hash(&mut hasher);
+        hasher.finish()
+    }
 }
 
 impl FromStr for Decks {
@@ -60,11 +72,12 @@ fn recursive_game(mut game: Decks) -> (u8, Decks) {
     // During a recursive game, we can't repeat arrangements
     let mut seen = HashSet::new();
     while !(game.p1.is_empty() || game.p2.is_empty()) {
-        if seen.contains(&game) {
+        let fpr = game.fpr();
+        if seen.contains(&fpr) {
             // We've seen this arrangement before, p1 wins by default
             return (1, game);
         }
-        seen.insert(game.clone());
+        seen.insert(fpr);
         // Okay, unique arrangement, play a round...
         let p1card = game.p1.pop_front().unwrap() as usize;
         let p2card = game.p2.pop_front().unwrap() as usize;
