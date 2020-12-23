@@ -35,12 +35,12 @@ fn parse_expr(s: &str) -> Result<Vec<Part>> {
     Ok(ret)
 }
 
-fn expr_to_postfix(mut input: impl Iterator<Item = Part>) -> Vec<Part> {
+fn expr_to_postfix(input: impl Iterator<Item = Part>) -> Vec<Part> {
     let mut ret = Vec::new();
     let mut opstack = Vec::new();
     for part in input {
         match part {
-            Number(n) => {
+            Number(_) => {
                 //println!("Emit1: {}", n);
                 ret.push(part);
             }
@@ -89,7 +89,6 @@ fn expr_to_postfix(mut input: impl Iterator<Item = Part>) -> Vec<Part> {
                     }
                 }
             }
-            _ => unreachable!(),
         }
     }
     while let Some(op) = opstack.pop() {
