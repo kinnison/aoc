@@ -1,3 +1,4 @@
+#![allow(clippy::needless_question_mark)]
 use std::{
     fs::read_to_string,
     ops::{Div, Mul},
@@ -271,7 +272,7 @@ impl XYPosition {
         self.x.abs() + self.y.abs()
     }
 
-    #[allow(clippy::clippy::comparison_chain)]
+    #[allow(clippy::comparison_chain)]
     pub fn rotate_left(self, deg: i32) -> Self {
         if deg == 0 {
             self
@@ -286,7 +287,7 @@ impl XYPosition {
         }
     }
 
-    #[allow(clippy::clippy::comparison_chain)]
+    #[allow(clippy::comparison_chain)]
     pub fn rotate_right(self, deg: i32) -> Self {
         if deg == 0 {
             self
