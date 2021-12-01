@@ -48,7 +48,7 @@ impl Node {
         self.size - self.used
     }
 
-    #[allow(clippy::clippy::if_same_then_else, clippy::needless_bool)]
+    #[allow(clippy::if_same_then_else, clippy::needless_bool)]
     fn viable_with(&self, other: &Node) -> bool {
         // A node is 'Viable' with another node iff:
         // self is not empty
