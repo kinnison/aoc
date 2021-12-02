@@ -12,22 +12,26 @@ enum Command {
 
 fn part1(input: &[Command]) -> i32 {
     // horiz, vert
-    let pos = input.iter().fold((0, 0), |acc, v| match v {
-        Command::Forward(n) => (acc.0 + n, acc.1),
-        Command::Down(n) => (acc.0, acc.1 + n),
-        Command::Up(n) => (acc.0, acc.1 - n),
-    });
-    pos.0 * pos.1
+    input
+        .iter()
+        .fold([0, 0], |acc, v| match v {
+            Command::Forward(n) => [acc[0] + n, acc[1]],
+            Command::Down(n) => [acc[0], acc[1] + n],
+            Command::Up(n) => [acc[0], acc[1] - n],
+        })
+        .iter()
+        .product()
 }
 
 fn part2(input: &[Command]) -> i32 {
     // horiz, vert, aim
-    let pos = input.iter().fold((0, 0, 0), |acc, v| match v {
-        Command::Down(n) => (acc.0, acc.1, acc.2 + n),
-        Command::Up(n) => (acc.0, acc.1, acc.2 - n),
-        Command::Forward(n) => (acc.0 + n, acc.1 + (acc.2 * n), acc.2),
-    });
-    pos.0 * pos.1
+    input.iter().fold([0, 0, 0], |acc, v| match v {
+        Command::Down(n) => [acc[0], acc[1], acc[2] + n],
+        Command::Up(n) => [acc[0], acc[1], acc[2] - n],
+        Command::Forward(n) => [acc[0] + n, acc[1] + (acc[2] * n), acc[2]],
+    })[..=1]
+        .iter()
+        .product()
 }
 
 #[cfg(test)]
