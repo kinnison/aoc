@@ -72,7 +72,6 @@ impl BingoCard {
     // Some((when, score)) -> did win at some point
     fn play(&self, seq: &[usize]) -> Option<(usize, usize)> {
         let mut called = HashSet::new();
-        println!("Playing game: {:?}", self);
         for (idx, val) in seq.iter().copied().enumerate() {
             called.insert(val);
             if idx < 5 {
@@ -86,13 +85,10 @@ impl BingoCard {
         None
     }
     fn score(&self, called: &HashSet<usize>) -> Option<usize> {
-        println!("Scoring based on callset of {:?}", called);
         let mut winning = false;
         'row: for row in self.wins() {
-            println!("Testing with: {:?}", row);
             for val in row {
                 if !called.contains(&val) {
-                    println!("Call set lacks {}", val);
                     continue 'row;
                 }
             }
@@ -172,7 +168,6 @@ mod test {
     #[test]
     fn testcase1() {
         let input = BingoGame::from_str(TEST_INPUT).unwrap();
-        println!("Input: {:?}", input);
         assert_eq!(part1(&input), 4512);
     }
 
