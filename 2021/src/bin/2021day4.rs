@@ -75,6 +75,9 @@ impl BingoCard {
         println!("Playing game: {:?}", self);
         for (idx, val) in seq.iter().copied().enumerate() {
             called.insert(val);
+            if idx < 5 {
+                continue;
+            }
             if let Some(remaining) = self.score(&called) {
                 return Some((idx, remaining * val));
             }
@@ -94,6 +97,7 @@ impl BingoCard {
                 }
             }
             winning = true;
+            break;
         }
         if winning {
             // We're winning, so compute unmarked total
@@ -119,22 +123,14 @@ impl BingoCard {
 }
 
 fn part1(input: &BingoGame) -> usize {
-    // Compute all card winning conditions and then select the card whose win comes earliest
-    let mut earliest = input.seq.len() + 1;
-    let mut score = 0;
-    for (n, card) in input.cards.iter().enumerate() {
-        if let Some((thistime, thisscore)) = card.play(&input.seq) {
-            println!("Game {} scored {} at time {}", n, thisscore, thistime);
-            if thistime < earliest {
-                earliest = thistime;
-                score = thisscore;
-            }
-        } else {
-            println!("Game {} did not win ever", n);
-        }
-    }
-
-    score
+    let mut wins: Vec<_> = input
+        .cards
+        .iter()
+        .filter_map(|card| card.play(&input.seq))
+        .collect();
+    wins.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+    // first winner should be first to win, so score that
+    wins[0].1
 }
 
 fn part2(input: &BingoGame) -> usize {
