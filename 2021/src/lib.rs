@@ -67,13 +67,10 @@ pub fn input_as_vec_and_first<T: ParseByRegex, S: AsRef<str>>(
         .filter(|s| !s.trim().is_empty()) // In case there are any blanks after the first line
         .map(ParseByRegex::parse_by_regex)
         .collect();
-    if first.is_none() {
-        Err("No lines at all?".into())
+    if let Some(first) = first {
+        Ok((mapped?, first.trim().to_owned()))
     } else {
-        Ok((
-            mapped?,
-            first.expect("Something went wrong").trim().to_owned(),
-        ))
+        Err("No lines at all?".into())
     }
 }
 
