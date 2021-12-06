@@ -40,13 +40,9 @@ impl From<Vec<Vent>> for OceanFloor {
 }
 
 impl OceanFloor {
-    fn make_grid(&self, all_vents: bool) -> Vec<Vec<usize>> {
-        let mut grid = Vec::new();
-        for _ in 0..=self.maxy {
-            let mut row = Vec::new();
-            row.resize(self.maxx + 1, 0usize);
-            grid.push(row);
-        }
+    fn make_grid(&self, all_vents: bool) -> usize {
+        let mut seen = HashSet::new();
+        let mut dups = HashSet::new();
 
         for vent in self.vents.iter().filter(|v| all_vents || v.is_orthogonal()) {
             let mut x = vent.x1;
@@ -54,7 +50,12 @@ impl OceanFloor {
             let stepx = vent.x1.cmp(&vent.x2);
             let stepy = vent.y1.cmp(&vent.y2);
             loop {
-                grid[y][x] += 1;
+                let point = (x, y);
+                if seen.contains(&point) {
+                    dups.insert(point);
+                } else {
+                    seen.insert(point);
+                }
                 if x == vent.x2 && y == vent.y2 {
                     break;
                 }
@@ -70,22 +71,16 @@ impl OceanFloor {
                 }
             }
         }
-        grid
+        dups.len()
     }
 }
 
 fn part1(input: &OceanFloor) -> usize {
-    let grid = input.make_grid(false);
-    grid.iter()
-        .map(|r| r.iter().filter(|n| **n > 1).count())
-        .sum()
+    input.make_grid(false)
 }
 
 fn part2(input: &OceanFloor) -> usize {
-    let grid = input.make_grid(true);
-    grid.iter()
-        .map(|r| r.iter().filter(|n| **n > 1).count())
-        .sum()
+    input.make_grid(true)
 }
 
 #[cfg(test)]
