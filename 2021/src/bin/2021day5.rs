@@ -10,13 +10,6 @@ struct Vent {
 }
 
 impl Vent {
-    fn maxx(&self) -> usize {
-        max(self.x1, self.x2)
-    }
-    fn maxy(&self) -> usize {
-        max(self.y1, self.y2)
-    }
-
     fn is_orthogonal(&self) -> bool {
         self.x1 == self.x2 || self.y1 == self.y2
     }
@@ -24,18 +17,11 @@ impl Vent {
 
 struct OceanFloor {
     vents: Vec<Vent>,
-    maxx: usize,
-    maxy: usize,
 }
 
 impl From<Vec<Vent>> for OceanFloor {
     fn from(vents: Vec<Vent>) -> Self {
-        let (maxx, maxy) = vents.iter().copied().fold((100000, 0), |mut acc, v| {
-            acc.0 = max(acc.0, v.maxx());
-            acc.1 = max(acc.1, v.maxy());
-            acc
-        });
-        OceanFloor { vents, maxx, maxy }
+        OceanFloor { vents }
     }
 }
 
