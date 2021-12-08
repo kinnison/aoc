@@ -15,7 +15,9 @@ fn part1(input: &[SpacedString]) -> usize {
         .sum()
 }
 
+#[allow(clippy::iter_nth_zero)]
 fn value_of_entry(entry: &SpacedString) -> usize {
+    println!("Input: {:?}", entry);
     // To calculate the value of the entry we need to decode which input is which.
     let mut digits = Vec::new();
     let mut dstrs = [""; 10];
@@ -26,24 +28,28 @@ fn value_of_entry(entry: &SpacedString) -> usize {
     for i in 0..10 {
         match entry[i].len() {
             2 => {
+                println!("1 == {}", entry[i]);
                 dstrs[1] = &entry[i];
                 entry[i].chars().for_each(|c| {
                     digits[1].insert(c);
                 });
             }
             4 => {
+                println!("4 == {}", entry[i]);
                 dstrs[4] = &entry[i];
                 entry[i].chars().for_each(|c| {
                     digits[4].insert(c);
                 });
             }
             3 => {
+                println!("7 == {}", entry[i]);
                 dstrs[7] = &entry[i];
                 entry[i].chars().for_each(|c| {
                     digits[7].insert(c);
                 });
             }
             7 => {
+                println!("8 == {}", entry[i]);
                 dstrs[8] = &entry[i];
                 entry[i].chars().for_each(|c| {
                     digits[8].insert(c);
@@ -56,9 +62,11 @@ fn value_of_entry(entry: &SpacedString) -> usize {
     // Now attempt to determine mappings of other values
     // 7 is 1 plus segment a
     let seg_a = *digits[7].difference(&digits[1]).next().unwrap();
+    println!("a => {}", seg_a);
     // segment b/d will be 4 minus 1
     let seg_bd: String = digits[4].difference(&digits[1]).cloned().collect();
     assert_eq!(seg_bd.len(), 2);
+    println!("b/d in {}", seg_bd);
     // whichever 6 char sequence lacks one of b/d is zero and the lacked segment is d
     let mut seg_b = ' ';
     let mut seg_d = ' ';
@@ -82,12 +90,111 @@ fn value_of_entry(entry: &SpacedString) -> usize {
                 dstrs[0] = v;
                 v.chars().for_each(|c| {
                     digits[0].insert(c);
-                })
+                });
+                println!("0 == {}", v);
             }
         });
+    println!("b => {}", seg_b);
+    println!("d => {}", seg_d);
     // We now know a, b, d and we think we know cf
+    // If we look for 6 char sequences which lack one of cf and are not zero then
+    // we will have found 6 (and commensurately 9 which lacks e)
+    let mut seg_c = ' ';
+    let mut seg_f = ' ';
+    let mut seg_e = ' ';
+    let zero = dstrs[0].to_string();
+    entry
+        .iter()
+        .take(10)
+        .filter(|v| v.len() == 6 && *v != &zero)
+        .for_each(|v| {
+            let may_c = v.contains(dstrs[1].chars().nth(0).unwrap());
+            let may_f = v.contains(dstrs[1].chars().nth(1).unwrap());
+            if let Some(idx) = if may_c && !may_f {
+                Some(0)
+            } else if may_f && !may_c {
+                Some(1)
+            } else {
+                None
+            } {
+                // idx is the found character (f) we found 6
+                seg_f = dstrs[1].chars().nth(idx).unwrap();
+                seg_c = dstrs[1].chars().nth(1 - idx).unwrap();
+                dstrs[6] = v;
+                v.chars().for_each(|c| {
+                    digits[6].insert(c);
+                });
+                println!("6 == {}", v);
+            } else {
+                // We found 9, which lacks e...
+                assert!(may_c);
+                assert!(may_f);
+                dstrs[9] = v;
+                v.chars().for_each(|c| {
+                    digits[9].insert(c);
+                });
+                for e in "abcdefg".chars() {
+                    if !v.contains(e) {
+                        seg_e = e;
+                    }
+                }
+                println!("9 == {}", v);
+            }
+        });
+    println!("c => {}", seg_c);
+    println!("e => {}", seg_e);
+    println!("f => {}", seg_f);
 
-    todo!()
+    // At this point we know 0, 1, 4, 6, 7, 8, 9
+    // And we know a, b, c, d, e, f - meaning we could deduce g and thence
+    // know 2, 3, and 5, all of which lack 2 of those characters
+    let mut eight = digits[8].clone();
+    eight.remove(&seg_a);
+    eight.remove(&seg_b);
+    eight.remove(&seg_c);
+    eight.remove(&seg_d);
+    eight.remove(&seg_e);
+    eight.remove(&seg_f);
+    let seg_g = eight.iter().copied().next().unwrap();
+    println!("g => {}", seg_g);
+    // Now we know g we can work out which of the remaining items is 2, 3, and 5
+    entry
+        .iter()
+        .take(10)
+        .filter(|v| v.len() == 5)
+        .for_each(|v| {
+            // 2, 3, 5
+            let has_b = v.contains(seg_b);
+            let has_e = v.contains(seg_e);
+            let has_f = v.contains(seg_f);
+            let idx = match (has_b, has_e, has_f) {
+                (false, true, false) => 2,
+                (false, false, true) => 3,
+                (true, false, true) => 5,
+                _ => panic!("Didn't expect this digit: {}", v),
+            };
+            dstrs[idx] = v;
+            v.chars().for_each(|c| {
+                digits[idx].insert(c);
+            });
+            println!("{} == {}", idx, v);
+        });
+    // Finally we want to iterate the outputs, finding the inputs and mapping them.
+    entry
+        .iter()
+        .skip(11)
+        .map(|v| {
+            // Find which dstr contains v
+            println!("Looking for {}", v);
+            dstrs
+                .iter()
+                .enumerate()
+                .filter(|(_, &d)| d.len() == v.len() && d.chars().all(|c| v.contains(c)))
+                .map(|(n, _)| n)
+                .next()
+                .unwrap()
+        })
+        .fold(0, |acc, n| (acc * 10) + n)
 }
 fn part2(input: &[SpacedString]) -> usize {
     // Attempt to decode each entry, and sum the values
