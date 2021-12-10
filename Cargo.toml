@@ -32,3 +32,6 @@ members = [
    "2020",
    "2021",
 ]
+
+[profile.release]
+lto = true
