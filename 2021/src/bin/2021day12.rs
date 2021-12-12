@@ -8,22 +8,22 @@ struct RawLink {
 }
 
 struct CaveSystem {
-    links: HashMap<(bool, String), Vec<(bool, String)>>,
+    links: HashMap<String, Vec<(bool, String)>>,
 }
 
 impl From<Vec<RawLink>> for CaveSystem {
     fn from(input: Vec<RawLink>) -> Self {
-        let mut links: HashMap<(bool, String), Vec<(bool, String)>> = HashMap::new();
+        let mut links: HashMap<String, Vec<(bool, String)>> = HashMap::new();
         for link in input {
             //println!("Raw Link: {:?}", link);
             let a_upper = (b'A'..=b'Z').contains(&link.cave_a.as_bytes()[0]);
             let b_upper = (b'A'..=b'Z').contains(&link.cave_b.as_bytes()[0]);
             links
-                .entry((a_upper, link.cave_a.clone()))
+                .entry(link.cave_a.clone())
                 .or_default()
                 .push((b_upper, link.cave_b.clone()));
             links
-                .entry((b_upper, link.cave_b))
+                .entry(link.cave_b)
                 .or_default()
                 .push((a_upper, link.cave_a));
         }
@@ -33,33 +33,30 @@ impl From<Vec<RawLink>> for CaveSystem {
 }
 
 #[allow(clippy::nonminimal_bool)]
-fn try_node(
-    input: &CaveSystem,
-    cur_path: &mut Vec<String>,
-    step_upper: bool,
-    step: String,
+fn try_node<'cave>(
+    input: &'cave CaveSystem,
+    cur_path: &mut Vec<&'cave str>,
+    step: &'cave str,
     already_doubled: bool,
 ) -> usize {
     if step == "end" {
-        cur_path.push(step);
-        cur_path.pop();
         return 1;
     }
     let mut count = 0;
-    cur_path.push(step.clone());
-    for possible_node in input.links.get(&(step_upper, step)).unwrap() {
-        if possible_node.1 == "start" {
+    cur_path.push(step);
+    for possible_node in input.links.get(step).unwrap() {
+        let next_step = possible_node.1.as_str();
+        if next_step == "start" {
             // Never repeat "start"
             continue;
         }
-        let exists = cur_path.contains(&possible_node.1);
+        let exists = cur_path.contains(&next_step);
         if possible_node.0 || !exists || (exists && !already_doubled) {
             // possible is uppercase or not in path, so try walking to it
             count += try_node(
                 input,
                 cur_path,
-                possible_node.0,
-                possible_node.1.clone(),
+                next_step,
                 already_doubled || (!possible_node.0 && exists),
             );
         }
@@ -70,13 +67,7 @@ fn try_node(
 
 fn count_all_paths(input: &CaveSystem, already_doubled: bool) -> usize {
     let mut cur_path = vec![];
-    try_node(
-        input,
-        &mut cur_path,
-        false,
-        "start".to_string(),
-        already_doubled,
-    )
+    try_node(input, &mut cur_path, "start", already_doubled)
 }
 
 fn part1(input: &CaveSystem) -> usize {
