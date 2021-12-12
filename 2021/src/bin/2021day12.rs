@@ -66,7 +66,7 @@ fn try_node<'cave>(
 }
 
 fn count_all_paths(input: &CaveSystem, already_doubled: bool) -> usize {
-    let mut cur_path = vec![];
+    let mut cur_path = Vec::with_capacity(input.links.len());
     try_node(input, &mut cur_path, "start", already_doubled)
 }
 
