@@ -35,21 +35,18 @@ impl From<Vec<RawLink>> for CaveSystem {
 #[allow(clippy::nonminimal_bool)]
 fn try_node(
     input: &CaveSystem,
-    all_paths: &mut Vec<Vec<String>>,
     cur_path: &mut Vec<String>,
     step_upper: bool,
     step: String,
     already_doubled: bool,
-) {
+) -> usize {
     if step == "end" {
         cur_path.push(step);
-        //println!("Path found: {:?}", cur_path);
-        all_paths.push(cur_path.clone());
         cur_path.pop();
-        return;
+        return 1;
     }
+    let mut count = 0;
     cur_path.push(step.clone());
-    //println!("Current path: {:?} ({})", cur_path, already_doubled);
     for possible_node in input.links.get(&(step_upper, step)).unwrap() {
         if possible_node.1 == "start" {
             // Never repeat "start"
@@ -57,46 +54,39 @@ fn try_node(
         }
         let exists = cur_path.contains(&possible_node.1);
         if possible_node.0 || !exists || (exists && !already_doubled) {
-            //println!("Trying: {:?}", possible_node);
             // possible is uppercase or not in path, so try walking to it
-            try_node(
+            count += try_node(
                 input,
-                all_paths,
                 cur_path,
                 possible_node.0,
                 possible_node.1.clone(),
                 already_doubled || (!possible_node.0 && exists),
             );
-        } else {
-            //println!("Skipping node: {:?}", possible_node);
         }
     }
     cur_path.pop();
+    count
 }
 
-fn find_all_paths(input: &CaveSystem, already_doubled: bool) -> Vec<Vec<String>> {
-    let mut all_paths = Vec::new();
+fn count_all_paths(input: &CaveSystem, already_doubled: bool) -> usize {
     let mut cur_path = vec![];
     try_node(
         input,
-        &mut all_paths,
         &mut cur_path,
         false,
         "start".to_string(),
         already_doubled,
-    );
-
-    all_paths
+    )
 }
 
 fn part1(input: &CaveSystem) -> usize {
     // Find all unique paths through the cave system from `start` to `end` without
     // revisiting any lowercase caves.  We can do this fairly easily with recursion.
-    find_all_paths(input, true).len()
+    count_all_paths(input, true)
 }
 
 fn part2(input: &CaveSystem) -> usize {
-    find_all_paths(input, false).len()
+    count_all_paths(input, false)
 }
 
 #[cfg(test)]
