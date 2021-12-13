@@ -20,7 +20,7 @@ impl FromStr for Instructions {
     fn from_str(input: &str) -> Result<Self> {
         let mut dots = HashSet::new();
         let mut input = input.trim().lines();
-        while let Some(line) = input.next() {
+        for line in input.by_ref() {
             if line.is_empty() {
                 break;
             }
@@ -29,7 +29,7 @@ impl FromStr for Instructions {
             dots.insert((nums[0], nums[1]));
         }
         let mut folds = Vec::new();
-        while let Some(line) = input.next() {
+        for line in input {
             folds.push(Fold::parse_by_regex(line)?);
         }
 
