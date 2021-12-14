@@ -42,10 +42,8 @@ fn insertion_step(input: &str, rules: &HashMap<(char, char), char>) -> String {
 
 fn part1(input: &Input) -> usize {
     let mut polymer = input.template.clone();
-    println!("Template: {}", polymer);
-    for i in 0..10 {
+    for _ in 0..10 {
         polymer = insertion_step(&std::mem::take(&mut polymer), &input.rules);
-        println!("After step {}: {} tokens", i + 1, polymer.len());
     }
     let mut counts = HashMap::new();
     polymer
