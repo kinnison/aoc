@@ -317,6 +317,12 @@ where
     }
 }
 
+// Stuff from 2021
+
+pub fn triangle(n: i32) -> i32 {
+    (n * (n - 1)) / 2
+}
+
 pub fn hex_byte_to_value(b: u8) -> u8 {
     match b {
         b'0'..=b'9' => b - b'0',
