@@ -178,7 +178,7 @@ fn part1(input: &[SFValue]) -> i32 {
     let summed = input
         .iter()
         .cloned()
-        .fold1(|acc, val| {
+        .reduce(|acc, val| {
             print!("{} + {} = ", acc, val);
             let ret = acc.add_to(val);
             println!("{}", ret);
