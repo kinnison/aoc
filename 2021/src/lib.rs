@@ -17,7 +17,7 @@ pub use std::collections::HashMap;
 pub use std::collections::HashSet;
 pub use std::convert::{Infallible, TryFrom, TryInto};
 pub use std::fmt;
-pub use std::iter::successors;
+pub use std::iter::{successors, Peekable};
 pub use std::ops::{Deref, DerefMut};
 pub use std::str::FromStr;
 
