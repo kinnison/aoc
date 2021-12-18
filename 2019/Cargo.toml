@@ -18,7 +18,7 @@ chrono="0.4"
 parsebyregex = { git="git://git.gitano.org.uk/parsebyregex.git" }
 parsebyregex-derive = { git="git://git.gitano.org.uk/parsebyregex.git" }
 twoway = "0.2"
-itertools = "0.9"
+itertools = "0.10"
 num-traits = "0.2"
 color-backtrace = "0.5"
 modinverse = "0.1"
