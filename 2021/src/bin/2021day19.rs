@@ -66,6 +66,7 @@ impl RelativeBeacon {
     }
 }
 
+#[allow(clippy::type_complexity)]
 fn clouds(input: &Input) -> (HashMap<usize, (i32, i32, i32)>, HashSet<(i32, i32, i32)>) {
     // We need to find the beacon cloud.
     // to do that, we assume the beacons from scanner zero are good, and we keep
