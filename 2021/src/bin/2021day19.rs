@@ -1,6 +1,6 @@
 use aoc2021::*;
 
-#[derive(ParseByRegex, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(ParseByRegex, PartialEq, Eq, PartialOrd, Ord)]
 #[regex = r"^(?P<x>-?\d+),(?P<y>-?\d+),(?P<z>-?\d+)"]
 struct RelativeBeacon {
     x: i32,
