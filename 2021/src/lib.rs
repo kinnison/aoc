@@ -38,6 +38,8 @@ pub use itertools::*;
 
 pub use modinverse::*;
 
+pub use memoize::memoize;
+
 pub fn read_input(day: usize) -> Result<String> {
     color_backtrace::install();
     Ok(read_to_string(format!("inputs/day{}", day))?)
