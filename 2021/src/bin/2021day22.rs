@@ -128,18 +128,6 @@ impl Cuboid {
         }
     }
 
-    fn points(&self) -> impl Iterator<Item = (i64, i64, i64)> {
-        let minx = self.minx;
-        let maxx = self.maxx;
-        let miny = self.miny;
-        let maxy = self.maxy;
-        let minz = self.minz;
-        let maxz = self.maxz;
-        (minx..=maxx).flat_map(move |x| {
-            (miny..=maxy).flat_map(move |y| (minz..=maxz).map(move |z| (x, y, z)))
-        })
-    }
-
     fn size(&self) -> i64 {
         (self.maxx - self.minx + 1) * (self.maxy - self.miny + 1) * (self.maxz - self.minz + 1)
     }
@@ -174,18 +162,18 @@ fn all_on_cubes(input: &[Instruction]) -> Vec<Cuboid> {
     all_on_cubes
 }
 
-fn part1(input: &[Instruction]) -> i64 {
+fn part1(all_on_cubes: &[Cuboid]) -> i64 {
     // finally, sum all the cube sizes
-    all_on_cubes(input)
-        .into_iter()
+    all_on_cubes
+        .iter()
         .filter_map(|c| c.intersect(&INIT_AREA))
         .map(|c| c.size())
         .sum()
 }
 
-fn part2(input: &[Instruction]) -> i64 {
+fn part2(all_on_cubes: &[Cuboid]) -> i64 {
     // finally, sum all the cube sizes
-    all_on_cubes(input).into_iter().map(|c| c.size()).sum()
+    all_on_cubes.iter().map(|c| c.size()).sum()
 }
 
 #[cfg(test)]
@@ -256,12 +244,14 @@ off x=-93533..-4276,y=-16170..68771,z=-104985..-24507"#;
     #[test]
     fn testcase1() {
         let input: Vec<Instruction> = input_as_vec(TEST_INPUT).unwrap();
+        let input = all_on_cubes(&input);
         assert_eq!(part1(&input), 474140);
     }
 
     #[test]
     fn testcase2() {
         let input: Vec<Instruction> = input_as_vec(TEST_INPUT).unwrap();
+        let input = all_on_cubes(&input);
         assert_eq!(part2(&input), 2758514936282235);
     }
 
@@ -309,6 +299,7 @@ off x=-93533..-4276,y=-16170..68771,z=-104985..-24507"#;
 
 fn main() -> Result<()> {
     let input: Vec<Instruction> = read_input_as_vec(22)?;
+    let input = all_on_cubes(&input);
     println!("Part 1: {}", part1(&input));
     println!("Part 2: {}", part2(&input));
     Ok(())
