@@ -158,24 +158,7 @@ impl Instruction {
     }
 }
 
-fn part1(input: &[Instruction]) -> usize {
-    let mut reactor = HashSet::new();
-
-    for instr in input {
-        if let Some(workarea) = INIT_AREA.intersect(instr.cuboid()) {
-            if instr.is_on() {
-                reactor.extend(workarea.points());
-            } else {
-                let points = workarea.points().collect::<HashSet<_>>();
-                reactor.retain(|p| !points.contains(p));
-            }
-        }
-    }
-
-    reactor.len()
-}
-
-fn part2(input: &[Instruction]) -> i64 {
+fn all_on_cubes(input: &[Instruction]) -> Vec<Cuboid> {
     let mut all_on_cubes: Vec<Cuboid> = Vec::new();
     for instr in input {
         let mut new_on_cubes = Vec::new();
@@ -188,8 +171,21 @@ fn part2(input: &[Instruction]) -> i64 {
         }
         all_on_cubes = new_on_cubes;
     }
+    all_on_cubes
+}
+
+fn part1(input: &[Instruction]) -> i64 {
     // finally, sum all the cube sizes
-    all_on_cubes.into_iter().map(|c| c.size()).sum()
+    all_on_cubes(input)
+        .into_iter()
+        .filter_map(|c| c.intersect(&INIT_AREA))
+        .map(|c| c.size())
+        .sum()
+}
+
+fn part2(input: &[Instruction]) -> i64 {
+    // finally, sum all the cube sizes
+    all_on_cubes(input).into_iter().map(|c| c.size()).sum()
 }
 
 #[cfg(test)]
