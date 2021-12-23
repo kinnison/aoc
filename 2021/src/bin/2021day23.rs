@@ -5,7 +5,7 @@ use pathfinding::directed::dijkstra;
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 struct AmbiCave {
     hallway: [u8; 7],
-    caves: [[u8; 2]; 4],
+    caves: [[u8; 4]; 4],
 }
 
 impl FromStr for AmbiCave {
@@ -22,10 +22,10 @@ impl FromStr for AmbiCave {
             Ok(AmbiCave {
                 hallway: [0; 7],
                 caves: [
-                    [input[4], input[0]],
-                    [input[5], input[1]],
-                    [input[6], input[2]],
-                    [input[7], input[3]],
+                    [1, 1, input[4], input[0]],
+                    [2, 2, input[5], input[1]],
+                    [3, 3, input[6], input[2]],
+                    [4, 4, input[7], input[3]],
                 ],
             })
         }
@@ -50,7 +50,7 @@ impl AmbiCave {
 
     fn hallway_cave_dist(cave: usize, hidx: usize) -> usize {
         // Hallway costs are related to the cave positions
-        // We measure hallway <-> front of cave, caller can add 1 if back-of-cave needed
+        // We measure hallway <-> front of cave, caller can add something if back-of-cave needed
         // as such, we return 1 to move from cave mouth to hallway, then the distance to the chosen hallway position
         let cpos = CPOS[cave];
         let hpos = HPOS[hidx];
@@ -88,10 +88,10 @@ impl AmbiCave {
             .map(|c| *c as usize)
             .for_each(|c| counts[c] += 1);
         (0..4)
-            .cartesian_product(0..2)
+            .cartesian_product(0..4)
             .map(|(cave, pos)| self.caves[cave][pos] as usize)
             .for_each(|c| counts[c] += 1);
-        counts == [7, 2, 2, 2, 2]
+        counts == [7, 4, 4, 4, 4]
     }
 
     fn neighbours(&self) -> Vec<(Self, usize)> {
@@ -103,38 +103,42 @@ impl AmbiCave {
         // It can only move if the hallway is clear
 
         for cave in 0..4 {
-            let cpods = (self.caves[cave][0], self.caves[cave][1]);
-            let cidxs = (
-                (self.caves[cave][0] as usize).wrapping_sub(1),
-                (self.caves[cave][1] as usize).wrapping_sub(1),
-            );
-            let corr = (cidxs.0 == cave, cidxs.1 == cave);
-            for pos in 0..2 {
+            for pos in 0..4 {
                 let ambipod = self.caves[cave][pos];
 
                 // No ambipod
                 if ambipod == 0 {
                     continue;
                 }
-                // back slot, and correct, next slot
-                if pos == 0 && corr.0 {
+                //println!(
+                //    "Want to try and move ambipod {} from cave {} pos {}",
+                //    ambipod, cave, pos
+                //);
+                // is our path out of the cave clear?
+                if pos < 3 && self.caves[cave].iter().skip(pos + 1).any(|v| *v != 0) {
+                    //println!("Can't! our path out isn't clear");
+                    //self.caves[cave]
+                    //    .iter()
+                    //    .skip(pos + 1)
+                    //    .for_each(|v| println!("pod {} in the way", v));
                     continue;
                 }
-                // back slot, front slot occupied, next slot
-                if pos == 0 && cpods.1 != 0 {
+                // Our path is clear out of the cave, but do we want to move?
+                if pos > 0
+                    && self.caves[cave]
+                        .iter()
+                        .take(pos + 1)
+                        .all(|v| *v == (cave + 1) as u8)
+                {
+                    //println!("No point, everyone in the cave is us");
                     continue;
                 }
-                // front slot, correct, and back slot correct, next slot
-                if pos == 1 && corr.1 && corr.0 {
-                    continue;
-                }
+                //println!("Let's give it a go");
                 // Otherwise try and fit it into each hallway slot
                 for hidx in 0..7 {
                     if self.cave_to_hallway_clear(cave, hidx) {
                         let mut cost = Self::hallway_cave_dist(cave, hidx);
-                        if pos == 0 {
-                            cost += 1;
-                        }
+                        cost += 3 - pos;
                         cost *= Self::ambi_cost(ambipod);
                         let mut newstate = *self;
                         newstate.caves[cave][pos] = 0;
@@ -164,22 +168,31 @@ impl AmbiCave {
                 continue;
             }
             let base_cost = Self::hallway_cave_dist(cave, hidx);
-            // next, either cave is empty, or the back slot is filled with the right ambipod
-            if self.caves[cave][0] == 0 && self.caves[cave][1] == 0 {
-                // we want to move into the back of the cave
-                let mut newstate = *self;
-                newstate.hallway[hidx] = 0;
-                newstate.caves[cave][0] = ambipod;
-                let cost = (base_cost + 1) * Self::ambi_cost(ambipod);
-                assert!(newstate.state_ok());
-                ret.push((newstate, cost));
-            } else if self.caves[cave][0] == ambipod && self.caves[cave][1] == 0 {
-                let mut newstate = *self;
-                newstate.hallway[hidx] = 0;
-                newstate.caves[cave][1] = ambipod;
-                assert!(newstate.state_ok());
-                ret.push((newstate, base_cost * Self::ambi_cost(ambipod)));
+            // the base cost is to the mouth of the cave.
+            // we can only move into the cave if the cave contains nothing
+            // which isn't us.
+            if self.caves[cave].iter().any(|v| *v != 0 && *v != ambipod) {
+                //println!("No, the cave has something not us in it");
+                continue;
             }
+            // OK, the cave has *only* us in it, so let's try and move in
+            let pos = self.caves[cave]
+                .iter()
+                .copied()
+                .enumerate()
+                .find(|v| v.1 == 0)
+                .expect("What?")
+                .0;
+            //println!(
+            //    "Yes, moving pod {} from hidx {} to cave {} pos {}",
+            //    ambipod, hidx, cave, pos
+            //);
+            let mut newstate = *self;
+            newstate.hallway[hidx] = 0;
+            newstate.caves[cave][pos] = ambipod;
+            let cost = (base_cost + 3 - pos) * Self::ambi_cost(ambipod);
+            assert!(newstate.state_ok());
+            ret.push((newstate, cost));
         }
 
         //if ret.is_empty() {
@@ -195,8 +208,26 @@ impl AmbiCave {
 
     fn is_finished(&self) -> bool {
         let ret = self.hallway.iter().all(|v| *v == 0)
-            && (0..4).all(|i| self.caves[i] == [(i as u8) + 1; 2]);
+            && (0..4).all(|i| self.caves[i] == [(i as u8) + 1; 4]);
         ret
+    }
+
+    // Part 2 unfolds a bit of the paper
+    fn unfold(&mut self) {
+        for i in 0..4 {
+            self.caves[i][0] = self.caves[i][2];
+        }
+        //#D#C#B#A#
+        //#D#B#A#C#
+        self.caves[0][1] = 4;
+        self.caves[0][2] = 4;
+        self.caves[1][1] = 2;
+        self.caves[1][2] = 3;
+        self.caves[2][1] = 1;
+        self.caves[2][2] = 2;
+        self.caves[3][1] = 3;
+        self.caves[3][2] = 1;
+        assert!(self.state_ok());
     }
 }
 
@@ -207,7 +238,11 @@ fn part1(input: &AmbiCave) -> usize {
 }
 
 fn part2(input: &AmbiCave) -> usize {
-    todo!()
+    let mut input = *input;
+    input.unfold();
+    let (_path, cost) =
+        dijkstra::dijkstra(&input, AmbiCave::neighbours, AmbiCave::is_finished).unwrap();
+    cost
 }
 
 #[cfg(test)]
@@ -231,7 +266,7 @@ mod test {
     #[test]
     fn testcase2() {
         let input = AmbiCave::from_str(TEST_INPUT).unwrap();
-        assert_eq!(part2(&input), 5);
+        assert_eq!(part2(&input), 44169);
     }
 }
 
