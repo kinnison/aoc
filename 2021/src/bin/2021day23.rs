@@ -1,6 +1,6 @@
 use aoc2021::*;
 
-use pathfinding::directed::astar;
+use pathfinding::directed::dijkstra;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 struct AmbiCave {
@@ -37,16 +37,6 @@ const HIDX: [usize; 12] = [0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 6];
 const CPOS: [usize; 4] = [3, 5, 7, 9];
 
 impl AmbiCave {
-    fn cave_cave_dist(c1: usize, c2: usize) -> usize {
-        let cmin = min(c1, c2);
-        let cmax = max(c1, c2);
-        if cmin == cmax {
-            0
-        } else {
-            2 + (2 * (cmax - cmin))
-        }
-    }
-
     fn ambi_cost(ambi: u8) -> usize {
         match ambi {
             0 => 0,
@@ -67,7 +57,7 @@ impl AmbiCave {
         max(cpos, hpos) - min(cpos, hpos) + 1
     }
 
-    fn hallway_clear(&self, cave: usize, hidx: usize) -> bool {
+    fn cave_to_hallway_clear(&self, cave: usize, hidx: usize) -> bool {
         // The hallway is clear if there's nothing between the cave and the hallway target
         let cpos = CPOS[cave];
         let hpos = HPOS[hidx];
@@ -75,6 +65,18 @@ impl AmbiCave {
             (HIDX[cpos + 1], hidx)
         } else {
             (hidx, HIDX[cpos - 1])
+        };
+        (hmin..=hmax).all(|hpos| self.hallway[hpos] == 0)
+    }
+
+    fn hallway_to_cave_clear(&self, cave: usize, hidx: usize) -> bool {
+        // The hallway is clear if there's nothing between the cave and the hallway target
+        let cpos = CPOS[cave];
+        let hpos = HPOS[hidx];
+        let (hmin, hmax) = if cpos < hpos {
+            (HIDX[cpos + 1], hidx - 1)
+        } else {
+            (hidx + 1, HIDX[cpos - 1])
         };
         (hmin..=hmax).all(|hpos| self.hallway[hpos] == 0)
     }
@@ -94,7 +96,7 @@ impl AmbiCave {
 
     fn neighbours(&self) -> Vec<(Self, usize)> {
         let mut ret = Vec::new();
-        println!("Starting at {:?}", self);
+        //println!("Starting at {:?}", self);
 
         // All possible neighbours of this node in the search graph
         // will either move an ambipod out of a cave, or into its target cave
@@ -128,7 +130,7 @@ impl AmbiCave {
                 }
                 // Otherwise try and fit it into each hallway slot
                 for hidx in 0..7 {
-                    if self.hallway_clear(cave, hidx) {
+                    if self.cave_to_hallway_clear(cave, hidx) {
                         let mut cost = Self::hallway_cave_dist(cave, hidx);
                         if pos == 0 {
                             cost += 1;
@@ -153,7 +155,12 @@ impl AmbiCave {
             }
             // is the target cave "available"? first is the path clear
             let cave = (ambipod as usize) - 1;
-            if !self.hallway_clear(cave, hidx) {
+            //println!(
+            //    "Could we move pod {} from hidx {} to cave {}?",
+            //    ambipod, hidx, cave
+            //);
+            if !self.hallway_to_cave_clear(cave, hidx) {
+                //println!("No, hallway isn't clear");
                 continue;
             }
             let base_cost = Self::hallway_cave_dist(cave, hidx);
@@ -175,47 +182,15 @@ impl AmbiCave {
             }
         }
 
-        if ret.is_empty() {
-            println!("No moves given {:?}", self);
-        } else {
-            for c in &ret {
-                println!("{:?} for {}", c.0, c.1);
-            }
-        }
+        //if ret.is_empty() {
+        //    println!("No moves given {:?}", self);
+        //} else {
+        //    for c in &ret {
+        //        println!("{:?} for {}", c.0, c.1);
+        //    }
+        //}
 
         ret
-    }
-
-    fn heuristic(&self) -> usize {
-        // The "cost" is basically what it'd cost to move each ambipod to its target cave
-        let mut tot = 0;
-        // First how much to move anyone in a cave
-        for c1 in 0..4 {
-            for pos in 0..2 {
-                let ambi = self.caves[c1][pos];
-                if ambi == 0 {
-                    continue;
-                }
-                let c2 = (ambi as usize) - 1;
-                if c1 == c2 {
-                    // no point moving me
-                    continue;
-                }
-                let dist = Self::cave_cave_dist(c1, c2) + 2; // back of cave to back of cave
-                tot += Self::ambi_cost(ambi) * dist;
-            }
-        }
-        // Now how much to move anyone in the hallway
-        for (hidx, v) in self.hallway.iter().copied().enumerate() {
-            // obvs we want to move each ambipod from the hallway to its own cave
-            if v != 0 {
-                let cave = (v as usize) - 1;
-                let dist = Self::hallway_cave_dist(cave, hidx) + 1;
-                tot += Self::ambi_cost(v) * dist;
-            }
-        }
-        println!("Cost of {:?} is {}", self, tot);
-        tot
     }
 
     fn is_finished(&self) -> bool {
@@ -226,22 +201,8 @@ impl AmbiCave {
 }
 
 fn part1(input: &AmbiCave) -> usize {
-    println!("Starting condition: {:?}", input);
-    //let (path, cost) = astar::astar(
-    //    input,
-    //    AmbiCave::neighbours,
-    //    AmbiCave::heuristic,
-    //    AmbiCave::is_finished,
-    //)
-    let (path, cost) = pathfinding::directed::dijkstra::dijkstra(
-        input,
-        AmbiCave::neighbours,
-        AmbiCave::is_finished,
-    )
-    .unwrap();
-    for step in path {
-        println!("{:?}", step);
-    }
+    let (_path, cost) =
+        dijkstra::dijkstra(input, AmbiCave::neighbours, AmbiCave::is_finished).unwrap();
     cost
 }
 
