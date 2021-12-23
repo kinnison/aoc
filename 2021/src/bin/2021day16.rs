@@ -41,8 +41,8 @@ impl Packet {
             let mut total_read = 1;
             let packets = if stream.read_bit()? {
                 // length is 11 bit packet count
-                let mut packets = Vec::new();
                 let pcount: u32 = stream.read(11)?;
+                let mut packets = Vec::new();
                 total_read += 11;
                 for _ in 0..pcount {
                     if let Some((packet, nbits)) = Self::read_from(stream)? {
@@ -58,8 +58,8 @@ impl Packet {
                 packets
             } else {
                 // length is a 15 bit count of bits in subpackets
-                let mut packets = Vec::new();
                 let mut pbits: u32 = stream.read(15)?;
+                let mut packets = Vec::new();
                 total_read += 15;
                 loop {
                     if let Some((packet, plen)) = Self::read_from(stream)? {
