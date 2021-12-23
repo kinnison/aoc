@@ -131,7 +131,7 @@ impl AmbiCave {
                         let mut newstate = *self;
                         newstate.caves[cave][pos] = 0;
                         newstate.hallway[hidx] = ambipod;
-                        assert!(newstate.state_ok());
+                        debug_assert!(newstate.state_ok());
                         ret.push((newstate, cost));
                     }
                 }
@@ -169,7 +169,7 @@ impl AmbiCave {
             newstate.hallway[hidx] = 0;
             newstate.caves[cave][pos] = ambipod;
             let cost = (base_cost + 3 - pos) * Self::ambi_cost(ambipod);
-            assert!(newstate.state_ok());
+            debug_assert!(newstate.state_ok());
             ret.push((newstate, cost));
         }
 
@@ -197,7 +197,7 @@ impl AmbiCave {
         self.caves[2][2] = 2;
         self.caves[3][1] = 3;
         self.caves[3][2] = 1;
-        assert!(self.state_ok());
+        debug_assert!(self.state_ok());
     }
 }
 
