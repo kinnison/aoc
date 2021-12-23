@@ -96,7 +96,6 @@ impl AmbiCave {
 
     fn neighbours(&self) -> Vec<(Self, usize)> {
         let mut ret = Vec::new();
-        //println!("Starting at {:?}", self);
 
         // All possible neighbours of this node in the search graph
         // will either move an ambipod out of a cave, or into its target cave
@@ -110,17 +109,8 @@ impl AmbiCave {
                 if ambipod == 0 {
                     continue;
                 }
-                //println!(
-                //    "Want to try and move ambipod {} from cave {} pos {}",
-                //    ambipod, cave, pos
-                //);
                 // is our path out of the cave clear?
                 if pos < 3 && self.caves[cave].iter().skip(pos + 1).any(|v| *v != 0) {
-                    //println!("Can't! our path out isn't clear");
-                    //self.caves[cave]
-                    //    .iter()
-                    //    .skip(pos + 1)
-                    //    .for_each(|v| println!("pod {} in the way", v));
                     continue;
                 }
                 // Our path is clear out of the cave, but do we want to move?
@@ -130,10 +120,8 @@ impl AmbiCave {
                         .take(pos + 1)
                         .all(|v| *v == (cave + 1) as u8)
                 {
-                    //println!("No point, everyone in the cave is us");
                     continue;
                 }
-                //println!("Let's give it a go");
                 // Otherwise try and fit it into each hallway slot
                 for hidx in 0..7 {
                     if self.cave_to_hallway_clear(cave, hidx) {
@@ -159,12 +147,7 @@ impl AmbiCave {
             }
             // is the target cave "available"? first is the path clear
             let cave = (ambipod as usize) - 1;
-            //println!(
-            //    "Could we move pod {} from hidx {} to cave {}?",
-            //    ambipod, hidx, cave
-            //);
             if !self.hallway_to_cave_clear(cave, hidx) {
-                //println!("No, hallway isn't clear");
                 continue;
             }
             let base_cost = Self::hallway_cave_dist(cave, hidx);
@@ -172,7 +155,6 @@ impl AmbiCave {
             // we can only move into the cave if the cave contains nothing
             // which isn't us.
             if self.caves[cave].iter().any(|v| *v != 0 && *v != ambipod) {
-                //println!("No, the cave has something not us in it");
                 continue;
             }
             // OK, the cave has *only* us in it, so let's try and move in
@@ -183,10 +165,6 @@ impl AmbiCave {
                 .find(|v| v.1 == 0)
                 .expect("What?")
                 .0;
-            //println!(
-            //    "Yes, moving pod {} from hidx {} to cave {} pos {}",
-            //    ambipod, hidx, cave, pos
-            //);
             let mut newstate = *self;
             newstate.hallway[hidx] = 0;
             newstate.caves[cave][pos] = ambipod;
@@ -194,14 +172,6 @@ impl AmbiCave {
             assert!(newstate.state_ok());
             ret.push((newstate, cost));
         }
-
-        //if ret.is_empty() {
-        //    println!("No moves given {:?}", self);
-        //} else {
-        //    for c in &ret {
-        //        println!("{:?} for {}", c.0, c.1);
-        //    }
-        //}
 
         ret
     }
