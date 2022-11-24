@@ -255,7 +255,7 @@ dependencies = [
  "itertools",
  "lazy_static",
  "md5",
- "memoize",
+ "memoize 0.1.9",
  "modinverse",
  "num-traits",
  "parsebyregex",
@@ -265,6 +265,24 @@ dependencies = [
  "regex",
  "serde_json",
  "twoway",
+]
+
+[[package]]
+name = "aoc2022"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "color-backtrace",
+ "gcd",
+ "itertools",
+ "lazy_static",
+ "memoize 0.3.1",
+ "modinverse",
+ "parsebyregex",
+ "parsebyregex-derive",
+ "permutohedron",
+ "regex",
+ "serde_json",
 ]
 
 [[package]]
@@ -497,6 +515,28 @@ name = "memoize"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb49e4361c7534fd1fd1d4a1da51b1bb4b254c5ebc519fc4e5dce578fd69f5d9"
+dependencies = [
+ "lazy_static",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "memoize"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e7d5a102c66be8fb20cce036b79e3ff5293d904d0e6415f0a8e519d6a4e76e5b"
+dependencies = [
+ "lazy_static",
+ "memoize-inner",
+]
+
+[[package]]
+name = "memoize-inner"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "217a1e7f586ba063a4dc87a2dfb26f7700e150c9b378cb2aef511cd42013f8a3"
 dependencies = [
  "lazy_static",
  "proc-macro2",

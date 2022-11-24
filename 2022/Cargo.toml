@@ -1,0 +1,20 @@
+[package]
+name = "aoc2022"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+gcd = "2"
+regex = "1"
+lazy_static = "1.4"
+serde_json = "1"
+parsebyregex = { git = "git://git.gitano.org.uk/parsebyregex.git" }
+parsebyregex-derive = { git = "git://git.gitano.org.uk/parsebyregex.git" }
+permutohedron = "0.2.4"
+chrono = "0.4"
+modinverse = "0.1"
+itertools = "0.10"
+color-backtrace = "0.5"
+"memoize" = "0.3"
