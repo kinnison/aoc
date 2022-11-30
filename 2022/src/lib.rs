@@ -1,4 +1,4 @@
-#![allow(clippy::needless_question_mark)]
+//#![allow(clippy::needless_question_mark)]
 use std::{
     fs::read_to_string,
     ops::{Div, Mul},
@@ -45,17 +45,16 @@ pub fn read_input(day: usize) -> Result<String> {
 
 pub fn read_input_as_vec<T: ParseByRegex>(day: usize) -> Result<Vec<T>> {
     let plain = read_input(day)?;
-    Ok(input_as_vec(plain)?)
+    input_as_vec(plain)
 }
 
 pub fn input_as_vec<T: ParseByRegex, S: AsRef<str>>(plain: S) -> Result<Vec<T>> {
-    let mapped: Result<Vec<T>> = plain
+    plain
         .as_ref()
         .trim()
         .lines()
         .map(ParseByRegex::parse_by_regex)
-        .collect();
-    Ok(mapped?)
+        .collect()
 }
 
 pub fn input_as_vec_and_first<T: ParseByRegex, S: AsRef<str>>(
@@ -76,42 +75,38 @@ pub fn input_as_vec_and_first<T: ParseByRegex, S: AsRef<str>>(
 
 pub fn read_input_as_vec_and_first<T: ParseByRegex>(day: usize) -> Result<(Vec<T>, String)> {
     let plain = read_input(day)?;
-    Ok(input_as_vec_and_first(plain)?)
+    input_as_vec_and_first(plain)
 }
 
 pub fn line_as_list<T: ParseByRegex, S: AsRef<str>>(line: S) -> Result<Vec<T>> {
-    let mapped: Result<Vec<T>> = line
-        .as_ref()
+    line.as_ref()
         .trim()
         .split(',')
         .map(ParseByRegex::parse_by_regex)
-        .collect();
-    Ok(mapped?)
+        .collect()
 }
 
 pub fn input_as_lists<T: ParseByRegex, S: AsRef<str>>(input: S) -> Result<Vec<Vec<T>>> {
-    let mapped: Result<Vec<Vec<T>>> = input.as_ref().trim().lines().map(line_as_list).collect();
-    Ok(mapped?)
+    input.as_ref().trim().lines().map(line_as_list).collect()
 }
 
 pub fn read_input_as_lists<T: ParseByRegex>(day: usize) -> Result<Vec<Vec<T>>> {
     let plain = read_input(day)?;
-    Ok(input_as_lists(plain)?)
+    input_as_lists(plain)
 }
 
 pub fn input_by_split_pat<T: ParseByRegex, S: AsRef<str>>(input: S, pat: &str) -> Result<Vec<T>> {
-    let mapped: Result<Vec<T>> = input
+    input
         .as_ref()
         .trim()
         .split(pat)
         .map(ParseByRegex::parse_by_regex)
-        .collect();
-    Ok(mapped?)
+        .collect()
 }
 
 pub fn read_input_as_vec_split<T: ParseByRegex>(day: usize, pat: &str) -> Result<Vec<T>> {
     let plain = read_input(day)?;
-    Ok(input_by_split_pat(plain, pat)?)
+    input_by_split_pat(plain, pat)
 }
 
 pub fn input_as_first_and_vec_by_pat<T: ParseByRegex, S: AsRef<str>>(
