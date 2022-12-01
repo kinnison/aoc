@@ -130,6 +130,28 @@ pub fn read_input_as_first_and_vec_by_pat<T: ParseByRegex>(
     input_as_first_and_vec_by_pat(plain, pat)
 }
 
+pub fn input_as_groups<T>(input: &str) -> Result<Vec<Vec<T>>>
+where
+    T: ParseByRegex,
+{
+    input
+        .trim()
+        .lines()
+        .group_by(|&s| s.is_empty())
+        .into_iter()
+        .filter(|i| !i.0)
+        .map(|(_, lines)| lines.map(T::parse_by_regex).collect::<Result<Vec<_>>>())
+        .collect()
+}
+
+pub fn read_input_as_groups<T>(day: usize) -> Result<Vec<Vec<T>>>
+where
+    T: ParseByRegex,
+{
+    let plain = read_input(day)?;
+    input_as_groups(&plain)
+}
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct SpacedString(Vec<String>);
 
