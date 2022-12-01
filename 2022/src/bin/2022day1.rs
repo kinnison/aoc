@@ -1,23 +1,20 @@
 use aoc2022::*;
 
-fn part1(input: &[u64]) -> usize {
+fn part1(input: &[Vec<u64>]) -> u64 {
     input
         .iter()
-        .tuple_windows()
-        .map(|(a, b)| a < b)
-        .filter(|x| *x)
-        .count()
+        .map(|elf| elf.iter().copied().sum())
+        .max()
+        .unwrap()
 }
 
-fn part2(input: &[u64]) -> usize {
+fn part2(input: &[Vec<u64>]) -> u64 {
     input
         .iter()
-        .tuple_windows()
-        .map(|(a, b, c)| a + b + c)
-        .tuple_windows()
-        .map(|(a, b)| a < b)
-        .filter(|x| *x)
-        .count()
+        .map(|elf| elf.iter().copied().sum())
+        .sorted_by(|a: &u64, b| Ord::cmp(b, a))
+        .take(3)
+        .sum()
 }
 
 #[cfg(test)]
@@ -25,32 +22,36 @@ mod test {
     use super::*;
 
     static TEST_INPUT: &str = r#"
-199
-200
-208
-210
-200
-207
-240
-269
-260
-263"#;
+1000
+2000
+3000
+
+4000
+
+5000
+6000
+
+7000
+8000
+9000
+
+10000"#;
 
     #[test]
     fn testcase1() {
-        let input: Vec<u64> = input_as_vec(TEST_INPUT).unwrap();
-        assert_eq!(part1(&input), 7);
+        let input: Vec<Vec<u64>> = input_as_groups(TEST_INPUT).unwrap();
+        assert_eq!(part1(&input), 24000);
     }
 
     #[test]
     fn testcase2() {
-        let input: Vec<u64> = input_as_vec(TEST_INPUT).unwrap();
-        assert_eq!(part2(&input), 5);
+        let input: Vec<Vec<u64>> = input_as_groups(TEST_INPUT).unwrap();
+        assert_eq!(part2(&input), 45000);
     }
 }
 
 fn main() -> Result<()> {
-    let input: Vec<u64> = read_input_as_vec(1)?;
+    let input: Vec<Vec<u64>> = read_input_as_groups(1)?;
     println!("Part 1: {}", part1(&input));
     println!("Part 2: {}", part2(&input));
     Ok(())
