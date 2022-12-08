@@ -1,6 +1,6 @@
 use aoc2022::*;
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 #[derive(ParseByRegex)]
 enum InputLine {
