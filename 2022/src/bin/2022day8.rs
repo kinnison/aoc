@@ -75,7 +75,6 @@ fn part2(input: &Forest) -> usize {
 
     for row in 1..(input.height - 1) {
         for col in 1..(input.width - 1) {
-            println!("try row={row} col={col}");
             #[allow(unused_parens)]
             let score = (
                 // left to right
@@ -87,7 +86,6 @@ fn part2(input: &Forest) -> usize {
                 // bottom to top
                 Forest::sees(input.rows.iter().rev().map(|v|v[col]).skip(input.height-row-1))
             );
-            println!("row={row} col={col} score={score}");
             if score > best_score {
                 best_score = score;
             }
@@ -121,7 +119,7 @@ mod test {
     }
 }
 
-fn main() -> Result<()> {
+pub fn main() -> Result<()> {
     let input: String = read_input(8)?;
     let input = input.into();
     println!("Part 1: {}", part1(&input));

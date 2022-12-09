@@ -160,7 +160,7 @@ move 1 from 1 to 2
     }
 }
 
-fn main() -> Result<()> {
+pub fn main() -> Result<()> {
     let input = read_input(5)?;
     let input = Input::from(&input);
     println!("Part 1: {}", part1(&input));

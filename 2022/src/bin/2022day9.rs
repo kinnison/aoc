@@ -141,7 +141,7 @@ U 20"#;
     }
 }
 
-fn main() -> Result<()> {
+pub fn main() -> Result<()> {
     let input: Vec<InputStep> = read_input_as_vec(9)?;
     println!("Part 1: {}", part1(&input));
     println!("Part 2: {}", part2(&input));

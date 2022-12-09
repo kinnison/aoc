@@ -104,7 +104,7 @@ C Z
     }
 }
 
-fn main() -> Result<()> {
+pub fn main() -> Result<()> {
     let input: Vec<Round> = read_input_as_vec(2)?;
     println!("Part 1: {}", part1(&input));
     println!("Part 2: {}", part2(&input));

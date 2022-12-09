@@ -49,7 +49,7 @@ mod test {
     }
 }
 
-fn main() -> Result<()> {
+pub fn main() -> Result<()> {
     let input: String = read_input(6)?;
     println!("Part 1: {}", part1(&input));
     println!("Part 2: {}", part2(&input));
