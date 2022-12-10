@@ -2,6 +2,8 @@ use aoc2022::*;
 
 #[path = "2022day1.rs"]
 mod day1;
+#[path = "2022day10.rs"]
+mod day10;
 #[path = "2022day2.rs"]
 mod day2;
 #[path = "2022day3.rs"]
@@ -29,6 +31,7 @@ fn main() -> Result<()> {
     day7::main()?;
     day8::main()?;
     day9::main()?;
+    day10::main()?;
 
     Ok(())
 }
