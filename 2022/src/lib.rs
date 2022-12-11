@@ -152,6 +152,21 @@ where
     input_as_groups(&plain)
 }
 
+pub fn input_as_chunks<T>(input: &str) -> Result<Vec<T>>
+where
+    T: ParseByRegex,
+{
+    input.trim().split("\n\n").map(T::parse_by_regex).collect()
+}
+
+pub fn read_input_as_chunks<T>(day: usize) -> Result<Vec<T>>
+where
+    T: ParseByRegex,
+{
+    let plain = read_input(day)?;
+    input_as_chunks(&plain)
+}
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct SpacedString(Vec<String>);
 
