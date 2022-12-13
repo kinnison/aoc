@@ -2,8 +2,6 @@ use aoc2022::*;
 
 #[derive(Debug, Clone)]
 struct Input {
-    width: usize,
-    height: usize,
     start: (i32, i32),
     end: (i32, i32),
     map: HashMap<(i32, i32), u8>,
@@ -15,8 +13,6 @@ where
 {
     fn from(input: T) -> Self {
         let input = input.as_ref().trim();
-        let width = input.lines().next().unwrap().trim().len();
-        let height = input.lines().count();
         let mut start = (0, 0);
         let mut end = (0, 0);
         let mut map = HashMap::new();
@@ -42,13 +38,7 @@ where
                 }
             }
         }
-        Self {
-            width,
-            height,
-            start,
-            end,
-            map,
-        }
+        Self { start, end, map }
     }
 }
 
