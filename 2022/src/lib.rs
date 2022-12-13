@@ -23,6 +23,7 @@ pub use std::str::FromStr;
 
 pub use permutohedron::Heap;
 
+pub use serde::Deserialize;
 pub use serde_json::Value;
 
 pub use chrono::prelude::*;

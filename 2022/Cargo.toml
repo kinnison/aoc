@@ -9,6 +9,7 @@ edition = "2021"
 gcd = "2"
 regex = "1"
 lazy_static = "1.4"
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 parsebyregex = { git = "git://git.gitano.org.uk/parsebyregex.git" }
 parsebyregex-derive = { git = "git://git.gitano.org.uk/parsebyregex.git" }
