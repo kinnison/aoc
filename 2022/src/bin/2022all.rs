@@ -26,6 +26,8 @@ mod day11;
 mod day12;
 #[path = "2022day13.rs"]
 mod day13;
+#[path = "2022day14.rs"]
+mod day14;
 
 fn main() -> Result<()> {
     day01::main()?;
@@ -41,6 +43,7 @@ fn main() -> Result<()> {
     day11::main()?;
     day12::main()?;
     day13::main()?;
+    day14::main()?;
 
     Ok(())
 }
