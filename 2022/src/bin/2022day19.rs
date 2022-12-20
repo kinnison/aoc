@@ -40,25 +40,6 @@ impl Resources {
             }
         }
     }
-    fn rollback(&mut self, action: Action, bp: &Blueprint) {
-        match action {
-            Action::Wait => (),
-            Action::BuildOreBot => {
-                self.ore += bp.orebotore;
-            }
-            Action::BuildClayBot => {
-                self.ore += bp.claybotore;
-            }
-            Action::BuildObsBot => {
-                self.ore += bp.obsbotore;
-                self.clay += bp.obsbotclay;
-            }
-            Action::BuildGeoBot => {
-                self.ore += bp.geobotore;
-                self.obsidian += bp.geobotobs;
-            }
-        }
-    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
@@ -86,12 +67,6 @@ impl BotArmy {
         resources.clay += self.claybots;
         resources.obsidian += self.obsbots;
         resources.geodes += self.geobots;
-    }
-    fn ungather(&self, resources: &mut Resources) {
-        resources.ore -= self.orebots;
-        resources.clay -= self.claybots;
-        resources.obsidian -= self.obsbots;
-        resources.geodes -= self.geobots;
     }
 }
 
@@ -137,23 +112,6 @@ impl Action {
             }
             Action::BuildGeoBot => {
                 bots.geobots += 1;
-            }
-        }
-    }
-    fn unapply(self, bots: &mut BotArmy) {
-        match self {
-            Action::Wait => (),
-            Action::BuildOreBot => {
-                bots.orebots -= 1;
-            }
-            Action::BuildClayBot => {
-                bots.claybots -= 1;
-            }
-            Action::BuildObsBot => {
-                bots.obsbots -= 1;
-            }
-            Action::BuildGeoBot => {
-                bots.geobots -= 1;
             }
         }
     }
