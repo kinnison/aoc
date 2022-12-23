@@ -276,6 +276,20 @@ impl Facing {
             self
         }
     }
+
+    pub fn row_col_offset(self) -> (i32, i32) {
+        match self {
+            Facing::North => (-1, 0),
+            Facing::East => (0, 1),
+            Facing::South => (1, 0),
+            Facing::West => (0, -1),
+        }
+    }
+
+    pub fn do_row_col_move(self, row: i32, col: i32) -> (i32, i32) {
+        let ofs = self.row_col_offset();
+        (row + ofs.0, col + ofs.1)
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Default)]
