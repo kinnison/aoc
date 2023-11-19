@@ -61,10 +61,6 @@ impl Dir {
             Dir::Up => (row - 1, col),
         }
     }
-
-    fn is_horz(self) -> bool {
-        matches!(self, Dir::Right | Dir::Left)
-    }
 }
 
 #[derive(Clone)]
@@ -250,6 +246,181 @@ impl Lock {
         // Final score is 1000 * row + r * col + facing
         (row * 1000) + (col * 4) + facing.val()
     }
+
+    fn wrap_cube(&mut self) {
+        // Find the minimum width, that'll be our grid size
+        let face_size = self
+            .row_bdr
+            .iter()
+            .copied()
+            .skip(1)
+            .map(|(f, l)| l - f + 1)
+            .min()
+            .unwrap();
+        let mut warps = HashMap::new();
+
+        // We need to find an inner corner to begin zipping.
+        // In both the example and our test input, we can find that by scanning downward,
+        // pairwise looking at the first non-empty cell.
+        // If the second is less than the first, we have a _| internal corner
+
+        println!("Performing cubic warp calculations for a cube of length {face_size}");
+
+        // A warp map consisits of a pair of warpings.  One left/right and one up/down
+        // The maps are limited by width/height of the *net* and have been hand
+        // computed.  For each one, we have a first-corner -> (first,corner,step,direction)
+        // mapping.  The maps are different for the example code and our test input, and
+        // we assume the test input is the same shape for everyone
+
+        let (horiz_maps, vert_maps) = if face_size == 4 {
+            let leftright = vec![
+                (
+                    // left from face 1 == down on face 3
+                    (face_size + 1, face_size + 1, Dir::Right, Dir::Down),
+                    // right from face 1 == left on face 6 upside down
+                    (face_size * 3, face_size * 4, Dir::Up, Dir::Left),
+                ),
+                (
+                    // left from face 2 == up on face 6, right-to-left
+                    (face_size * 3, face_size * 4, Dir::Left, Dir::Up),
+                    // Right from face 4 == down on face 6, right to left
+                    ((face_size * 2) + 1, face_size * 4, Dir::Left, Dir::Down),
+                ),
+                (
+                    // left from face 5 == up on face 3, right to left
+                    (face_size * 2, face_size * 2, Dir::Left, Dir::Up),
+                    // right from face 6 == left on face 1, bottom to top
+                    (face_size, face_size * 3, Dir::Up, Dir::Left),
+                ),
+            ];
+            let topbottom = vec![
+                (
+                    // up from face 2 == down on face 1, right to left
+                    (face_size * 3, 1, Dir::Left, Dir::Down),
+                    // down from face 2 == up on face 4, right to left
+                    (face_size * 3, face_size * 3, Dir::Left, Dir::Up),
+                ),
+                (
+                    // up from face 3 == right on face 1, top to bottom
+                    (face_size * 3, 1, Dir::Down, Dir::Right),
+                    // Down from face 3 == right on face 5 bottom to top
+                    ((face_size * 2) + 1, face_size * 3, Dir::Up, Dir::Right),
+                ),
+                (
+                    // up from face 1 == down on face 2, right to left
+                    (face_size + 1, face_size, Dir::Left, Dir::Down),
+                    // down from face 5 == up on face 2, right to left
+                    (face_size * 2, face_size, Dir::Left, Dir::Up),
+                ),
+                (
+                    // up from face 6 == left on face 4, bottom to top
+                    (face_size * 2, face_size * 3, Dir::Up, Dir::Left),
+                    // down from face 6 == left on face 2, bottom to top
+                    (face_size * 2, face_size, Dir::Up, Dir::Left),
+                ),
+            ];
+            (leftright, topbottom)
+        } else {
+            todo!()
+        };
+
+        // To build our warps, we go through the two maps and build from there
+        // let's do the horizontal maps first
+
+        for (gridrow, (leftmap, rightmap)) in horiz_maps.into_iter().enumerate() {
+            // gridrow will be 0, 1, ...
+            // leftmap is what to do off the left of this and rightmap for the right
+            // we iterate face_size times moving *down* and doing a warp map for each side
+            // Let's walk the left side first
+            let row = (gridrow * face_size) + 1;
+            let (leftcol, rightcol) = self.row_bdr[row];
+            Self::warp_waltz(
+                face_size,
+                &mut warps,
+                row,
+                leftcol - 1,
+                Dir::Left,
+                Dir::Down,
+                leftmap.0,
+                leftmap.1,
+                leftmap.2,
+                leftmap.3,
+            );
+            Self::warp_waltz(
+                face_size,
+                &mut warps,
+                row,
+                rightcol + 1,
+                Dir::Right,
+                Dir::Down,
+                rightmap.0,
+                rightmap.1,
+                rightmap.2,
+                rightmap.3,
+            );
+        }
+
+        // And now the vertical maps
+        for (gridcol, (topmap, bottommap)) in vert_maps.into_iter().enumerate() {
+            // gridrow will be 0, 1, ...
+            // leftmap is what to do off the left of this and rightmap for the right
+            // we iterate face_size times moving *down* and doing a warp map for each side
+            // Let's walk the left side first
+            let col = (gridcol * face_size) + 1;
+            let (toprow, bottomrow) = self.col_bdr[col];
+            Self::warp_waltz(
+                face_size,
+                &mut warps,
+                toprow - 1,
+                col,
+                Dir::Up,
+                Dir::Right,
+                topmap.0,
+                topmap.1,
+                topmap.2,
+                topmap.3,
+            );
+            Self::warp_waltz(
+                face_size,
+                &mut warps,
+                bottomrow + 1,
+                col,
+                Dir::Down,
+                Dir::Right,
+                bottommap.0,
+                bottommap.1,
+                bottommap.2,
+                bottommap.3,
+            );
+        }
+        // And place our new warps in place
+        self.warps = warps;
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn warp_waltz(
+        face_size: usize,
+        warps: &mut HashMap<(usize, usize, Dir), (usize, usize, Dir)>,
+        mut row: usize,
+        mut col: usize,
+        dir: Dir,
+        fromdir: Dir,
+        mut torow: usize,
+        mut tocol: usize,
+        todir: Dir,
+        mapdir: Dir,
+    ) {
+        println!("Computing a warp waltz");
+        println!("  Starting at {row}, {col}, moving {fromdir:?} along the edge");
+        println!("  Mapping it to {torow}, {tocol}, moving {todir:?} along the edge");
+        // we waltz from row,col onward in fromdir, mapping it to torow,tocol, modded by todir; and record a warp with dir->mapdir
+        for _ in 0..face_size {
+            println!("    ({row},{col},{dir:?}) -> ({torow},{tocol},{mapdir:?})");
+            warps.insert((row, col, dir), (torow, tocol, mapdir));
+            (row, col) = fromdir.move1(row, col);
+            (torow, tocol) = todir.move1(torow, tocol);
+        }
+    }
 }
 
 fn part1(input: &Lock) -> usize {
@@ -258,7 +429,9 @@ fn part1(input: &Lock) -> usize {
 }
 
 fn part2(input: &Lock) -> usize {
+    let mut input = input.clone();
     input.render();
+    input.wrap_cube();
     input.follow_plan()
 }
 
