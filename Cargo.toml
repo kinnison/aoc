@@ -32,7 +32,9 @@ members = [
    "2020",
    "2021",
    "2022",
+   "2023",
 ]
+resolver = "2"
 
 [profile.release]
 lto = true
