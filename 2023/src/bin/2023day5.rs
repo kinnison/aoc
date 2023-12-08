@@ -34,8 +34,6 @@ impl From<&str> for MapEntry {
 fn parse_almanac(input: &str) -> Almanac {
     let (seeds, maps) = input.split_once("\n\n").unwrap();
 
-    println!("Seeds: {seeds:?}");
-
     let seeds = seeds
         .strip_prefix("seeds: ")
         .unwrap()
@@ -43,10 +41,14 @@ fn parse_almanac(input: &str) -> Almanac {
         .map(|e| e.parse::<u64>().unwrap())
         .collect();
 
-    let maps = maps
+    let mut maps: Vec<Vec<MapEntry>> = maps
         .split("\n\n")
         .map(|map| map.lines().skip(1).map(MapEntry::from).collect())
         .collect();
+
+    for m in &mut maps {
+        m.sort_by_key(|m| m.src);
+    }
 
     Almanac { seeds, maps }
 }
@@ -62,6 +64,46 @@ impl MapEntry {
 
     fn block_map(maps: &[MapEntry], v: u64) -> u64 {
         maps.iter().filter_map(|m| m.maps(v)).next().unwrap_or(v)
+    }
+
+    fn range_block_map(
+        maps: &[MapEntry],
+        mut start: u64,
+        mut len: u64,
+        ranges: &mut Vec<(u64, u64)>,
+    ) {
+        // This time, we're given a start and len, and we return a vec of start,len pairs
+        // mapped through this map.  We can take advantage of how maps is always sorted
+        // by start, and guaranteed to be non-overlapping by the input rules.
+        let mut mapn = 0;
+
+        while len > 0 {
+            // If there's anything to be had before this mapping entry, capture it directly
+            if start < maps[mapn].src {
+                let n = len.min(maps[mapn].src - start);
+                ranges.push((start, n));
+                start += n;
+                len -= n;
+                continue;
+            }
+
+            // Okay, if we overlap this mapping entry at all, do the mapping of the overlap
+            if let Some(dst) = maps[mapn].maps(start) {
+                let ofs = dst - maps[mapn].dest;
+                let n = len.min(maps[mapn].len - ofs);
+                ranges.push((dst, n));
+                start += n;
+                len -= n;
+                continue;
+            }
+
+            mapn += 1;
+            if mapn == maps.len() {
+                // We've reached the end, direct map what's left
+                ranges.push((start, len));
+                break;
+            }
+        }
     }
 }
 
@@ -85,7 +127,20 @@ fn part1(input: &Almanac) -> u64 {
 }
 
 fn part2(input: &Almanac) -> u64 {
-    todo!()
+    let mut ranges = input
+        .seeds
+        .chunks_exact(2)
+        .map(|chunk| (chunk[0], chunk[1]))
+        .collect_vec();
+
+    for layer in &input.maps {
+        for (start, len) in std::mem::take(&mut ranges) {
+            MapEntry::range_block_map(layer, start, len, &mut ranges);
+        }
+    }
+
+    // We want the smallest start
+    ranges.into_iter().map(|(start, _len)| start).min().unwrap()
 }
 
 #[cfg(test)]
@@ -137,6 +192,6 @@ humidity-to-location map:
     #[test]
     fn testcase2() {
         let input = parse_almanac(TEST_INPUT);
-        assert_eq!(part2(&input), 30);
+        assert_eq!(part2(&input), 46);
     }
 }
