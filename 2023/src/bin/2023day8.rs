@@ -99,7 +99,7 @@ fn part1(input: &Map) -> usize {
 }
 
 fn part2(input: &Map) -> u64 {
-    let mut ghosts = input
+    let ghosts = input
         .rules
         .keys()
         .copied()
@@ -107,22 +107,26 @@ fn part2(input: &Map) -> u64 {
         .sorted()
         .collect_vec();
 
-    let mut len = 0;
-    let mut path = input.path.chars().cycle();
-
-    while ghosts.iter().any(|r| !r.ends_z()) {
-        let step = path.next().unwrap();
-        ghosts.iter_mut().for_each(|r| {
-            *r = match step {
-                'L' => input.rules[r].0,
-                'R' => input.rules[r].1,
-                _ => unreachable!(),
+    // for each ghost, collect a path to an ends_z and then one more, and see where it shows up
+    let plen: Vec<u64> = ghosts
+        .into_iter()
+        .map(|sghost| {
+            let mut ghost = sghost;
+            let mut chain = input.path.chars().cycle().peekable();
+            let mut len = 0;
+            while !ghost.ends_z() {
+                ghost = match chain.next().unwrap() {
+                    'L' => input.rules[&ghost].0,
+                    'R' => input.rules[&ghost].1,
+                    _ => unreachable!(),
+                };
+                len += 1;
             }
-        });
-        len += 1;
-    }
+            len
+        })
+        .collect_vec();
 
-    len
+    plen.into_iter().fold(1, |acc, x| acc.lcm(x))
 }
 
 #[cfg(test)]
