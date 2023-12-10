@@ -81,6 +81,7 @@ impl Map {
         unreachable!()
     }
 
+    #[allow(dead_code)]
     fn print(&self) {
         for row in self.grid.iter() {
             println!("{row}");
@@ -90,7 +91,6 @@ impl Map {
     fn find_path(&self) -> Vec<(i32, i32)> {
         let mut path = Vec::new();
         let (srow, scol) = self.find_start();
-        println!("Finding path, starting at {srow},{scol}");
 
         let (mut nrow, mut ncol, mut came_from) = if can_down(self.at(srow - 1, scol)) {
             (srow - 1, scol, Down)
@@ -166,12 +166,10 @@ impl Map {
                 if (ci & 1) == 1 {
                     continue;
                 }
-                print!("{}", pos as char);
                 if pos == b'.' {
                     ret += 1;
                 }
             }
-            println!();
         }
         ret
     }
@@ -220,7 +218,7 @@ fn parse_map(input: &str) -> Map {
 }
 
 fn part1(input: &Map) -> usize {
-    input.print();
+    //input.print();
     let path = input.find_path();
 
     (path.len() + 1) >> 1
@@ -229,7 +227,7 @@ fn part1(input: &Map) -> usize {
 fn part2(input: &Map) -> usize {
     let mut map = input.ignore_nonpath().blow_up();
     map.flood_outside();
-    map.print();
+    //map.print();
     map.count_inside()
 }
 
