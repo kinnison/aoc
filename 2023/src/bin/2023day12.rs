@@ -27,7 +27,7 @@ impl FromStr for SpringMap {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 enum Spring {
     Working,
     Broken,
@@ -60,79 +60,80 @@ impl Spring {
     }
 }
 
-impl SpringMap {
-    fn _ways(springs: &[Spring], sets: &[usize]) -> usize {
-        //println!("_ways({springs:?}, {sets:?}");
-        // We're going to go set by set, to satisfy things
-        // If we run out of sets, there had best be no broken springs left
+#[memoize::memoize]
+fn compute_ways(springs: Vec<Spring>, sets: Vec<usize>) -> usize {
+    //println!("_ways({springs:?}, {sets:?}");
+    // We're going to go set by set, to satisfy things
+    // If we run out of sets, there had best be no broken springs left
+    if sets.is_empty() {
+        if springs.iter().copied().any(Spring::is_broken) {
+            //println!("No more sets, but there are broken springs left!");
+            return 0; // No way to satisfy more broken springs
+        } else {
+            //println!("No more sets, no more broken springs, hurrah");
+            return 1; // We can satisfy what's left by it being all working
+        }
+    }
+    // If we run out of springs, there'd best be no sets left
+    if springs.is_empty() {
         if sets.is_empty() {
-            if springs.iter().copied().any(Spring::is_broken) {
-                //println!("No more sets, but there are broken springs left!");
-                return 0; // No way to satisfy more broken springs
-            } else {
-                //println!("No more sets, no more broken springs, hurrah");
-                return 1; // We can satisfy what's left by it being all working
-            }
+            //println!("No more springs, no more sets, hurrah");
+            return 1; // One way to do nothing
+        } else {
+            //println!("No more springs, but more sets, booo!");
+            return 0; // No way to satisfy more sets with no springs
         }
-        // If we run out of springs, there'd best be no sets left
-        if springs.is_empty() {
-            if sets.is_empty() {
-                //println!("No more springs, no more sets, hurrah");
-                return 1; // One way to do nothing
-            } else {
-                //println!("No more springs, but more sets, booo!");
-                return 0; // No way to satisfy more sets with no springs
-            }
-        }
+    }
 
-        // Okay, so we have at least one spring, and at least one set left to satisfy it.
-        let mut count = 0;
-        // If the spring could be working, then we skip it and count what's left
-        if springs[0].maybe_working() {
-            //println!("First spring may be working, recursing...");
-            count += Self::_ways(&springs[1..], sets);
-            //println!("Back to {springs:?}, {sets:?}");
-        }
-        // If the spring could be broken, then we need to try and complete the current set
-        if springs[0].maybe_broken() {
-            //println!("First spring is broken, do we have enough springs left?");
-            // Step one, are there enough springs left at all to satisfy this set?
-            if springs.len() >= sets[0] {
-                // Next question, are there any working springs in that slice?
-                //println!("Enough springs left, are there enough maybe_broken?");
-                if !springs
-                    .iter()
-                    .take(sets[0])
-                    .copied()
-                    .any(Spring::is_working)
-                {
-                    // Okay, so the next sets[0] springs are or could be broken,
-                    // so let's assume they are.  But, is the *subsequent* spring (if there is one)
-                    // broken?  If it is, the set is too long
-                    //println!("Enough maybe broken, but is the subsequent spring (if any) working?");
-                    if !matches!(
-                        springs.iter().skip(sets[0]).copied().next(),
-                        Some(Spring::Broken)
-                    ) {
-                        //println!("Looks good, recursing...");
-                        // All good, we have sets[0] maybe_broken springs, and we are not
-                        // running into another spring, so let's call that good
-                        let slicefrom = if sets[0] < springs.len() {
-                            sets[0] + 1
-                        } else {
-                            sets[0]
-                        };
-                        count += Self::_ways(&springs[slicefrom..], &sets[1..]);
-                    }
+    // Okay, so we have at least one spring, and at least one set left to satisfy it.
+    let mut count = 0;
+    // If the spring could be working, then we skip it and count what's left
+    if springs[0].maybe_working() {
+        //println!("First spring may be working, recursing...");
+        count += compute_ways(springs[1..].to_owned(), sets.clone());
+        //println!("Back to {springs:?}, {sets:?}");
+    }
+    // If the spring could be broken, then we need to try and complete the current set
+    if springs[0].maybe_broken() {
+        //println!("First spring is broken, do we have enough springs left?");
+        // Step one, are there enough springs left at all to satisfy this set?
+        if springs.len() >= sets[0] {
+            // Next question, are there any working springs in that slice?
+            //println!("Enough springs left, are there enough maybe_broken?");
+            if !springs
+                .iter()
+                .take(sets[0])
+                .copied()
+                .any(Spring::is_working)
+            {
+                // Okay, so the next sets[0] springs are or could be broken,
+                // so let's assume they are.  But, is the *subsequent* spring (if there is one)
+                // broken?  If it is, the set is too long
+                //println!("Enough maybe broken, but is the subsequent spring (if any) working?");
+                if !matches!(
+                    springs.iter().skip(sets[0]).copied().next(),
+                    Some(Spring::Broken)
+                ) {
+                    //println!("Looks good, recursing...");
+                    // All good, we have sets[0] maybe_broken springs, and we are not
+                    // running into another spring, so let's call that good
+                    let slicefrom = if sets[0] < springs.len() {
+                        sets[0] + 1
+                    } else {
+                        sets[0]
+                    };
+                    count += compute_ways(springs[slicefrom..].to_owned(), sets[1..].to_owned());
                 }
             }
         }
-        //println!("Done here, found {count} ways so far");
-        count
     }
+    //println!("Done here, found {count} ways so far");
+    count
+}
 
+impl SpringMap {
     fn ways(&self) -> usize {
-        dbg!(Self::_ways(&self.springs, &self.sets))
+        compute_ways(self.springs.clone(), self.sets.clone())
     }
 
     fn unfold(&self) -> Self {
