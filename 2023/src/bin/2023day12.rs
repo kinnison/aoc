@@ -60,8 +60,11 @@ impl Spring {
     }
 }
 
-#[memoize::memoize]
-fn compute_ways(springs: Vec<Spring>, sets: Vec<usize>) -> usize {
+fn compute_ways<'values>(
+    springs: &'values [Spring],
+    sets: &'values [usize],
+    cache: &mut HashMap<(&'values [Spring], &'values [usize]), usize>,
+) -> usize {
     //println!("_ways({springs:?}, {sets:?}");
     // We're going to go set by set, to satisfy things
     // If we run out of sets, there had best be no broken springs left
@@ -85,12 +88,16 @@ fn compute_ways(springs: Vec<Spring>, sets: Vec<usize>) -> usize {
         }
     }
 
+    if let Some(answer) = cache.get(&(springs, sets)) {
+        return *answer;
+    }
+
     // Okay, so we have at least one spring, and at least one set left to satisfy it.
     let mut count = 0;
     // If the spring could be working, then we skip it and count what's left
     if springs[0].maybe_working() {
         //println!("First spring may be working, recursing...");
-        count += compute_ways(springs[1..].to_owned(), sets.clone());
+        count += compute_ways(&springs[1..], sets, cache);
         //println!("Back to {springs:?}, {sets:?}");
     }
     // If the spring could be broken, then we need to try and complete the current set
@@ -122,18 +129,19 @@ fn compute_ways(springs: Vec<Spring>, sets: Vec<usize>) -> usize {
                     } else {
                         sets[0]
                     };
-                    count += compute_ways(springs[slicefrom..].to_owned(), sets[1..].to_owned());
+                    count += compute_ways(&springs[slicefrom..], &sets[1..], cache);
                 }
             }
         }
     }
     //println!("Done here, found {count} ways so far");
+    cache.insert((springs, sets), count);
     count
 }
 
 impl SpringMap {
     fn ways(&self) -> usize {
-        compute_ways(self.springs.clone(), self.sets.clone())
+        compute_ways(&self.springs, &self.sets, &mut HashMap::new())
     }
 
     fn unfold(&self) -> Self {
