@@ -10,7 +10,6 @@ pub fn main() -> Result<()> {
 
 #[derive(Debug)]
 struct Map {
-    grid: Vec<String>,
     galaxies: Vec<(usize, usize)>,
     empty_rows: Vec<bool>,
     empty_cols: Vec<bool>,
@@ -40,7 +39,6 @@ fn parse_map(input: &str) -> Map {
     }
 
     Map {
-        grid,
         galaxies,
         empty_rows,
         empty_cols,
