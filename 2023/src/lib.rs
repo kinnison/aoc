@@ -222,7 +222,7 @@ impl DerefMut for CommaSpacedString {
 
 // 2020 specific stuff
 
-#[derive(ParseByRegex, Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(ParseByRegex, Copy, Clone, PartialEq, Eq, Debug, Hash)]
 pub enum Facing {
     #[regex = "[Nn]"]
     North,
