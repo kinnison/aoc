@@ -1,5 +1,7 @@
 use aoc2023::*;
 
+use rayon::prelude::*;
+
 pub fn main() -> Result<()> {
     let input = read_input(16)?;
     let input = LightMap::from_str(&input).unwrap();
@@ -16,19 +18,23 @@ fn part2(input: &LightMap) -> usize {
     let width = (input.grid[0].len() - 2) as i32;
     let height = (input.grid.len() - 2) as i32;
 
-    let mut best = 0;
+    let mut starts = Vec::new();
 
     for row in 1..=height {
-        best = best.max(input.energised(row, 1, Facing::East));
-        best = best.max(input.energised(row, width, Facing::West));
+        starts.push((row, 1, Facing::East));
+        starts.push((row, width, Facing::West));
     }
 
     for col in 1..=width {
-        best = best.max(input.energised(1, col, Facing::South));
-        best = best.max(input.energised(height, col, Facing::North));
+        starts.push((1, col, Facing::South));
+        starts.push((height, col, Facing::North));
     }
 
-    best
+    starts
+        .into_par_iter()
+        .map(|(srow, scol, sdir)| input.energised(srow, scol, sdir))
+        .max()
+        .unwrap()
 }
 
 #[derive(Debug, Clone)]
@@ -115,6 +121,7 @@ enum Tile {
     NegMirror,
 }
 
+use rayon::prelude::IntoParallelIterator;
 use Tile::*;
 
 impl Tile {
