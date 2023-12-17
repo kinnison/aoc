@@ -20,3 +20,4 @@ serde_json = "1.0.108"
 parsebyregex = { git = "git://git.gitano.org.uk/parsebyregex.git" }
 parsebyregex-derive = { git = "git://git.gitano.org.uk/parsebyregex.git" }
 rayon = "1.8.0"
+pathfinding = "4.6.0"
