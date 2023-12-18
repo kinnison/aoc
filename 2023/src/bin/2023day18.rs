@@ -7,26 +7,15 @@ pub fn main() -> Result<()> {
     Ok(())
 }
 
-fn part1(input: &[Instruction]) -> usize {
-    let mut plan = DigPlan::from_instrs(input);
-    plan.fill();
-    plan.grid
-        .iter()
-        .map(|r| r.iter().copied().filter(|&b| b).count())
-        .sum()
+fn part1(input: &[Instruction]) -> i64 {
+    let plan = DigPlan::from_instrs(input);
+    plan.area()
 }
 
-fn part2(input: &[Instruction]) -> usize {
+fn part2(input: &[Instruction]) -> i64 {
     let input = input.iter().map(|i| i.transpose()).collect_vec();
-    println!("Make plan...");
-    let mut plan = DigPlan::from_instrs(&input);
-    println!("Fill plan...");
-    plan.fill();
-    println!("Sum outcome...");
-    plan.grid
-        .iter()
-        .map(|r| r.iter().copied().filter(|&b| b).count())
-        .sum()
+    let plan = DigPlan::from_instrs(&input);
+    plan.area()
 }
 
 #[derive(Debug, ParseByRegex)]
@@ -57,104 +46,63 @@ impl Instruction {
 }
 
 struct DigPlan {
-    grid: Vec<Vec<bool>>,
+    points: Vec<(i64, i64)>,
 }
 
 impl DigPlan {
     fn from_instrs(input: &[Instruction]) -> Self {
-        let mut dug = HashSet::new();
+        // Instead of trying to store a grid, instead store the points of the polygon
+        // This is in service of trying Gauss's area formula (shoelace formula)
+        let mut points = vec![(0, 0)];
+
         let mut row = 0;
         let mut col = 0;
-        let mut minrow = 0;
-        let mut mincol = 0;
-        let mut maxrow = 0;
-        let mut maxcol = 0;
-        dug.insert((row, col));
+
         for instr in input {
-            println!("Next instruction, so far we have {} dug holes", dug.len());
             let (rofs, cofs) = instr.dir.row_col_offset();
-            for _ in 0..instr.dist {
-                row += rofs;
-                col += cofs;
-                dug.insert((row, col));
-                minrow = minrow.min(row);
-                mincol = mincol.min(col);
-                maxrow = maxrow.max(row);
-                maxcol = maxcol.max(col);
-            }
+            row += (rofs * instr.dist) as i64;
+            col += (cofs * instr.dist) as i64;
+
+            points.push((row, col));
         }
 
-        let height = (maxrow - minrow) as usize + 1;
-        let width = (maxcol - mincol) as usize + 1;
-        println!("Creating a {height}x{width} grid, please hold...");
+        // For the area formula, return to zero,zero
+        points.push((0, 0));
 
-        let mut grid = (0..height + 2)
-            .map(|_| std::iter::repeat(false).take(width + 2).collect_vec())
-            .collect_vec();
-
-        println!("Grid created, transferring holes");
-
-        let rofs = minrow - 1;
-        let cofs = mincol - 1;
-
-        for (row, col) in dug {
-            let row = (row - rofs) as usize;
-            let col = (col - cofs) as usize;
-            grid[row][col] = true;
-        }
-
-        println!("Grid made");
-
-        Self { grid }
+        Self { points }
     }
 
-    #[allow(dead_code)]
-    fn print(&self) {
-        for row in &self.grid {
-            for col in row {
-                if *col {
-                    print!("#");
-                } else {
-                    print!(".");
-                }
-            }
-            println!();
+    fn gauss_area(&self) -> i64 {
+        // Perform Gauss's formula
+        // from https://en.m.wikipedia.org/wiki/Shoelace_formula
+        let mut area = 0;
+        for i in 0..(self.points.len() - 1) {
+            let j = i + 1;
+            area += self.points[i].0 * self.points[j].1;
+            area -= self.points[i].1 * self.points[j].0;
         }
-        println!();
+
+        area.abs() / 2
     }
 
-    fn fill(&mut self) {
-        let mut dug = vec![vec![true; self.grid[0].len()]; self.grid.len()];
-        let mut queue: Vec<(usize, usize)> = vec![(0, 0)];
+    fn area(&self) -> i64 {
+        // Because our coordinates are meant to be *inclusive* and
+        // Gauss' formula isn't, we need to add half the perimeter
+        // as well.
+        // Finally, add one because apparently everything is off by one?
+        self.gauss_area() + (self.perimeter() / 2) + 1
+    }
 
-        let height = dug.len();
-        let width = dug[0].len();
-
-        while !queue.is_empty() {
-            for (row, col) in std::mem::take(&mut queue) {
-                // If out of bounds, skip
-                if row >= height || col >= width {
-                    continue;
-                }
-                // Already level, skip
-                if !dug[row][col] {
-                    continue;
-                }
-                // Cannot level because already dug by robot
-                if self.grid[row][col] {
-                    continue;
-                }
-                // Queue up/down/left/right
-                queue.push((row.saturating_sub(1), col));
-                queue.push((row, col.saturating_sub(1)));
-                queue.push((row + 1, col));
-                queue.push((row, col + 1));
-                // And level this cell
-                dug[row][col] = false;
-            }
+    fn perimeter(&self) -> i64 {
+        let mut perim = 0;
+        for i in 0..(self.points.len() - 1) {
+            let j = i + 1;
+            // We add the manhattan distance between the points, since each
+            // line is rectilinear this is the real perimeter
+            perim += self.points[i].0.abs_diff(self.points[j].0);
+            perim += self.points[i].1.abs_diff(self.points[j].1);
         }
-
-        self.grid = dug;
+        perim as i64
     }
 }
 
