@@ -224,13 +224,13 @@ impl DerefMut for CommaSpacedString {
 
 #[derive(ParseByRegex, Copy, Clone, PartialEq, Eq, Debug, Hash)]
 pub enum Facing {
-    #[regex = "[Nn]"]
+    #[regex = "[NnUu]"]
     North,
-    #[regex = "[Ee]"]
+    #[regex = "[EeRr]"]
     East,
-    #[regex = "[Ss]"]
+    #[regex = "[SsDd]"]
     South,
-    #[regex = "[Ww]"]
+    #[regex = "[WwLl]"]
     West,
 }
 
