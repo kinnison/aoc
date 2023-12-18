@@ -16,8 +16,17 @@ fn part1(input: &[Instruction]) -> usize {
         .sum()
 }
 
-fn part2(input: &[Instruction]) -> u64 {
-    todo!()
+fn part2(input: &[Instruction]) -> usize {
+    let input = input.iter().map(|i| i.transpose()).collect_vec();
+    println!("Make plan...");
+    let mut plan = DigPlan::from_instrs(&input);
+    println!("Fill plan...");
+    plan.fill();
+    println!("Sum outcome...");
+    plan.grid
+        .iter()
+        .map(|r| r.iter().copied().filter(|&b| b).count())
+        .sum()
 }
 
 #[derive(Debug, ParseByRegex)]
@@ -26,6 +35,25 @@ struct Instruction {
     dir: Facing,
     dist: i32,
     hex: String,
+}
+
+impl Instruction {
+    fn transpose(&self) -> Self {
+        let dist: String = self.hex.chars().take(5).collect();
+        let dist = i32::from_str_radix(&dist, 16).unwrap();
+        let dir = match self.hex.chars().nth(5).unwrap() {
+            '0' => Facing::East,
+            '1' => Facing::South,
+            '2' => Facing::West,
+            '3' => Facing::North,
+            _ => unreachable!(),
+        };
+        Self {
+            dir,
+            dist,
+            hex: String::new(),
+        }
+    }
 }
 
 struct DigPlan {
@@ -43,6 +71,7 @@ impl DigPlan {
         let mut maxcol = 0;
         dug.insert((row, col));
         for instr in input {
+            println!("Next instruction, so far we have {} dug holes", dug.len());
             let (rofs, cofs) = instr.dir.row_col_offset();
             for _ in 0..instr.dist {
                 row += rofs;
@@ -57,10 +86,13 @@ impl DigPlan {
 
         let height = (maxrow - minrow) as usize + 1;
         let width = (maxcol - mincol) as usize + 1;
+        println!("Creating a {height}x{width} grid, please hold...");
 
         let mut grid = (0..height + 2)
             .map(|_| std::iter::repeat(false).take(width + 2).collect_vec())
             .collect_vec();
+
+        println!("Grid created, transferring holes");
 
         let rofs = minrow - 1;
         let cofs = mincol - 1;
@@ -70,6 +102,8 @@ impl DigPlan {
             let col = (col - cofs) as usize;
             grid[row][col] = true;
         }
+
+        println!("Grid made");
 
         Self { grid }
     }
@@ -154,6 +188,6 @@ mod test {
     #[test]
     fn testcase2() {
         let input = input_as_vec(TEST_INPUT).unwrap();
-        assert_eq!(part2(&input), 0);
+        assert_eq!(part2(&input), 952_408_144_115);
     }
 }
