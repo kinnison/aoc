@@ -18,7 +18,105 @@ fn part1(input: &PartSorter) -> i64 {
 }
 
 fn part2(input: &PartSorter) -> i64 {
-    todo!()
+    let mut heads = Vec::new();
+    heads.push(PathHead::default());
+    let mut finished = Vec::new();
+
+    while !heads.is_empty() {
+        for mut head in std::mem::take(&mut heads) {
+            if head.loc == "A" {
+                finished.push(head);
+                continue;
+            } else if head.loc == "R" {
+                // Rejected
+                continue;
+            }
+            let flow = &input.workflows[head.loc];
+
+            for rule in &*flow.rules {
+                match rule {
+                    Rule::Conditional {
+                        attr,
+                        operator,
+                        value,
+                        target,
+                    } => {
+                        let (mut at_min_pass, mut at_most_pass) = head.constraints[attr];
+                        let (mut at_min_skip, mut at_most_skip) = head.constraints[attr];
+                        match operator {
+                            Op::LessThan => {
+                                // attr < value to pass means that
+                                // to pass, we need at_most_pass to be dropped
+                                at_most_pass = at_most_pass.min((*value) - 1);
+                                // But to skip, we need to be more
+                                at_min_skip = at_min_skip.max(*value);
+                            }
+                            Op::GreaterThan => {
+                                // attr > value to pass means that
+                                // to pass, we need at least value
+                                at_min_pass = at_min_pass.max((*value) + 1);
+                                // to skip, it must be less
+                                at_most_skip = at_most_skip.min(*value);
+                            }
+                        }
+                        if at_min_pass <= at_most_pass {
+                            // At least one option still exists for this attribute
+                            // so pass on to the next requirement
+                            let mut pass = head.clone();
+                            pass.constraints.insert(*attr, (at_min_pass, at_most_pass));
+                            pass.loc = target.as_str();
+                            heads.push(pass);
+                        }
+                        if at_min_skip <= at_most_skip {
+                            // At least one option still exists for this attribute
+                            // so move on to the next part of the workflow
+                            head.constraints.insert(*attr, (at_min_skip, at_most_skip));
+                        } else {
+                            // No option remains for this workflow, so move on
+                            break;
+                        }
+                    }
+                    Rule::Unconditional { target } => {
+                        head.loc = target.as_str();
+                        heads.push(head);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    let mut tot = 0;
+
+    for head in finished {
+        let mut possibilities = 1;
+        for (_, (min, max)) in head.constraints {
+            possibilities *= (max - min) + 1;
+        }
+        tot += possibilities;
+    }
+
+    tot
+}
+
+#[derive(Clone, Debug)]
+struct PathHead<'a> {
+    loc: &'a str,
+    constraints: HashMap<Attribute, (i64, i64)>,
+}
+
+impl Default for PathHead<'_> {
+    fn default() -> Self {
+        let mut constraints = HashMap::new();
+        constraints.insert(Attribute::ExtremelyCoolLooking, (1, 4000));
+        constraints.insert(Attribute::Musical, (1, 4000));
+        constraints.insert(Attribute::Aerodynamic, (1, 4000));
+        constraints.insert(Attribute::Shiny, (1, 4000));
+        Self {
+            loc: "in",
+            constraints,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -142,7 +240,7 @@ impl Rule {
     }
 }
 
-#[derive(Debug, ParseByRegex, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, ParseByRegex, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
 enum Attribute {
     #[regex = r"x"]
     ExtremelyCoolLooking,
@@ -223,6 +321,6 @@ hdj{m>838:A,pv}
     #[test]
     fn testcase2() {
         let input = PartSorter::from_str(TEST_INPUT).unwrap();
-        assert_eq!(part2(&input), 0);
+        assert_eq!(part2(&input), 167409079868000);
     }
 }
